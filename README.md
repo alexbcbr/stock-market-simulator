@@ -13,8 +13,20 @@ npm run dev
 cdk init app --language typescript
 npm install
 cdk bootstrap
+
 cdk synth
 cdk deploy
+
+
+
+ 3510  cdk synth
+ 3511  cdk deploy
+ 3512  cdk destroy
+ 3513  cdk synth
+ 3514  cdk deploy
+ 3515  cdk destroy
+ 3516  cdk deploy
+ 3517  cdk destroy
 
 
 
