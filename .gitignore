@@ -22,3 +22,22 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Node / Vue / frontend
+node_modules/
+dist/
+.vite/
+
+# Environment files (local overrides, secrets)
+.env
+.env.*
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor and macOS
+.vscode/
+.idea/
+.DS_Store
