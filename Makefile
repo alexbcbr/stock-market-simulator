@@ -27,8 +27,8 @@ destroy:
 	cdk deploy TradeControllerStack
 
 test-api:
-	curl https://3jacw6kcwf.execute-api.us-east-2.amazonaws.com/prod/listAllTrades
-	curl -X POST https://3jacw6kcwf.execute-api.us-east-2.amazonaws.com/prod/listTradesByCustomerName \
+	curl https://qwppyg6xa5.execute-api.us-east-2.amazonaws.com/prod/listAllTrades
+	curl -X POST https://qwppyg6xa5.execute-api.us-east-2.amazonaws.com/prod/listTradesByCustomerName \
   		-H "Content-Type: application/json" \
   		-d '{"customer_name": "alex"}'
 

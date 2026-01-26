@@ -17,9 +17,6 @@ export class TradeDbStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Add validation for symbol (4 characters, uppercase)
-    // Note: DynamoDB doesn't have CHECK constraints like SQL, but we can enforce this in application code
-
     // Create trade table
     const tradeTable = new dynamodb.Table(this, 'TradeTable', {
       tableName: 'trade',
@@ -45,19 +42,15 @@ export class TradeDbStack extends cdk.Stack {
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
-    // Note: Foreign key constraint from trade.symbol to market_price.symbol
-    // cannot be enforced in DynamoDB at the database level.
-    // This should be handled in application logic.
-
     // Outputs
     new cdk.CfnOutput(this, 'MarketPriceTableName', {
       value: marketPriceTable.tableName,
-      description: 'Market Price DynamoDB Table Name',
+      description: 'Market Price DynamoDB Table',
     });
 
     new cdk.CfnOutput(this, 'TradeTableName', {
       value: tradeTable.tableName,
-      description: 'Trade DynamoDB Table Name',
+      description: 'Trade DynamoDB Table',
     });
   }
 }

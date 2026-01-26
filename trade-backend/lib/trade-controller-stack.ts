@@ -2,6 +2,10 @@ import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as path from 'path';
 
 export class TradeControllerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -21,6 +25,11 @@ export class TradeControllerStack extends cdk.Stack {
       description: 'Trade API for listing trades',
       deployOptions: {
         stageName: 'prod',
+      },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: ['Content-Type', 'Authorization'],
       },
     });
 
@@ -45,6 +54,9 @@ export class TradeControllerStack extends cdk.Stack {
             responseTemplates: {
               'application/json': '$input.path(\'$.Items\')',
             },
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
           },
           {
             statusCode: '500',
@@ -52,6 +64,9 @@ export class TradeControllerStack extends cdk.Stack {
               'application/json': '{"error": "Internal Server Error"}',
             },
             selectionPattern: '5\\d{2}',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
           },
         ],
       },
@@ -65,11 +80,17 @@ export class TradeControllerStack extends cdk.Stack {
           responseModels: {
             'application/json': apigateway.Model.EMPTY_MODEL,
           },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
         },
         {
           statusCode: '500',
           responseModels: {
             'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
           },
         },
       ],
@@ -103,6 +124,9 @@ export class TradeControllerStack extends cdk.Stack {
             responseTemplates: {
               'application/json': '$input.path(\'$.Items\')',
             },
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
           },
           {
             statusCode: '400',
@@ -110,6 +134,9 @@ export class TradeControllerStack extends cdk.Stack {
               'application/json': '{"error": "Bad Request - customer_name is required"}',
             },
             selectionPattern: '4\\d{2}',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
           },
           {
             statusCode: '500',
@@ -117,6 +144,9 @@ export class TradeControllerStack extends cdk.Stack {
               'application/json': '{"error": "Internal Server Error"}',
             },
             selectionPattern: '5\\d{2}',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
           },
         ],
       },
@@ -130,17 +160,82 @@ export class TradeControllerStack extends cdk.Stack {
           responseModels: {
             'application/json': apigateway.Model.EMPTY_MODEL,
           },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
         },
         {
           statusCode: '400',
           responseModels: {
             'application/json': apigateway.Model.EMPTY_MODEL,
           },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
         },
         {
           statusCode: '500',
           responseModels: {
             'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
+    // Reference existing DynamoDB trade table
+    const tradeTable = dynamodb.Table.fromTableName(this, 'TradeTable', 'trade');
+
+    // Create Lambda function for buyStock
+    const buyStockFunction = new NodejsFunction(this, 'BuyStockFunction', {
+      entry: path.join(__dirname, '../src/handlers/buyStock.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        TRADE_TABLE: tradeTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    // Grant Lambda permission to write to DynamoDB
+    tradeTable.grantWriteData(buyStockFunction);
+
+    // Create resource for buyStock
+    const buyStockResource = api.root.addResource('buyStock');
+
+    // Add POST method for buyStock with Lambda integration
+    buyStockResource.addMethod('POST', new apigateway.LambdaIntegration(buyStockFunction), {
+      methodResponses: [
+        {
+          statusCode: '201',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '400',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
           },
         },
       ],
@@ -160,6 +255,11 @@ export class TradeControllerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'ListTradesByCustomerEndpoint', {
       value: `${api.url}listTradesByCustomerName`,
       description: 'List Trades by Customer Name Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'BuyStockEndpoint', {
+      value: `${api.url}buyStock`,
+      description: 'Buy Stock Endpoint',
     });
   }
 }

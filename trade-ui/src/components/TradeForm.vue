@@ -23,6 +23,7 @@
           v-model="trade.customer_name"
           required
           placeholder="Enter customer name"
+          @input="tradeStore.setCustomerName(trade.customer_name)"
         />
       </div>
       <div class="form-group">
@@ -38,11 +39,11 @@
         />
       </div>
       <div class="form-group">
-        <label for="open_price_at_execution">Open Price at Execution</label>
+        <label for="open_price">Open Price</label>
         <input
           type="number"
-          id="open_price_at_execution"
-          v-model.number="trade.open_price_at_execution"
+          id="open_price"
+          v-model.number="trade.open_price"
           required
           step="0.01"
           min="0"
@@ -50,11 +51,11 @@
         />
       </div>
       <div class="form-group">
-        <label for="reference_price_at_execution">Reference Price at Execution</label>
+        <label for="close_price">Close Price</label>
         <input
           type="number"
-          id="reference_price_at_execution"
-          v-model.number="trade.reference_price_at_execution"
+          id="close_price"
+          v-model.number="trade.close_price"
           required
           step="0.01"
           min="0"
@@ -69,15 +70,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useTradeStore } from '../stores/trades';
-import type { Trade } from '../services/api';
+import type { BuyStockRequest } from '../services/api';
 
 const tradeStore = useTradeStore();
-const trade = ref<Omit<Trade, 'trade_id' | 'price_difference'>>({
+const trade = ref({
   symbol: '',
   customer_name: '',
   executed_price: 0,
-  open_price_at_execution: 0,
-  reference_price_at_execution: 0,
+  open_price: 0,
+  close_price: 0,
 });
 
 const handleSubmit = async () => {
@@ -102,25 +103,33 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (trade.value.open_price_at_execution < 0) {
-    alert('Open price at execution cannot be negative.');
+  if (trade.value.open_price < 0) {
+    alert('Open price cannot be negative.');
     return;
   }
 
-  if (trade.value.reference_price_at_execution < 0) {
-    alert('Reference price at execution cannot be negative.');
+  if (trade.value.close_price < 0) {
+    alert('Close price cannot be negative.');
     return;
   }
 
-  await tradeStore.addTrade({ ...trade.value });
+  const request: BuyStockRequest = {
+    symbol: trade.value.symbol,
+    customer_name: trade.value.customer_name,
+    executed_price: trade.value.executed_price,
+    open_price: trade.value.open_price,
+    close_price: trade.value.close_price,
+  };
+
+  await tradeStore.addTrade(request);
 
   // Reset form
   trade.value = {
     symbol: '',
     customer_name: '',
     executed_price: 0,
-    open_price_at_execution: 0,
-    reference_price_at_execution: 0,
+    open_price: 0,
+    close_price: 0,
   };
 };
 </script>

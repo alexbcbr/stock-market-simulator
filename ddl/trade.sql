@@ -4,16 +4,16 @@ CREATE TABLE trade (
     symbol                      TEXT NOT NULL,
     customer_name               TEXT NOT NULL,
     executed_price              REAL NOT NULL,
-    open_price_at_execution     REAL NOT NULL,
-    reference_price_at_execution REAL NOT NULL,
+    open_price                  REAL NOT NULL,
+    closed_price                REAL NOT NULL,
     price_difference            REAL NOT NULL,
-    status_transaction          BOOLEAN NOT NULL DEFAULT 0,
+    status_trade                BOOLEAN NOT NULL DEFAULT 0,
 
     CHECK (length(symbol) = 4),
     CHECK (symbol = upper(symbol)),
     CHECK (executed_price >= 0),
-    CHECK (open_price_at_execution >= 0),
-    CHECK (reference_price_at_execution >= 0),
+    CHECK (open_price >= 0),
+    CHECK (closed_price >= 0),
     CHECK (status_transaction IN (0,1)),
 
     FOREIGN KEY (symbol)

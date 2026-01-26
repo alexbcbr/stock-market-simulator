@@ -5,9 +5,10 @@ export interface Trade {
   symbol: string;
   customer_name: string;
   executed_price: number;
-  open_price_at_execution: number;
-  reference_price_at_execution: number;
+  open_price: number;
+  close_price: number;
   price_difference: number;
+  status_trade: boolean;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -24,19 +25,19 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export const getTrades = async (): Promise<Trade[]> => {
-  const response = await fetch(`${API_BASE_URL}/trades/`);
+  const response = await fetch(`${API_BASE_URL}listAllTrades`);
   return handleResponse<Trade[]>(response);
 };
 
 export const getTrade = async (id: number): Promise<Trade> => {
-  const response = await fetch(`${API_BASE_URL}/trades/${id}/`);
+  const response = await fetch(`${API_BASE_URL}trades/${id}`);
   return handleResponse<Trade>(response);
 };
 
 export const createTrade = async (
   trade: Omit<Trade, 'trade_id' | 'price_difference'>
 ): Promise<Trade> => {
-  const response = await fetch(`${API_BASE_URL}/trades/`, {
+  const response = await fetch(`${API_BASE_URL}trades`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ export const createTrade = async (
 };
 
 export const deleteTrade = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/trades/${id}/`, {
+  const response = await fetch(`${API_BASE_URL}trades/${id}`, {
     method: 'DELETE',
   });
   // We don't expect a JSON response from a successful delete, so we just check if the call was successful.
@@ -56,4 +57,34 @@ export const deleteTrade = async (id: number): Promise<void> => {
     console.error('API Error:', error);
     throw new Error(`API request failed with status ${response.status}`);
   }
+};
+
+export const listTradesByCustomerName = async (customerName: string): Promise<Trade[]> => {
+  const response = await fetch(`${API_BASE_URL}listTradesByCustomerName`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ customer_name: customerName }),
+  });
+  return handleResponse<Trade[]>(response);
+};
+
+export interface BuyStockRequest {
+  symbol: string;
+  customer_name: string;
+  executed_price: number;
+  open_price: number;
+  close_price: number;
+}
+
+export const buyStock = async (request: BuyStockRequest): Promise<Trade> => {
+  const response = await fetch(`${API_BASE_URL}buyStock`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+  return handleResponse<Trade>(response);
 };
