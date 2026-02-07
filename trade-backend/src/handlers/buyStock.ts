@@ -27,16 +27,32 @@ export const handler = async (
     const request: BuyStockRequest = JSON.parse(event.body);
 
     // Validate required fields
-    if (!request.symbol || !request.customer_name ||
-        request.executed_price === undefined ||
-        request.open_price === undefined ||
-        request.close_price === undefined ||
-        request.status_trade === undefined) {
+    if (!request.symbol || !request.customer_name || !request.price_mode) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: 'Missing required fields: symbol, customer_name, executed_price, open_price, close_price, status_trade'
+          error: 'Missing required fields: symbol, customer_name, price_mode'
+        }),
+      };
+    }
+
+    if (!['manual', 'market', 'agent'].includes(request.price_mode)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          error: 'price_mode must be one of: manual, market, agent'
+        }),
+      };
+    }
+
+    if (request.price_mode === 'manual' && (request.bid_price === undefined || request.bid_price < 0)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          error: 'bid_price is required and must be non-negative when price_mode is manual'
         }),
       };
     }
@@ -52,12 +68,14 @@ export const handler = async (
   } catch (error) {
     console.error('Error creating trade:', error);
 
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const isSymbolError = message.includes('is not available');
+
     return {
-      statusCode: 500,
+      statusCode: isSymbolError ? 404 : 500,
       headers,
       body: JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        error: isSymbolError ? message : 'Internal server error',
       }),
     };
   }

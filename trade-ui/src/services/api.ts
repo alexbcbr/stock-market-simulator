@@ -73,10 +73,8 @@ export const listTradesByCustomerName = async (customerName: string): Promise<Tr
 export interface BuyStockRequest {
   symbol: string;
   customer_name: string;
-  executed_price: number;
-  open_price: number;
-  close_price: number;
-  status_trade: boolean;
+  price_mode: 'manual' | 'market' | 'agent';
+  bid_price?: number;
 }
 
 export const buyStock = async (request: BuyStockRequest): Promise<Trade> => {

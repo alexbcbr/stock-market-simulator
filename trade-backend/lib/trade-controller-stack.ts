@@ -260,14 +260,16 @@ export class TradeControllerStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         TRADE_TABLE: tradeTable.tableName,
+        MARKET_PRICE_TABLE: marketPriceTable.tableName,
       },
       bundling: {
         externalModules: [],
       },
     });
 
-    // Grant Lambda permission to write to DynamoDB
+    // Grant Lambda permission to write to trade table and read from market_price table
     tradeTable.grantWriteData(buyStockFunction);
+    marketPriceTable.grantReadData(buyStockFunction);
 
     // Create resource for buyStock
     const buyStockResource = api.root.addResource('buyStock');

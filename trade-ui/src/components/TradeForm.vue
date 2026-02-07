@@ -47,11 +47,11 @@
         </div>
       </div>
       <div v-if="priceMode === 'manual'" class="form-group">
-        <label for="executed_price">Bid Price</label>
+        <label for="bid_price">Bid Price</label>
         <input
           type="number"
-          id="executed_price"
-          v-model.number="trade.executed_price"
+          id="bid_price"
+          v-model.number="trade.bid_price"
           required
           :disabled="submitting"
           step="0.01"
@@ -67,7 +67,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useTradeStore } from '../stores/trades';
-import { getMarketPrice } from '../services/api';
 import type { BuyStockRequest } from '../services/api';
 
 const tradeStore = useTradeStore();
@@ -77,7 +76,7 @@ const submitting = ref(false);
 const trade = ref({
   symbol: '',
   customer_name: '',
-  executed_price: 0,
+  bid_price: 0,
 });
 
 const handleSubmit = async () => {
@@ -99,67 +98,27 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (priceMode.value === 'manual' && trade.value.executed_price < 0) {
-    alert('Executed price cannot be negative.');
+  if (priceMode.value === 'manual' && trade.value.bid_price < 0) {
+    alert('Bid price cannot be negative.');
     return;
-  }
-
-  // Fetch market price for the symbol
-  let openPrice: number;
-  let closePrice: number;
-  let highestPrice: number;
-  let lowestPrice: number;
-  try {
-    const marketPrice = await getMarketPrice(trade.value.symbol);
-    openPrice = marketPrice.open_price;
-    closePrice = marketPrice.close_price;
-    highestPrice = marketPrice.highest_price;
-    lowestPrice = marketPrice.lowest_price;
-  } catch {
-    symbolError.value = 'Symbol is not available';
-    return;
-  }
-
-  let executedPrice: number;
-  let statusTrade: boolean;
-
-  if (priceMode.value === 'agent') {
-    // Agent: random between 70% and 100% of highest_price
-    executedPrice = +(highestPrice * (0.7 + Math.random() * 0.3)).toFixed(2);
-    statusTrade = true;
-  } else if (priceMode.value === 'market') {
-    // Market: random between lowest_price and 72% of highest_price
-    const ceiling = highestPrice * 0.72;
-    executedPrice = +(lowestPrice + Math.random() * (ceiling - lowestPrice)).toFixed(2);
-    statusTrade = true;
-  } else {
-    // Manual: adjust price and status based on thresholds
-    const threshold = lowestPrice + 0.45 * (highestPrice - lowestPrice);
-    if (trade.value.executed_price < lowestPrice) {
-      executedPrice = lowestPrice;
-      statusTrade = true;
-    } else if (trade.value.executed_price <= threshold) {
-      executedPrice = trade.value.executed_price;
-      statusTrade = true;
-    } else {
-      executedPrice = trade.value.executed_price;
-      statusTrade = false;
-    }
   }
 
   const request: BuyStockRequest = {
     symbol: trade.value.symbol,
     customer_name: trade.value.customer_name,
-    executed_price: executedPrice,
-    open_price: openPrice,
-    close_price: closePrice,
-    status_trade: statusTrade,
+    price_mode: priceMode.value,
+    ...(priceMode.value === 'manual' ? { bid_price: trade.value.bid_price } : {}),
   };
 
   submitting.value = true;
+  symbolError.value = '';
   try {
     await tradeStore.addTrade(request);
-    trade.value.executed_price = 0;
+    trade.value.bid_price = 0;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('404')) {
+      symbolError.value = 'Symbol is not available';
+    }
   } finally {
     submitting.value = false;
   }
