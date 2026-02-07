@@ -22,7 +22,7 @@ deploy-all:
 diff-controller:
 	cd trade-backend && npx cdk diff TradeControllerStack
 
-destroy:
+deploy:
 	cdk deploy TradeDbStack
 	cdk deploy TradeControllerStack
 

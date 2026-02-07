@@ -30,12 +30,13 @@ export const handler = async (
     if (!request.symbol || !request.customer_name ||
         request.executed_price === undefined ||
         request.open_price === undefined ||
-        request.close_price === undefined) {
+        request.close_price === undefined ||
+        request.status_trade === undefined) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: 'Missing required fields: symbol, customer_name, executed_price, open_price, close_price'
+          error: 'Missing required fields: symbol, customer_name, executed_price, open_price, close_price, status_trade'
         }),
       };
     }

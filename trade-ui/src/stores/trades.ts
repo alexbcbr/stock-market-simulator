@@ -15,7 +15,7 @@ interface DynamoDBItem {
 }
 
 const transformDynamoDBItem = (item: DynamoDBItem): Trade => ({
-  trade_id: Number(item.trade_id.S),
+  trade_id: item.trade_id.S,
   symbol: item.symbol.S,
   customer_name: item.customer_name.S,
   executed_price: Number(item.executed_price.N),
@@ -44,8 +44,12 @@ export const useTradeStore = defineStore('trades', () => {
   };
 
   const addTrade = async (request: BuyStockRequest) => {
-    const createdTrade = await api.buyStock(request);
-    trades.value.push(createdTrade);
+    await api.buyStock(request);
+    if (customerName.value) {
+      await fetchTradesByCustomerName(customerName.value);
+    } else {
+      await fetchTrades();
+    }
   };
 
   return { trades, customerName, fetchTrades, fetchTradesByCustomerName, setCustomerName, addTrade };

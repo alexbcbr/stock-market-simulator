@@ -185,8 +185,72 @@ export class TradeControllerStack extends cdk.Stack {
       ],
     });
 
-    // Reference existing DynamoDB trade table
+    // Create resource for listMarketPrices
+    const listMarketPricesResource = api.root.addResource('listMarketPrices');
+
+    // Integration for listing all market prices (Scan operation)
+    const listMarketPricesIntegration = new apigateway.AwsIntegration({
+      service: 'dynamodb',
+      action: 'Scan',
+      options: {
+        credentialsRole: apiGatewayRole,
+        passthroughBehavior: apigateway.PassthroughBehavior.WHEN_NO_TEMPLATES,
+        requestTemplates: {
+          'application/json': JSON.stringify({
+            TableName: 'market_price',
+          }),
+        },
+        integrationResponses: [
+          {
+            statusCode: '200',
+            responseTemplates: {
+              'application/json': '$input.path(\'$.Items\')',
+            },
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
+          },
+          {
+            statusCode: '500',
+            responseTemplates: {
+              'application/json': '{"error": "Internal Server Error"}',
+            },
+            selectionPattern: '5\\d{2}',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
+          },
+        ],
+      },
+    });
+
+    // Add GET method for listMarketPrices
+    listMarketPricesResource.addMethod('GET', listMarketPricesIntegration, {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
+    // Reference existing DynamoDB tables
     const tradeTable = dynamodb.Table.fromTableName(this, 'TradeTable', 'trade');
+    const marketPriceTable = dynamodb.Table.fromTableName(this, 'MarketPriceTable', 'market_price');
 
     // Create Lambda function for buyStock
     const buyStockFunction = new NodejsFunction(this, 'BuyStockFunction', {
@@ -241,6 +305,59 @@ export class TradeControllerStack extends cdk.Stack {
       ],
     });
 
+    // Create Lambda function for getMarketPrice
+    const getMarketPriceFunction = new NodejsFunction(this, 'GetMarketPriceFunction', {
+      entry: path.join(__dirname, '../src/handlers/getMarketPrice.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        MARKET_PRICE_TABLE: marketPriceTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    // Grant Lambda permission to read from market_price table
+    marketPriceTable.grantReadData(getMarketPriceFunction);
+
+    // Create resource for getMarketPrice
+    const getMarketPriceResource = api.root.addResource('getMarketPrice');
+
+    // Add GET method for getMarketPrice with Lambda integration
+    getMarketPriceResource.addMethod('GET', new apigateway.LambdaIntegration(getMarketPriceFunction), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '404',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiGatewayUrl', {
       value: api.url,
@@ -260,6 +377,16 @@ export class TradeControllerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'BuyStockEndpoint', {
       value: `${api.url}buyStock`,
       description: 'Buy Stock Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'ListMarketPricesEndpoint', {
+      value: `${api.url}listMarketPrices`,
+      description: 'List Market Prices Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'GetMarketPriceEndpoint', {
+      value: `${api.url}getMarketPrice`,
+      description: 'Get Market Price by Symbol Endpoint',
     });
   }
 }

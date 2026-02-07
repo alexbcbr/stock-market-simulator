@@ -12,7 +12,6 @@
           <th>Customer</th>
           <th>Executed Price</th>
           <th>Open Price</th>
-          <th>Reference Price</th>
           <th>Price Diff</th>
           <th>Status</th>
         </tr>
@@ -24,7 +23,6 @@
           <td>{{ trade.customer_name }}</td>
           <td>${{ trade.executed_price.toFixed(2) }}</td>
           <td>${{ trade.open_price.toFixed(2) }}</td>
-          <td>${{ trade.close_price.toFixed(2) }}</td>
           <td :class="getPriceDiffClass(trade.price_difference)">
             {{ formatPriceDiff(trade.price_difference) }}
           </td>
@@ -51,10 +49,6 @@ const handleRefresh = () => {
   }
 };
 
-const handleDelete = (id: number) => {
-  tradeStore.removeTrade(id);
-};
-
 const formatPriceDiff = (diff: number): string => {
   const sign = diff >= 0 ? '+' : '';
   return `${sign}$${diff.toFixed(2)}`;
@@ -77,21 +71,6 @@ const getPriceDiffClass = (diff: number): string => {
 
 .header h2 {
   margin: 0;
-}
-
-.refresh-btn {
-  padding: 0.2rem 0.4rem;
-  font-size: 0.75rem;
-  line-height: 1;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.refresh-btn:hover {
-  background-color: #0056b3;
 }
 
 .positive {

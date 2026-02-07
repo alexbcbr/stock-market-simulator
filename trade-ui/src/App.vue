@@ -29,6 +29,7 @@ const route = useRoute();
 
 const title = computed(() => {
   if (route.name === 'trades') return 'Trade Management';
+  if (route.name === 'marketPrices') return 'Market Prices';
   return 'Stock Market Simulator';
 });
 </script>

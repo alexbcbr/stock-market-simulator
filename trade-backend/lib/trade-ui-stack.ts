@@ -17,14 +17,10 @@ export class TradeUiStack extends cdk.Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
-    // Create an Origin Access Identity and grant it read access to the bucket
-    const oai = new cloudfront.OriginAccessIdentity(this, 'OriginAccessIdentity');
-    bucket.grantRead(oai);
-
-    // CloudFront distribution in front of the S3 bucket
+    // CloudFront distribution in front of the S3 bucket using Origin Access Control
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
       defaultBehavior: {
-        origin: new origins.S3Origin(bucket, { originAccessIdentity: oai }),
+        origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
       defaultRootObject: 'index.html',

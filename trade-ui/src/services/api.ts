@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_URL_TRADE_SERVICES;
 
 export interface Trade {
-  trade_id: number;
+  trade_id: string;
   symbol: string;
   customer_name: string;
   executed_price: number;
@@ -29,7 +29,7 @@ export const getTrades = async (): Promise<Trade[]> => {
   return handleResponse<Trade[]>(response);
 };
 
-export const getTrade = async (id: number): Promise<Trade> => {
+export const getTrade = async (id: string): Promise<Trade> => {
   const response = await fetch(`${API_BASE_URL}trades/${id}`);
   return handleResponse<Trade>(response);
 };
@@ -47,7 +47,7 @@ export const createTrade = async (
   return handleResponse<Trade>(response);
 };
 
-export const deleteTrade = async (id: number): Promise<void> => {
+export const deleteTrade = async (id: string): Promise<void> => {
   const response = await fetch(`${API_BASE_URL}trades/${id}`, {
     method: 'DELETE',
   });
@@ -76,6 +76,7 @@ export interface BuyStockRequest {
   executed_price: number;
   open_price: number;
   close_price: number;
+  status_trade: boolean;
 }
 
 export const buyStock = async (request: BuyStockRequest): Promise<Trade> => {
@@ -87,4 +88,23 @@ export const buyStock = async (request: BuyStockRequest): Promise<Trade> => {
     body: JSON.stringify(request),
   });
   return handleResponse<Trade>(response);
+};
+
+export interface MarketPrice {
+  symbol: string;
+  open_price: number;
+  close_price: number;
+  highest_price: number;
+  lowest_price: number;
+  volume: number;
+}
+
+export const getMarketPrices = async (): Promise<MarketPrice[]> => {
+  const response = await fetch(`${API_BASE_URL}listMarketPrices`);
+  return handleResponse<MarketPrice[]>(response);
+};
+
+export const getMarketPrice = async (symbol: string): Promise<MarketPrice> => {
+  const response = await fetch(`${API_BASE_URL}getMarketPrice?symbol=${encodeURIComponent(symbol)}`);
+  return handleResponse<MarketPrice>(response);
 };

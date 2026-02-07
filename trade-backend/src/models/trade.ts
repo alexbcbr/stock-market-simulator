@@ -15,4 +15,5 @@ export interface BuyStockRequest {
   executed_price: number;
   open_price: number;
   close_price: number;
+  status_trade: boolean;
 }

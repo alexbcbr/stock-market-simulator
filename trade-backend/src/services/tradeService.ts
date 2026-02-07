@@ -28,7 +28,7 @@ export class TradeService {
       open_price: request.open_price,
       close_price: request.close_price,
       price_difference: priceDifference,
-      status_trade: false, // New trades start as pending
+      status_trade: request.status_trade,
     };
 
     // Persist to DynamoDB
