@@ -30,6 +30,7 @@ const route = useRoute();
 const title = computed(() => {
   if (route.name === 'trades') return 'Trade Management';
   if (route.name === 'marketPrices') return 'Market Prices';
+  if (route.name === 'leaderboard') return 'Trade Leaderboard';
   return 'Stock Market Simulator';
 });
 </script>

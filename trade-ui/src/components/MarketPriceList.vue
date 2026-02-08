@@ -1,7 +1,7 @@
 <template>
   <div class="market-price-list">
     <div class="header">
-      <h2>Market Closing Prices</h2>
+      <h2>Market Closing Prices as of January 21, 2026</h2>
       <button @click="handleRefresh" class="refresh-btn">Refresh Prices</button>
     </div>
     <table>
@@ -17,7 +17,9 @@
       </thead>
       <tbody>
         <tr v-for="price in marketPriceStore.marketPrices" :key="price.symbol">
-          <td>{{ price.symbol }}</td>
+          <td>
+            <SymbolLink :symbol="price.symbol" />
+          </td>
           <td>${{ price.open_price.toFixed(2) }}</td>
           <td>${{ price.close_price.toFixed(2) }}</td>
           <td>${{ price.highest_price.toFixed(2) }}</td>
@@ -32,6 +34,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useMarketPriceStore } from '../stores/marketPrices';
+import SymbolLink from './SymbolLink.vue';
 
 const marketPriceStore = useMarketPriceStore();
 

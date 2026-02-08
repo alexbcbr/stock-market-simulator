@@ -54,6 +54,17 @@ export class TradeService {
 
     const priceDifference = executedPrice - open_price;
     const tradeId = uuidv4();
+    
+    // Get current time in Seattle timezone (HH:MM:SS format)
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    const trade_timestamp = formatter.format(now);
 
     const trade: Trade = {
       trade_id: tradeId,
@@ -64,6 +75,8 @@ export class TradeService {
       close_price,
       price_difference: priceDifference,
       status_trade: statusTrade,
+      trade_source: request.price_mode,
+      trade_timestamp,
     };
 
     await this.client.send(

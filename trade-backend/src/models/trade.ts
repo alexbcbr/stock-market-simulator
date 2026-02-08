@@ -7,6 +7,8 @@ export interface Trade {
   close_price: number;
   price_difference: number;
   status_trade: boolean;
+  trade_source: 'manual' | 'market' | 'agent';
+  trade_timestamp: string;
 }
 
 export interface BuyStockRequest {

@@ -17,11 +17,26 @@ export class TradeDbStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Create market_symbol table
+    const marketSymbolTable = new dynamodb.Table(this, 'MarketSymbolTable', {
+      tableName: 'market_symbol',
+      partitionKey: {
+        name: 'symbol',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Create trade table
     const tradeTable = new dynamodb.Table(this, 'TradeTable', {
       tableName: 'trade',
       partitionKey: {
         name: 'trade_id',
+        type: dynamodb.AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'trade_timestamp',
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -36,7 +51,7 @@ export class TradeDbStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
-        name: 'trade_id',
+        name: 'trade_timestamp',
         type: dynamodb.AttributeType.STRING,
       },
       projectionType: dynamodb.ProjectionType.ALL,
@@ -46,6 +61,11 @@ export class TradeDbStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'MarketPriceTableName', {
       value: marketPriceTable.tableName,
       description: 'Market Price DynamoDB Table',
+    });
+
+    new cdk.CfnOutput(this, 'MarketSymbolTableName', {
+      value: marketSymbolTable.tableName,
+      description: 'Market Symbol DynamoDB Table',
     });
 
     new cdk.CfnOutput(this, 'TradeTableName', {

@@ -9,6 +9,8 @@ export interface Trade {
   close_price: number;
   price_difference: number;
   status_trade: boolean;
+  trade_source: 'manual' | 'market' | 'agent';
+  trade_timestamp: string;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -105,4 +107,20 @@ export const getMarketPrices = async (): Promise<MarketPrice[]> => {
 export const getMarketPrice = async (symbol: string): Promise<MarketPrice> => {
   const response = await fetch(`${API_BASE_URL}getMarketPrice?symbol=${encodeURIComponent(symbol)}`);
   return handleResponse<MarketPrice>(response);
+};
+
+export interface MarketSymbol {
+  symbol: string;
+  name: string;
+  lastSale: string;
+  marketCap: string;
+  ipoYear: string;
+  sector: string;
+  industry: string;
+  summaryQuote: string;
+}
+
+export const getMarketSymbol = async (symbol: string): Promise<MarketSymbol> => {
+  const response = await fetch(`${API_BASE_URL}getMarketSymbol?symbol=${encodeURIComponent(symbol)}`);
+  return handleResponse<MarketSymbol>(response);
 };

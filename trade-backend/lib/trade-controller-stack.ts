@@ -116,6 +116,7 @@ export class TradeControllerStack extends cdk.Stack {
                 S: '$input.path(\'$.customer_name\')',
               },
             },
+            ScanIndexForward: false,
           }),
         },
         integrationResponses: [
@@ -251,6 +252,7 @@ export class TradeControllerStack extends cdk.Stack {
     // Reference existing DynamoDB tables
     const tradeTable = dynamodb.Table.fromTableName(this, 'TradeTable', 'trade');
     const marketPriceTable = dynamodb.Table.fromTableName(this, 'MarketPriceTable', 'market_price');
+    const marketSymbolTable = dynamodb.Table.fromTableName(this, 'MarketSymbolTable', 'market_symbol');
 
     // Create Lambda function for buyStock
     const buyStockFunction = new NodejsFunction(this, 'BuyStockFunction', {
@@ -360,6 +362,59 @@ export class TradeControllerStack extends cdk.Stack {
       ],
     });
 
+    // Create Lambda function for getMarketSymbol
+    const getMarketSymbolFunction = new NodejsFunction(this, 'GetMarketSymbolFunction', {
+      entry: path.join(__dirname, '../src/handlers/getMarketSymbol.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        MARKET_SYMBOL_TABLE: marketSymbolTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    // Grant Lambda permission to read from market_symbol table
+    marketSymbolTable.grantReadData(getMarketSymbolFunction);
+
+    // Create resource for getMarketSymbol
+    const getMarketSymbolResource = api.root.addResource('getMarketSymbol');
+
+    // Add GET method for getMarketSymbol with Lambda integration
+    getMarketSymbolResource.addMethod('GET', new apigateway.LambdaIntegration(getMarketSymbolFunction), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '404',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiGatewayUrl', {
       value: api.url,
@@ -389,6 +444,11 @@ export class TradeControllerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'GetMarketPriceEndpoint', {
       value: `${api.url}getMarketPrice`,
       description: 'Get Market Price by Symbol Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'GetMarketSymbolEndpoint', {
+      value: `${api.url}getMarketSymbol`,
+      description: 'Get Market Symbol by Symbol Endpoint',
     });
   }
 }

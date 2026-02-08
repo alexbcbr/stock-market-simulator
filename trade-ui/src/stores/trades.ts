@@ -12,6 +12,8 @@ interface DynamoDBItem {
   close_price: { N: string };
   price_difference: { N: string };
   status_trade: { BOOL: boolean };
+  trade_source: { S: string };
+  trade_timestamp: { S: string };
 }
 
 const transformDynamoDBItem = (item: DynamoDBItem): Trade => ({
@@ -23,6 +25,8 @@ const transformDynamoDBItem = (item: DynamoDBItem): Trade => ({
   close_price: Number(item.close_price.N),
   price_difference: Number(item.price_difference.N),
   status_trade: item.status_trade.BOOL,
+  trade_source: (item.trade_source?.S || 'manual') as Trade['trade_source'],
+  trade_timestamp: item.trade_timestamp.S,
 });
 
 export const useTradeStore = defineStore('trades', () => {
@@ -31,12 +35,16 @@ export const useTradeStore = defineStore('trades', () => {
 
   const fetchTrades = async () => {
     const rawTrades = await api.getTrades();
-    trades.value = (rawTrades as unknown as DynamoDBItem[]).map(transformDynamoDBItem);
+    const transformedTrades = (rawTrades as unknown as DynamoDBItem[]).map(transformDynamoDBItem);
+    // Sort by trade_timestamp in descending order (newest first)
+    trades.value = transformedTrades.sort((a, b) => b.trade_timestamp.localeCompare(a.trade_timestamp));
   };
 
   const fetchTradesByCustomerName = async (name: string) => {
     const rawTrades = await api.listTradesByCustomerName(name);
-    trades.value = (rawTrades as unknown as DynamoDBItem[]).map(transformDynamoDBItem);
+    const transformedTrades = (rawTrades as unknown as DynamoDBItem[]).map(transformDynamoDBItem);
+    // Already sorted by DynamoDB Query with ScanIndexForward: false, but sort again for consistency
+    trades.value = transformedTrades.sort((a, b) => b.trade_timestamp.localeCompare(a.trade_timestamp));
   };
 
   const setCustomerName = (name: string) => {
