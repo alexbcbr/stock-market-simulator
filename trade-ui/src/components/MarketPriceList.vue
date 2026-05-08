@@ -1,16 +1,16 @@
 <template>
   <div class="market-price-list">
     <div class="header">
-      <h2>Market Price: Replay of January 21, 2026</h2>
+      <h2>Trading Day: January 21, 2026</h2>
       <button @click="handleRefresh" class="refresh-btn">Refresh Prices</button>
     </div>
     <table>
       <thead>
         <tr>
           <th>Symbol</th>
-          <th>Open Price (Today)</th>
-          <th>Highest Price (Yesterday)</th>
-          <th>Lowest Price (Yesterday)</th>
+          <th>Open Price</th>
+          <th>Highest Price</th>
+          <th>Lowest Price</th>
         </tr>
       </thead>
       <tbody>
@@ -31,12 +31,17 @@
               </svg>
             </button>
           </td>
-          <td>${{ price.open_price.toFixed(2) }}</td>
+          <td>
+            <button class="price-link" @click="openPriceChart(price)">
+              ${{ price.open_price.toFixed(2) }}
+            </button>
+          </td>
           <td>${{ price.highest_price.toFixed(2) }}</td>
           <td>${{ price.lowest_price.toFixed(2) }}</td>
         </tr>
       </tbody>
     </table>
+    <OpenPriceModal ref="openPriceModal" />
   </div>
 </template>
 
@@ -44,9 +49,18 @@
 import { ref, onMounted } from 'vue';
 import { useMarketPriceStore } from '../stores/marketPrices';
 import SymbolLink from './SymbolLink.vue';
+import OpenPriceModal from './OpenPriceModal.vue';
 
 const marketPriceStore = useMarketPriceStore();
 const copiedSymbol = ref('');
+const openPriceModal = ref<InstanceType<typeof OpenPriceModal>>();
+
+interface MarketPrice {
+  symbol: string;
+  open_price: number;
+  highest_price: number;
+  lowest_price: number;
+}
 
 const copySymbol = async (symbol: string) => {
   await navigator.clipboard.writeText(symbol);
@@ -56,6 +70,15 @@ const copySymbol = async (symbol: string) => {
 
 const handleRefresh = () => {
   marketPriceStore.fetchMarketPrices();
+};
+
+const openPriceChart = (price: MarketPrice) => {
+  openPriceModal.value?.openModal(
+    price.symbol,
+    price.open_price,
+    price.highest_price,
+    price.lowest_price,
+  );
 };
 
 onMounted(() => {
@@ -105,5 +128,25 @@ tr:hover .copy-btn {
 
 .copy-btn:hover {
   color: #ccc;
+}
+
+.price-link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.price-link:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+.price-link:active {
+  color: #1e40af;
 }
 </style>

@@ -2,10 +2,10 @@
   <aside class="sidebar">
     <div class="sidebar-top">
       <router-link
-        to="/"
+        to="/market-prices"
         class="sidebar-item"
-        :class="{ active: $route.name === 'trades' }"
-        title="Trade Management"
+        :class="{ active: $route.name === 'marketPrices' }"
+        title="Market Prices"
       >
         <div class="icon-container">
           <svg
@@ -21,10 +21,10 @@
         </div>
       </router-link>
       <router-link
-        to="/market-prices"
+        to="/trades"
         class="sidebar-item"
-        :class="{ active: $route.name === 'marketPrices' }"
-        title="Market Prices"
+        :class="{ active: $route.name === 'trades' }"
+        title="Trade Management"
       >
         <div class="icon-container">
           <svg

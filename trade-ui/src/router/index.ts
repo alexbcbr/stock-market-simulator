@@ -8,13 +8,17 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'trades',
-      component: TradesView,
+      redirect: '/market-prices',
     },
     {
       path: '/market-prices',
       name: 'marketPrices',
       component: MarketPricesView,
+    },
+    {
+      path: '/trades',
+      name: 'trades',
+      component: TradesView,
     },
     {
       path: '/leaderboard',
