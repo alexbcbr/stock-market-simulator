@@ -19,4 +19,7 @@ cdk deploy
 cdk destroy
 
 
+cdk deploy TradeUiStack --context bucketExists=true
+
+
 

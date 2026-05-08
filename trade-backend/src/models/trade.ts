@@ -1,3 +1,5 @@
+export type PriceMode = 'manual' | 'market' | 'agent_conservative' | 'agent_moderate' | 'agent_aggressive' | 'agent';
+
 export interface Trade {
   trade_id: string;
   symbol: string;
@@ -7,13 +9,14 @@ export interface Trade {
   close_price: number;
   price_difference: number;
   status_trade: boolean;
-  trade_source: 'manual' | 'market' | 'agent';
+  status_sell: boolean;
+  trade_source: PriceMode;
   trade_timestamp: string;
 }
 
 export interface BuyStockRequest {
   symbol: string;
   customer_name: string;
-  price_mode: 'manual' | 'market' | 'agent';
+  price_mode: PriceMode;
   bid_price?: number;
 }

@@ -309,6 +309,44 @@ export class TradeControllerStack extends cdk.Stack {
       ],
     });
 
+    // Create Lambda function for sellStock
+    const sellStockFunction = new NodejsFunction(this, 'SellStockFunction', {
+      entry: path.join(__dirname, '../src/handlers/sellStock.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        TRADE_TABLE: tradeTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    tradeTable.grantWriteData(sellStockFunction);
+
+    const sellStockResource = api.root.addResource('sellStock');
+
+    sellStockResource.addMethod('POST', new apigateway.LambdaIntegration(sellStockFunction), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: { 'application/json': apigateway.Model.EMPTY_MODEL },
+          responseParameters: { 'method.response.header.Access-Control-Allow-Origin': true },
+        },
+        {
+          statusCode: '400',
+          responseModels: { 'application/json': apigateway.Model.EMPTY_MODEL },
+          responseParameters: { 'method.response.header.Access-Control-Allow-Origin': true },
+        },
+        {
+          statusCode: '500',
+          responseModels: { 'application/json': apigateway.Model.EMPTY_MODEL },
+          responseParameters: { 'method.response.header.Access-Control-Allow-Origin': true },
+        },
+      ],
+    });
+
     // Create Lambda function for getMarketPrice
     const getMarketPriceFunction = new NodejsFunction(this, 'GetMarketPriceFunction', {
       entry: path.join(__dirname, '../src/handlers/getMarketPrice.ts'),
@@ -449,6 +487,11 @@ export class TradeControllerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'GetMarketSymbolEndpoint', {
       value: `${api.url}getMarketSymbol`,
       description: 'Get Market Symbol by Symbol Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'SellStockEndpoint', {
+      value: `${api.url}sellStock`,
+      description: 'Sell Stock Endpoint',
     });
   }
 }

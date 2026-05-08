@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_URL_TRADE_SERVICES;
 
+export type PriceMode = 'manual' | 'market' | 'agent_conservative' | 'agent_moderate' | 'agent_aggressive' | 'agent';
+
 export interface Trade {
   trade_id: string;
   symbol: string;
@@ -9,7 +11,8 @@ export interface Trade {
   close_price: number;
   price_difference: number;
   status_trade: boolean;
-  trade_source: 'manual' | 'market' | 'agent';
+  status_sell: boolean;
+  trade_source: PriceMode;
   trade_timestamp: string;
 }
 
@@ -75,7 +78,7 @@ export const listTradesByCustomerName = async (customerName: string): Promise<Tr
 export interface BuyStockRequest {
   symbol: string;
   customer_name: string;
-  price_mode: 'manual' | 'market' | 'agent';
+  price_mode: PriceMode;
   bid_price?: number;
 }
 
@@ -123,4 +126,13 @@ export interface MarketSymbol {
 export const getMarketSymbol = async (symbol: string): Promise<MarketSymbol> => {
   const response = await fetch(`${API_BASE_URL}getMarketSymbol?symbol=${encodeURIComponent(symbol)}`);
   return handleResponse<MarketSymbol>(response);
+};
+
+export const sellStock = async (trade_id: string, trade_timestamp: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}sellStock`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trade_id, trade_timestamp }),
+  });
+  return handleResponse<void>(response);
 };

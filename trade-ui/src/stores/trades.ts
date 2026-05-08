@@ -12,6 +12,7 @@ interface DynamoDBItem {
   close_price: { N: string };
   price_difference: { N: string };
   status_trade: { BOOL: boolean };
+  status_sell: { BOOL: boolean };
   trade_source: { S: string };
   trade_timestamp: { S: string };
 }
@@ -25,6 +26,7 @@ const transformDynamoDBItem = (item: DynamoDBItem): Trade => ({
   close_price: Number(item.close_price.N),
   price_difference: Number(item.price_difference.N),
   status_trade: item.status_trade.BOOL,
+  status_sell: item.status_sell?.BOOL ?? false,
   trade_source: (item.trade_source?.S || 'manual') as Trade['trade_source'],
   trade_timestamp: item.trade_timestamp.S,
 });

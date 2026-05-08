@@ -37,12 +37,13 @@ export const handler = async (
       };
     }
 
-    if (!['manual', 'market', 'agent'].includes(request.price_mode)) {
+    const validModes = ['manual', 'market', 'agent_conservative', 'agent_moderate', 'agent_aggressive', 'agent'];
+    if (!validModes.includes(request.price_mode)) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: 'price_mode must be one of: manual, market, agent'
+          error: 'price_mode must be one of: manual, market, agent_conservative, agent_moderate, agent_aggressive'
         }),
       };
     }

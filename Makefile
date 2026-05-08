@@ -1,6 +1,6 @@
 S3_BUCKET := s3://com.trade.web
 
-deploy:
+deploy-ui:
 	cd ../../trade-ui && npm run build && aws s3 sync dist $(S3_BUCKET) --delete
 
 create-db-sqlite3:

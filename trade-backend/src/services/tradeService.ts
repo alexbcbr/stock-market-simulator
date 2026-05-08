@@ -27,32 +27,48 @@ export class TradeService {
     let executedPrice: number;
     let statusTrade: boolean;
 
-    if (request.price_mode === 'agent') {
-      // Agent: random between 70% and 100% of highest_price
-      executedPrice = +(highest_price * (0.7 + Math.random() * 0.3)).toFixed(2);
+    if (request.price_mode === 'agent_aggressive') {
+      // Aggressive: lowest_price to lowest + 50% of range
+      const range = highest_price - lowest_price;
+      executedPrice = +(lowest_price + Math.random() * 0.5 * range).toFixed(2);
       statusTrade = true;
+
+    } else if (request.price_mode === 'agent_moderate') {
+      // Moderate: lowest + 5% to lowest + 45% of range
+      const range = highest_price - lowest_price;
+      executedPrice = +(lowest_price + (0.05 + Math.random() * 0.40) * range).toFixed(2);
+      statusTrade = true;
+
+    } else if (request.price_mode === 'agent_conservative') {
+      // Conservative: lowest + 10% to lowest + 40% of range
+      const range = highest_price - lowest_price;
+      executedPrice = +(lowest_price + (0.10 + Math.random() * 0.30) * range).toFixed(2);
+      statusTrade = true;
+
     } else if (request.price_mode === 'market') {
-      // Market: random between lowest_price and 72% of highest_price
-      const ceiling = highest_price * 0.72;
-      executedPrice = +(lowest_price + Math.random() * (ceiling - lowest_price)).toFixed(2);
+      // Market: random between 48% and 100% of the interval (highest - lowest)
+      const floor = lowest_price + 0.48 * (highest_price - lowest_price);
+      executedPrice = +(floor + Math.random() * (highest_price - floor)).toFixed(2);
       statusTrade = true;
+
     } else {
-      // Manual: adjust price and status based on thresholds
+      // Manual: executed price based on bid vs range, with random chance of failure
       const bidPrice = request.bid_price!;
-      const threshold = lowest_price + 0.45 * (highest_price - lowest_price);
-      if (bidPrice < lowest_price) {
-        executedPrice = lowest_price;
+      if (bidPrice >= highest_price) {
+        executedPrice = highest_price;
         statusTrade = true;
-      } else if (bidPrice <= threshold) {
-        executedPrice = bidPrice;
-        statusTrade = true;
-      } else {
+      } else if (bidPrice <= lowest_price) {
         executedPrice = bidPrice;
         statusTrade = false;
+      } else {
+        const randomInInterval = lowest_price + Math.random() * (highest_price - lowest_price);
+        const failureThreshold = lowest_price + 0.45 * (highest_price - lowest_price);
+        executedPrice = bidPrice;
+        statusTrade = randomInInterval > failureThreshold;
       }
     }
 
-    const priceDifference = executedPrice - open_price;
+    const priceDifference = close_price - executedPrice;
     const tradeId = uuidv4();
     
     // Get current time in Seattle timezone (HH:MM:SS format)
@@ -75,6 +91,7 @@ export class TradeService {
       close_price,
       price_difference: priceDifference,
       status_trade: statusTrade,
+      status_sell: false,
       trade_source: request.price_mode,
       trade_timestamp,
     };

@@ -8,9 +8,6 @@
             <img src="/logo/gartner.png" alt="Gartner logo" class="company-logo" />
             <h1>{{ title }}</h1>
           </div>
-          <div class="header-right">
-            <img src="/user-picture.jpg" alt="User Profile" class="user-picture" />
-          </div>
         </div>
       </header>
       <main>
