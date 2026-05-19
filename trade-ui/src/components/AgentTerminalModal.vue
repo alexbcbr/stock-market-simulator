@@ -52,7 +52,9 @@ const buildScript = (t: Trade): LogLine[] => {
   const d = new Date(t.trade_timestamp);
   const ts = isNaN(d.getTime()) ? t.trade_timestamp : d.toISOString().replace('T', ' ').substring(0, 19);
   const secondsMatch = t.trade_timestamp.match(/:(\d{2})(?:\.|$|\s|Z)/);
-  const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : (isNaN(d.getTime()) ? 0 : d.getSeconds());
+  const seconds = secondsMatch?.[1]
+    ? parseInt(secondsMatch[1], 10)
+    : (isNaN(d.getTime()) ? 0 : d.getSeconds());
   const n = Math.max(1, Math.floor(seconds / 3));
   const checkingLines: LogLine[] = Array.from({ length: n }, () => ({
     prefix: '[BUYER]   ',
