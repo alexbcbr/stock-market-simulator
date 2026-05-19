@@ -135,4 +135,38 @@ const $route = useRoute();
 .sidebar-bottom {
   margin-bottom: 8px;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: 56px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+  }
+
+  .sidebar-top {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .sidebar-bottom {
+    margin-bottom: 0;
+  }
+
+  .sidebar-item {
+    border-left: none;
+    border-top: 2px solid transparent;
+  }
+
+  .sidebar-item.active {
+    border-left-color: transparent;
+    border-top-color: white;
+  }
+}
 </style>

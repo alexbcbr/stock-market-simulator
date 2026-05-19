@@ -4,43 +4,45 @@
       <h2>Trading Day: January 21, 2026</h2>
       <button @click="handleRefresh" class="refresh-btn">Refresh Prices</button>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Symbol</th>
-          <th>Open Price</th>
-          <th>Highest Price</th>
-          <th>Lowest Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="price in marketPriceStore.marketPrices" :key="price.symbol">
-          <td class="symbol-cell">
-            <SymbolLink :symbol="price.symbol" />
-            <button
-              class="copy-btn"
-              :title="'Copy ' + price.symbol"
-              @click.stop="copySymbol(price.symbol)"
-            >
-              <svg v-if="copiedSymbol !== price.symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-              <svg v-else viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </button>
-          </td>
-          <td>
-            <button class="price-link" @click="openPriceChart(price)">
-              ${{ price.open_price.toFixed(2) }}
-            </button>
-          </td>
-          <td>${{ price.highest_price.toFixed(2) }}</td>
-          <td>${{ price.lowest_price.toFixed(2) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Open Price</th>
+            <th>Highest Price</th>
+            <th>Lowest Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="price in marketPriceStore.marketPrices" :key="price.symbol">
+            <td class="symbol-cell">
+              <SymbolLink :symbol="price.symbol" />
+              <button
+                class="copy-btn"
+                :title="'Copy ' + price.symbol"
+                @click.stop="copySymbol(price.symbol)"
+              >
+                <svg v-if="copiedSymbol !== price.symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <svg v-else viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
+            </td>
+            <td>
+              <button class="price-link" @click="openPriceChart(price)">
+                ${{ price.open_price.toFixed(2) }}
+              </button>
+            </td>
+            <td>${{ price.highest_price.toFixed(2) }}</td>
+            <td>${{ price.lowest_price.toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <OpenPriceModal ref="openPriceModal" />
   </div>
 </template>
@@ -148,5 +150,16 @@ tr:hover .copy-btn {
 
 .price-link:active {
   color: #1e40af;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (hover: none) {
+  .copy-btn {
+    opacity: 1;
+  }
 }
 </style>

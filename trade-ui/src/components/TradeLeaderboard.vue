@@ -1,19 +1,20 @@
 <template>
   <div>
     <MarketVolumeChart class="lb-chart" />
+    <div class="table-scroll">
     <table>
       <thead>
         <tr>
           <th>#</th>
           <th>Customer</th>
           <th>Symbol</th>
-          <th>Open Price</th>
+          <th class="col-open-price">Open Price</th>
           <th>Purchase Price</th>
           <th>Sell Price</th>
           <th>Profit</th>
           <th>Source</th>
-          <th>Timestamp</th>
-          <th>ID</th>
+          <th class="col-timestamp">Timestamp</th>
+          <th class="col-id">ID</th>
         </tr>
       </thead>
       <tbody>
@@ -26,7 +27,7 @@
           </td>
           <td class="col-customer">{{ trade.customer_name }}</td>
           <td class="col-symbol">{{ trade.symbol }}</td>
-          <td class="col-price">${{ trade.open_price.toFixed(2) }}</td>
+          <td class="col-price col-open-price">${{ trade.open_price.toFixed(2) }}</td>
           <td class="col-price">${{ trade.executed_price.toFixed(2) }}</td>
           <td class="col-price">${{ trade.close_price.toFixed(2) }}</td>          
           <td :class="getPnlClass(trade.price_difference)">
@@ -74,11 +75,12 @@
             <!-- Fallback -->
             <span v-else class="source-icon">&#10067;</span>
           </td>
-          <td class="col-dim">{{ trade.trade_timestamp }}</td>
-          <td class="col-dim">{{ trade.trade_id }}</td>
+          <td class="col-dim col-timestamp">{{ trade.trade_timestamp }}</td>
+          <td class="col-dim col-id">{{ trade.trade_id }}</td>
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </template>
 
@@ -130,4 +132,17 @@ const getPnlArrow = (diff: number): string => {
 .source-agent-conservative { color: #6f42c1; }
 .source-agent-moderate { color: #f5a623; }
 .source-agent-aggressive { color: #dc3545; }
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .col-id,
+  .col-open-price,
+  .col-timestamp {
+    display: none;
+  }
+}
 </style>

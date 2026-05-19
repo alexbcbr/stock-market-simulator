@@ -256,7 +256,8 @@ const handleSubmit = async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.radio-label:hover .agent-tooltip {
+.radio-label:hover .agent-tooltip,
+.radio-label:focus-within .agent-tooltip {
   display: block;
 }
 

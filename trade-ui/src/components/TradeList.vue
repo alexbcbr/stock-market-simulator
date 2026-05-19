@@ -4,28 +4,29 @@
       <h2>{{ tradeStore.customerName ? `${tradeStore.customerName}'s Trades` : "All Users' Trades" }}</h2>
       <button @click="handleRefresh" class="refresh-btn">Refresh Transaction List</button>
     </div>
+    <div class="table-scroll">
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th class="col-id">ID</th>
           <th>Symbol</th>
           <th>Customer</th>
           <th>Order Price</th>
-          <th>Open Price</th>
+          <th class="col-open-price">Open Price</th>
           <th>Profit</th>
           <th>Buy</th>
           <th>Sell</th>
           <th>Source</th>
-          <th>Timestamp</th>
+          <th class="col-timestamp">Timestamp</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="trade in tradeStore.trades" :key="trade.trade_id">
-          <td>{{ trade.trade_id }}</td>
+          <td class="col-id">{{ trade.trade_id }}</td>
           <td><SymbolLink :symbol="trade.symbol" /></td>
           <td>{{ trade.customer_name }}</td>
           <td>${{ trade.executed_price.toFixed(2) }}</td>
-          <td>${{ trade.open_price.toFixed(2) }}</td>
+          <td class="col-open-price">${{ trade.open_price.toFixed(2) }}</td>
           <td :class="trade.status_sell ? getPriceDiffClass(trade.price_difference) : ''">
             {{ trade.status_sell ? formatPriceDiff(trade.price_difference) : '' }}
           </td>
@@ -86,10 +87,11 @@
               <span v-else class="source-icon">&#10067;</span>
             </button>
           </td>
-          <td>{{ trade.trade_timestamp }}</td>
+          <td class="col-timestamp">{{ trade.trade_timestamp }}</td>
         </tr>
       </tbody>
     </table>
+    </div>
 
     <AgentTerminalModal ref="terminalModal" />
   </div>
@@ -246,5 +248,18 @@ const getPriceDiffClass = (diff: number): string => {
 
 .source-agent-aggressive {
   color: #dc3545;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .col-id,
+  .col-open-price,
+  .col-timestamp {
+    display: none;
+  }
 }
 </style>
