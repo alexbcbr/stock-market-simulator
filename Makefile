@@ -1,34 +1,39 @@
-S3_BUCKET := s3://com.trade.web
+# Local settings (S3_BUCKET, API_URL) live in .env — copy .env.example to .env
+-include .env
 
 deploy-ui:
-	cd ../../trade-ui && npm run build && aws s3 sync dist $(S3_BUCKET) --delete
+	cd trade-ui && bun run build && aws s3 sync dist $(S3_BUCKET) --delete
 
 create-db-sqlite3:
 	sqlite3 data/market_stock.db ".tables" && sqlite3 data/market_stock.db ".schema"
 
 # CDK commands
 deploy-ui:
-	cd trade-backend && npm install && npm run build && npx cdk deploy TradeUiStack
+	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeUiStack
 
 deploy-db:
-	cd trade-backend && npm install && npm run build && npx cdk deploy TradeDbStack
+	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeDbStack
 
 deploy-controller:
-	cd trade-backend && npm install && npm run build && npx cdk deploy TradeControllerStack
+	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeControllerStack
 
 deploy-all:
-	cd trade-backend && npm install && npm run build && npx cdk deploy
+	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy
 
 diff-controller:
-	cd trade-backend && npx cdk diff TradeControllerStack
+	cd trade-backend-aws && bunx cdk diff TradeControllerStack
 
 deploy:
 	cdk deploy TradeDbStack
 	cdk deploy TradeControllerStack
 
 test-api:
-	curl https://qwppyg6xa5.execute-api.us-east-2.amazonaws.com/prod/listAllTrades
-	curl -X POST https://qwppyg6xa5.execute-api.us-east-2.amazonaws.com/prod/listTradesByCustomerName \
+	curl $(API_URL)/listAllTrades
+	curl -X POST $(API_URL)/listTradesByCustomerName \
   		-H "Content-Type: application/json" \
   		-d '{"customer_name": "alex"}'
 
+
+# Run once per clone: enables the tracked git hooks in .githooks/
+setup-hooks:
+	git config core.hooksPath .githooks

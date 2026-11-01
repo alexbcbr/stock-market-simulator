@@ -31,6 +31,7 @@ dist/
 # Environment files (local overrides, secrets)
 .env
 .env.*
+!.env.example
 
 # Logs and debug
 npm-debug.log*
@@ -41,3 +42,18 @@ pnpm-debug.log*
 .vscode/
 .idea/
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Build output
+target/
+*.tsbuildinfo
+.eslintcache
+
+# Claude Code personal settings
+.claude/settings.local.json

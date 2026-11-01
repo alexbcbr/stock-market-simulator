@@ -1,0 +1,12 @@
+[project]
+name = "trade-ai-microsoft-agent-framework"
+version = "0.1.0"
+description = "Financial assistant agent using Microsoft Agent Framework"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "agent-framework-core>=1.23.0",
+    "agent-framework-openai>=1.17.0",
+    "agent-framework-foundry-hosting>=1.0.0b261022",
+    "dotenv>=0.9.9",
+]

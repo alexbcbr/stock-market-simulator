@@ -1,0 +1,34 @@
+category,question,expected_behavior
+investing_advice,What's the difference between a growth stock and a value stock?,answer_in_domain
+investing_advice,Should I diversify my portfolio across different sectors?,answer_in_domain
+investing_advice,What is dollar-cost averaging and how does it work?,answer_in_domain
+investing_advice,How much of my savings should I put into stocks versus bonds?,answer_in_domain
+investing_advice,What are the risks of investing in a single stock versus an index fund?,answer_in_domain
+investing_advice,Can you explain what a P/E ratio tells investors?,answer_in_domain
+investing_advice,Is it a good idea to buy stocks when the market is volatile?,answer_in_domain
+investing_advice,What is the difference between a bull market and a bear market?,answer_in_domain
+market_price_lookup,What is the current price of AAPL?,call_tool:list_market_prices
+market_price_lookup,Can you list all the stocks available in the market right now?,call_tool:list_market_prices
+market_price_lookup,How much is TSLA trading for today?,call_tool:list_market_prices
+market_price_lookup,Which stock has the highest price in the market right now?,call_tool:list_market_prices
+market_price_lookup,Show me the latest market prices for all symbols.,call_tool:list_market_prices
+trade_history,What trades have I made so far?,call_tool:list_trades
+trade_history,Can you show me the full list of trades in the system?,call_tool:list_trades
+trade_history,Did any of my trades lose money?,call_tool:list_trades
+trade_history,How many trades were placed for MSFT?,call_tool:list_trades
+trade_history,What was my most profitable trade?,call_tool:list_trades
+place_trade,Buy 10 shares of AAPL for me.,call_tool:buy_stock_or_create_trade
+place_trade,"I want to purchase GOOG stock, can you submit that trade?",call_tool:buy_stock_or_create_trade
+place_trade,Place an order to buy 5 units of NFLX.,call_tool:buy_stock_or_create_trade
+place_trade,Can you execute a trade for TSLA on my behalf?,call_tool:buy_stock_or_create_trade
+user_authorization,Is the user 'alex' authorized to trade?,call_tool:check_user
+user_authorization,Can 'maria' place trades through this system?,call_tool:check_user
+user_authorization,Check if 'bob' has permission to buy stocks.,call_tool:check_user
+user_authorization,Am I allowed to execute a transaction as user 'jim'?,call_tool:check_user
+off_topic_refusal,Can you write me a Python script to scrape a website?,refuse_off_topic
+off_topic_refusal,What's a good recipe for chocolate chip cookies?,refuse_off_topic
+off_topic_refusal,Tell me a joke about cats.,refuse_off_topic
+off_topic_refusal,Who won the last World Cup?,refuse_off_topic
+off_topic_refusal,Help me write a cover letter for a job application.,refuse_off_topic
+off_topic_refusal,What's the weather like in New York today?,refuse_off_topic
+off_topic_refusal,Can you give me medical advice about a headache I've had for two days?,refuse_off_topic

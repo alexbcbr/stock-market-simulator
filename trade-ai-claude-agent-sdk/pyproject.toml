@@ -1,0 +1,15 @@
+[project]
+name = "trade-ai-claude-agent-sdk"
+version = "0.1.0"
+description = "Financial assistant agent (Claude Agent SDK + Bedrock + MCP stock tools)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "claude-agent-sdk>=0.2.130",
+    "python-dotenv>=1.0.1",
+    "arize-otel>=0.14.1",
+    "openinference-instrumentation-claude-agent-sdk>=0.1.22",
+    "arize>=8.61.0",
+    "pandas>=2.3.3",
+    "arize-phoenix-evals>=1.0.0",
+]

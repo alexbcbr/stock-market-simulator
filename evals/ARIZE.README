@@ -1,0 +1,61 @@
+# financial_advice_dataset — Dataset
+
+Example questions for evaluating the trade-ai financial assistant agent
+(01fin_assistant.py / 02fin_assistant_with_tools.py / 03fin_assistant_async.py /
+04fin_assistant_bp.py and the trade-ai-claude-agent-sdk port), covering:
+
+- investing_advice       — general finance/investing questions answered from model knowledge
+- market_price_lookup    — questions expected to call the list_market_prices MCP tool
+- trade_history          — questions expected to call the list_trades MCP tool
+- place_trade            — buy/order requests expected to call buy_stock / create_trade
+- user_authorization     — questions expected to call the check_user MCP tool
+- off_topic_refusal      — non-finance questions that should be refused per the system prompt
+                            ("You're a financial assistant. Don't answer question outside of
+                            the context of financial market.")
+
+## Files
+
+- `financial_advice_dataset.csv` 33 examples
+
+## Create the Default Space
+ax datasets create --name "financial_advice_dataset" --space "Default Space" --file financial_advice_dataset.json
+
+## Importing the CSV into another Arize account
+ax datasets create --name "financial_*_dataset" --space SPACE --file financial_*_dataset.csv
+
+# View dataset metadata / versions
+ax datasets get financial_*_dataset --space SPACE
+
+# Export current contents
+ax datasets export financial_*_dataset --space SPACE
+
+# Append more examples
+ax datasets append financial_*_dataset --space SPACE --json '[{"category": "...", "question": "...", "expected_behavior": "..."}]'
+
+-------
+Create evaluators golden Parameters:
+ax evaluators create-evaluator template \
+    --name "financial_golden_answer_correctness" \
+    --space "Default Space" \
+    --commit-message "Initial version" \
+    --template-name "correctness" \
+    --template 'You are grading whether a financial assistant'"'"'s answer matches the intent
+  and key facts of a reference answer.
+
+  Question: {question}
+
+  Reference answer: {expected_answer}
+
+  Assistant'"'"'s answer: {output}
+
+  Does the assistant'"'"'s answer convey the same key information as the reference answer, even
+  if worded differently? Minor phrasing differences are fine; missing or contradicting key
+  facts is not. Respond with "correct" or "incorrect".' \
+    --ai-integration-id "TGxtSW50ZWdyYXRpb246NTM4NzpXUXRw" \
+    --model-name "us.anthropic.claude-sonnet-4-5-20250929-v1:0" \
+    --classification-choices '{"correct": 1, "incorrect": 0}' \
+    --direction MAXIMIZE \
+    --include-explanations
+    :
+                                                        Type: 
+

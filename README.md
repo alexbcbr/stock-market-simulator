@@ -3,23 +3,28 @@ Stock market game simulation for education purpose
 
 #setup trade-ui (Vite v7.3.1 + Vue 3)
 
-npm create vue
+bun create vue@latest
+
 cd trade-ui
-npm install
-npm run format
-npm run dev
+bun install
+bun run dev
 
 # setup deploy in CDK para AWS
-cdk init app --language typescript
-npm install
-cdk bootstrap
+brew install oven-sh/bun/bun
 
-cdk synth
-cdk deploy
-cdk destroy
+bunx cdk init app --language typescript
+bun install
+bunx cdk bootstrap
 
-
-cdk deploy TradeUiStack --context bucketExists=true
-
+bunx cdk synth
+bunx cdk deploy
+bunx cdk destroy
 
 
+bunx cdk deploy TradeUiStack --context bucketExists=true
+
+
+
+
+# git hooks (run once per clone)
+make setup-hooks   # enables .githooks/pre-commit: blocks env files and secrets at commit time

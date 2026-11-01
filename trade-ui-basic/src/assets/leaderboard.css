@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+/* ── Bloomberg / Nasdaq terminal aesthetic ── */
+/* Scoped under .leaderboard-view so it never leaks to other pages */
+
+.leaderboard-view {
+  font-family: 'Roboto', sans-serif;
+  min-height: 100%;
+}
+
+/* Override the light-blue <main> canvas */
+main:has(.leaderboard-view) {
+  background-color: #0a0e17;
+}
+
+/* ── Header ── */
+.leaderboard-view .lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.leaderboard-view .lb-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #e0e6ed;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.leaderboard-view .lb-subtitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: #5a6a7a;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
+
+/* ── Table ── */
+.leaderboard-view table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #111822;
+  border: 1px solid #1e2a3a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.leaderboard-view th {
+  background-color: #0d1320;
+  color: #5a6a7a;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #1e2a3a;
+  border-right: none;
+  border-left: none;
+  border-top: none;
+  text-align: left;
+}
+
+.leaderboard-view td {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  color: #c8d0da;
+  padding: 11px 16px;
+  border-bottom: 1px solid #1a2332;
+  border-right: none;
+  border-left: none;
+  border-top: none;
+}
+
+.leaderboard-view tbody tr {
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.leaderboard-view tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+
+.leaderboard-view tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.leaderboard-view tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Rank column ── */
+.leaderboard-view .col-rank {
+  font-weight: 700;
+  color: #5a6a7a;
+  text-align: center;
+  width: 48px;
+}
+
+/* Top-3 gold / silver / bronze accents */
+.leaderboard-view .rank-1 { color: #f0b90b; }
+.leaderboard-view .rank-2 { color: #a8b5c8; }
+.leaderboard-view .rank-3 { color: #cd7f32; }
+
+/* ── Customer name – green accent ── */
+.leaderboard-view .col-customer {
+  color: #00c176;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+/* ── Symbol ── */
+.leaderboard-view .col-symbol {
+  color: #e0e6ed;
+  font-weight: 500;
+}
+
+/* ── Price columns ── */
+.leaderboard-view .col-price {
+  color: #c8d0da;
+}
+
+/* ── PnL (Profit & Loss) ── */
+.leaderboard-view .pnl-positive {
+  color: #00e676;
+  font-weight: 600;
+}
+
+.leaderboard-view .pnl-negative {
+  color: #ff5252;
+  font-weight: 600;
+}
+
+.leaderboard-view .pnl-neutral {
+  color: #5a6a7a;
+  font-weight: 500;
+}
+
+.leaderboard-view .pnl-arrow {
+  font-size: 10px;
+  margin-right: 4px;
+}
+
+/* ── Source column ── */
+.leaderboard-view .col-source {
+  text-align: center;
+}
+
+.leaderboard-view .source-svg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
+.leaderboard-view .source-manual {
+  color: #4fc3f7;
+}
+
+.leaderboard-view .source-market {
+  color: #00e676;
+}
+
+.leaderboard-view .source-agent {
+  color: #b388ff;
+}
+
+/* ── Timestamp & ID – dimmed ── */
+.leaderboard-view .col-dim {
+  color: #4a5568;
+  font-size: 12px;
+}
+
+/* ── Responsive: mobile (≤768px) ── */
+@media (max-width: 768px) {
+  .leaderboard-view th,
+  .leaderboard-view td {
+    padding: 10px 12px;
+  }
+}

@@ -1,0 +1,12 @@
+# Gitleaks config: default rules plus allowlist for known-safe placeholders.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholders and third-party skill docs with example credentials"
+paths = [
+  '''(^|/)\.env\.(example|sample|template)$''',
+  '''^\.(agents|claude)/skills/''',
+  '''package-lock\.json$''',
+  '''uv\.lock$''',
+]

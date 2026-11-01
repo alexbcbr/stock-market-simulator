@@ -1,0 +1,228 @@
+:root {
+  --primary-color: #2c3e50;
+  --action-color: #7f8c8d;
+  --action-hover-color: #5d6d7e;
+  --accent-color: #95a5a6;
+  --background-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --border-color: #bdc3c7;
+  --surface-color: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", "Times", serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 16px 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+main {
+  flex-grow: 1;
+  padding: 32px;
+}
+
+.trades-view {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.form-container,
+.list-container {
+  background-color: var(--surface-color);
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  font-size: 20px;
+  color: var(--primary-color);
+  margin-top: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: "Georgia", "Times New Roman", "Times", serif;
+  background-color: #fafafa;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--action-color);
+  box-shadow: 0 0 0 2px rgba(127, 140, 141, 0.2);
+  background-color: white;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Button Styles */
+button {
+  background-color: var(--action-color);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: "Georgia", "Times New Roman", "Times", serif;
+  letter-spacing: 0.5px;
+}
+
+button:hover {
+  background-color: var(--action-hover-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Georgia", "Times New Roman", "Times", serif;
+}
+
+th,
+td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 500;
+  color: var(--primary-color);
+  letter-spacing: 0.5px;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+tbody tr:hover {
+  background-color: #e8f4f8;
+  transition: background-color 0.2s;
+}
+
+/* Header specific styles for gray theme */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.company-logo {
+  height: 40px;
+  width: auto;
+  filter: brightness(1.1);
+}
+
+.user-picture {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s;
+}
+
+.user-picture:hover {
+  transform: scale(1.05);
+}
+
+/* ── Responsive: mobile (≤768px) ── */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  .company-logo {
+    height: 28px;
+  }
+
+  main {
+    padding: 16px;
+    padding-bottom: 72px;
+  }
+
+  .trades-view {
+    grid-template-columns: 1fr;
+  }
+}

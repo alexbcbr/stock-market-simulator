@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Tracked git pre-commit hook: blocks commits that stage env files or secrets.
+# Enable on each clone with:  make setup-hooks   (git config core.hooksPath .githooks)
+# Bypass for a verified false positive:  git commit --no-verify
+set -euo pipefail
+
+fail=0
+
+# 1. Env files (templates are allowed)
+while IFS= read -r f; do
+  case "$(basename "$f")" in
+    .env.example|.env.sample|.env.template) ;;
+    .env|.env.*) echo "pre-commit: env file staged: $f" >&2; fail=1 ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=ACM)
+
+# 2. Secret patterns in added lines (skip third-party skill docs and lockfiles)
+pattern='(AKIA|ASIA)[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|sk-(ant-)?[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|(api[_-]?key|secret|token|password|ARIZE_API_KEY)["'"'"' ]*[:=]["'"'"' ]*[^$<"'"'"' .][A-Za-z0-9/+_.-]{15,}'
+hits=$(git diff --cached -U0 --diff-filter=ACM -- . ':!.agents' ':!.claude/skills' ':!*package-lock.json' ':!*uv.lock' ':!.env.example' ':!*/.env.example' \
+  | grep -E '^\+[^+]' | grep -Eiq "$pattern" && echo yes || true)
+if [ "$hits" = "yes" ]; then
+  echo "pre-commit: possible secret in staged changes. Review with: git diff --cached" >&2
+  fail=1
+fi
+
+# 3. Gitleaks, if installed (stricter, uses .gitleaks.toml)
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --config .gitleaks.toml >&2 || fail=1
+fi
+
+[ "$fail" -eq 0 ] || { echo "pre-commit: commit blocked." >&2; exit 1; }

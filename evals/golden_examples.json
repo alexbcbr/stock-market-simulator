@@ -1,0 +1,102 @@
+[
+  {
+    "id": "21f656ba-3a64-429b-8940-ec5d9468b1fb",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "The price-to-earnings (P/E) ratio is a stock's price divided by its earnings per share. It shows how much investors are willing to pay per dollar of earnings, used to gauge whether a stock is relatively expensive or cheap compared to its earnings, its own history, or peers. A high P/E can signal high growth expectations (or overvaluation); a low P/E can signal undervaluation (or weak growth prospects).",
+      "question": "Can you explain what a P/E ratio tells investors?"
+    }
+  },
+  {
+    "id": "4d3f22d0-e46a-4b37-9de9-658ea043563d",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "off_topic_refusal",
+      "expected_answer": "I'm not able to help with that \u2014 I'm a financial assistant focused only on stock market and investing topics. I'd be glad to help with a finance-related question.",
+      "question": "What's the weather like in New York today?"
+    }
+  },
+  {
+    "id": "4d609a66-93b8-498a-a019-10cba87d0ef9",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "A bull market is a sustained period of rising asset prices (commonly defined as a 20%+ rise from recent lows), usually reflecting investor optimism and economic growth. A bear market is a sustained period of falling prices (commonly a 20%+ decline from recent highs), usually reflecting pessimism or economic contraction.",
+      "question": "What is the difference between a bull market and a bear market?"
+    }
+  },
+  {
+    "id": "5e2db7fa-1f51-4365-b99a-574dbe8fa83b",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "A growth stock is from a company expected to grow revenue/earnings faster than the market average, usually reinvesting profits instead of paying dividends, and often trades at a higher valuation. A value stock is one trading below what its fundamentals suggest it's worth, typically from a mature company, often paying dividends, and favored for its lower relative valuation (e.g. lower P/E).",
+      "question": "What's the difference between a growth stock and a value stock?"
+    }
+  },
+  {
+    "id": "94fc3ab7-3e29-43c5-a268-bb880c529ef3",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "A single stock carries company-specific risk: if that one company performs poorly, fails, or has negative news, your entire investment is affected. An index fund spreads money across many companies, so poor performance by any one holding has a much smaller impact on the overall fund, though you still face broad market risk.",
+      "question": "What are the risks of investing in a single stock versus an index fund?"
+    }
+  },
+  {
+    "id": "ae7ac210-a13a-41ec-8811-0e3aaeb01398",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "off_topic_refusal",
+      "expected_answer": "I'm a financial assistant and only handle questions related to the financial market, so I can't help with recipes. Let me know if you have a stock or investing question instead.",
+      "question": "What's a good recipe for chocolate chip cookies?"
+    }
+  },
+  {
+    "id": "b0136b4d-ae98-431c-966f-2bc65610e757",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "off_topic_refusal",
+      "expected_answer": "I'm a financial assistant focused on the stock market, so I can't help with general coding tasks like web scraping. I'm happy to help with questions about stocks, trades, or investing.",
+      "question": "Can you write me a Python script to scrape a website?"
+    }
+  },
+  {
+    "id": "bdc9e093-c5d3-42ad-9918-fb7d133ca992",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "Dollar-cost averaging is investing a fixed amount of money at regular intervals (e.g. monthly) regardless of the asset's price. Over time this buys more shares when prices are low and fewer when prices are high, which smooths out the average purchase price and reduces the risk of investing a lump sum right before a downturn.",
+      "question": "What is dollar-cost averaging and how does it work?"
+    }
+  },
+  {
+    "id": "e4dbff9e-98aa-41c9-85d9-b5184d08cf09",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "Generally yes. Diversifying across sectors reduces the risk that a downturn in any single industry significantly hurts your overall portfolio, since different sectors often don't move in the same direction at the same time. It won't eliminate market-wide risk, but it reduces company- and sector-specific risk.",
+      "question": "Should I diversify my portfolio across different sectors?"
+    }
+  },
+  {
+    "id": "fb7c3427-6155-414d-8f93-d753f753835d",
+    "created_at": "2026-10-26T16:06:50Z",
+    "updated_at": "2026-10-26T16:06:50Z",
+    "additional_properties": {
+      "category": "investing_advice",
+      "expected_answer": "A stock represents partial ownership in a company, with returns coming from price appreciation and possibly dividends, and higher risk/reward. A bond is a loan to a company or government that pays periodic interest and returns principal at maturity, generally lower risk and lower expected return than stocks.",
+      "question": "What is the difference between a stock and a bond?"
+    }
+  }
+]

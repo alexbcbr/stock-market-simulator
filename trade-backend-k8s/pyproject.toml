@@ -1,0 +1,19 @@
+[project]
+name = "trade-backend"
+version = "0.1.1"
+description = "trade business logic and persistence"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.139.0",
+    "pytest>=9.1.1",
+    "uvicorn>=0.51.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

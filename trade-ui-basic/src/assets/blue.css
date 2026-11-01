@@ -1,0 +1,172 @@
+:root {
+  --primary-color: #003580;
+  --action-color: #009fe3;
+  --action-hover-color: #0077cc;
+  --accent-color: #feba02;
+  --background-color: #f2f6fa;
+  --text-color: #262626;
+  --border-color: #dee2e6;
+  --surface-color: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 16px 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+main {
+  flex-grow: 1;
+  padding: 32px;
+}
+
+.trades-view {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.form-container,
+.list-container {
+  background-color: var(--surface-color);
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  font-size: 20px;
+  color: var(--primary-color);
+  margin-top: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--action-color);
+  box-shadow: 0 0 0 2px rgba(0, 159, 227, 0.2);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Button Styles */
+button {
+  background-color: var(--action-color);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: var(--action-hover-color);
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+/* ── Responsive: mobile (≤768px) ── */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  .company-logo {
+    height: 28px;
+  }
+
+  main {
+    padding: 16px;
+    padding-bottom: 72px;
+  }
+
+  .trades-view {
+    grid-template-columns: 1fr;
+  }
+}
