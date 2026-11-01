@@ -7,11 +7,15 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
-const BUCKET_NAME = 'com.trade.web';
-
 export class TradeUiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    // Bucket name comes from trade-backend-aws/.env (git-ignored); see .env.example
+    const BUCKET_NAME = process.env.BUCKET_NAME;
+    if (!BUCKET_NAME) {
+      throw new Error('BUCKET_NAME is not set. Copy .env.example to .env and set BUCKET_NAME.');
+    }
 
     // Pass --context bucketExists=true when the bucket already exists outside this stack
     // (e.g. after cdk destroy with RETAIN policy, then redeploying)

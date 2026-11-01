@@ -33,7 +33,7 @@ Makefile              # Root-level CDK deploy shortcuts
 
 ## Tooling
 
-Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip/python). Most Python projects are `uv`-managed (`pyproject.toml` + `uv.lock`): use `uv sync` / `uv run`. JS projects still contain a legacy `package-lock.json` (no `bun.lock` yet); `bun install` will generate one.
+Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip/python). Most Python projects are `uv`-managed (`pyproject.toml` + `uv.lock`): use `uv sync` / `uv run`. JS projects (`trade-backend-aws`, `trade-ui`, `trade-ui-basic`) are locked with `bun.lock`; don't reintroduce `package-lock.json` (two lockfiles break CDK synth).
 
 ## Commands
 
