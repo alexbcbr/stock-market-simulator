@@ -1,0 +1,40 @@
+name: Claude Review
+
+# Claude Code reviews PRs into main, using AWS Bedrock (us-west-2) via OIDC.
+# Required repo variables (Settings > Secrets and variables > Actions > Variables):
+#   AWS_ROLE_ARN       e.g. arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>
+#   BEDROCK_MODEL_ID   Bedrock model / inference-profile ID enabled in us-west-2
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write # required for AWS OIDC
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+
+      - name: Claude code review
+        uses: anthropics/claude-code-action@v1
+        with:
+          use_bedrock: "true"
+          prompt: |
+            Review this pull request. Focus on bugs, security issues
+            (secrets, injection, unsafe AWS/IAM config) and readability.
+            Be concise and cite file and line numbers.
+          claude_args: |
+            --model ${{ vars.BEDROCK_MODEL_ID }}
