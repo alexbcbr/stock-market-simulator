@@ -1,0 +1,31 @@
+name: CI
+
+# Runs on PRs into main (before merge) and on pushes to main (after merge).
+# Pushes to dev don't trigger it; use "Run workflow" for a manual run on any branch.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Ruff lint
+        run: uvx ruff check .
+
+      - name: Ruff format check
+        run: uvx ruff format --check .
+
+  # Later:
+  # test-backend:      cd trade-backend-k8s && uv run pytest
+  # security:          dependency audit / SAST (or a separate security.yml)
