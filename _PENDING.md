@@ -1,13 +1,3 @@
-- [ ] test all apps
-
-- [ ] git add, commit and push
-- [ ] change the stock-market-simulator para public
-- [ ] test push again
-- [ ] Fix TODO-LIST plugin of VSCode
-
-- [ ] save old repo gartner-stock-market-simulator
-- [ ] delete gartner-stock-market-simulator
-- [ ] change the name of the repo to stock-market-simulator
 - [ ] workflow de lint no github
 - [ ] add spec-driven-development
 
@@ -26,3 +16,8 @@
 - [ ] deepWiki (cognition map)
 - [ ] test doc generation
 - [ ] test OpenAPI
+
+
+Low Priority
+- [ ] save old repo gartner-stock-market-simulator
+- [ ] delete gartner-stock-market-simulator
