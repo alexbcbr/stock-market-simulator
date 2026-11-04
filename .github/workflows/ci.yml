@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  issues: write # needed by report-failure to open/comment on issues
 
 jobs:
   lint-python:
@@ -25,6 +26,28 @@ jobs:
 
       - name: Ruff format check
         run: uvx ruff format --check .
+
+  # Opens (or comments on) a GitHub issue when CI fails on main.
+  # Skipped for PR runs: the red check on the PR is enough.
+  report-failure:
+    needs: [lint-python] # add new jobs here (tests, security)
+    if: failure() && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="CI failing on main"
+          body="CI failed on commit ${GITHUB_SHA::7}. Run: $RUN_URL"
+          existing=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
 
   # Later:
   # test-backend:      cd trade-backend-k8s && uv run pytest
