@@ -71,3 +71,5 @@ flowchart LR
 - **UI data shape.** Against the AWS backend the UI parses raw DynamoDB JSON in its Pinia stores.
 - **Market data** is loaded into DynamoDB by `yahoo-finance-stocks/` and into SQLite from `ddl/`.
 - Dashed lines are optional/alternative or non-request paths (static hosting, tracing).
+- 2 branches (dev and main)
+- GitHub workflows as my CI/CD
