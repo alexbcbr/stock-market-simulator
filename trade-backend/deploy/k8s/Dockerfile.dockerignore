@@ -1,0 +1,8 @@
+# Allow-list: send only what the Dockerfile copies.
+*
+!trade-backend/package.json
+!trade-backend/bun.lock
+!trade-backend/src
+!trade-backend/scripts/seed.ts
+!yahoo-finance-stocks/prod-data/2026-01-21.csv
+!yahoo-finance-stocks/prod-data/nasdaq.csv

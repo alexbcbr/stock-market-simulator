@@ -9,7 +9,7 @@ A stock market simulation game for education. Players submit trades against real
 ## Project Structure
 
 ```
-trade-backend-aws/    # AWS CDK app (TypeScript) — DynamoDB, API Gateway, Lambda, S3/CloudFront
+trade-backend/        # Multi-target TypeScript backend (AWS CDK today; Azure, local, k8s planned) — DynamoDB, API Gateway, Lambda, S3/CloudFront
 trade-backend-k8s/    # FastAPI backend (Python, uv) + SQLite, Dockerfile, k8s manifest
 trade-ui/             # Vue 3 + Vite frontend (TypeScript) — graphs, mobile-friendly layout
 trade-ui-basic/       # Simpler variant of trade-ui (adds Toast + notifications store)
@@ -29,29 +29,61 @@ _PENDING.md           # Personal TODO list for the repo
 Makefile              # Root-level CDK deploy shortcuts
 ```
 
-> `docs/development.md` still references the old names `trade-backend/` (now `trade-backend-aws/` or `trade-backend-k8s/`) and `trade-backend-py`. Prefer the paths above.
+> `docs/development.md` still references the old names `trade-backend/` (the old Python backend, now `trade-backend-k8s/`) and `trade-backend-py`. Note `trade-backend/` now means the multi-target TypeScript backend (formerly `trade-backend-aws/`). Prefer the paths above.
 
 ## Tooling
 
-Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip/python). Most Python projects are `uv`-managed (`pyproject.toml` + `uv.lock`): use `uv sync` / `uv run`. JS projects (`trade-backend-aws`, `trade-ui`, `trade-ui-basic`) are locked with `bun.lock`; don't reintroduce `package-lock.json` (two lockfiles break CDK synth).
+Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip/python). Most Python projects are `uv`-managed (`pyproject.toml` + `uv.lock`): use `uv sync` / `uv run`. JS projects (`trade-backend`, `trade-ui`, `trade-ui-basic`) are locked with `bun.lock`; don't reintroduce `package-lock.json` (two lockfiles break CDK synth).
 
 ## Commands
 
-### AWS backend (CDK + Lambda) — `trade-backend-aws/`
+### AWS backend (CDK + Lambda) — `trade-backend/deploy/aws-cdk/`
 ```bash
-cd trade-backend-aws
+cd trade-backend
 bun install
 bun run build        # tsc compile
-bun run watch        # tsc watch mode
+bun test             # unit, repository contract, API and VTL template tests
 
-bunx cdk deploy TradeDbStack
-bunx cdk deploy TradeControllerStack
-bunx cdk deploy TradeUiStack
-bunx cdk deploy TradeUiStack --context bucketExists=true   # existing S3 bucket
-bunx cdk deploy                                            # all stacks
-bunx cdk diff TradeControllerStack
+bun run cdk synth                                   # `bun run cdk` runs cdk from deploy/aws-cdk
+bun run cdk deploy TradeDbStack
+bun run cdk deploy TradeControllerStack
+bun run cdk deploy TradeUiStack
+bun run cdk deploy TradeUiStack --context bucketExists=true   # existing S3 bucket
+bun run cdk deploy --all
+bun run cdk diff TradeControllerStack
 ```
-The root `Makefile` has similar targets (`deploy-db`, `deploy-controller`, `deploy-ui`, `deploy-all`, `diff-controller`) and now use `trade-backend-aws` with bun/bunx. (`deploy-ui` is defined twice — the later CDK one wins; the first one only syncs `trade-ui/dist` to S3.)
+The root `Makefile` has the same targets (`deploy-db`, `deploy-controller`, `deploy-ui`, `deploy-all`, `diff-controller`). (`deploy-ui` is defined twice — the later CDK one wins; the first one only syncs `trade-ui/dist` to S3.) CDK `.env` (BUCKET_NAME) lives in `trade-backend/deploy/aws-cdk/.env`.
+
+### Deploying and verifying all targets — `trade-backend/deploy/README.md`
+`make validate-all` (from `trade-backend/`) runs every offline check; `scripts/smoke.sh <base-url>` is the shared API check for local, k8s, AWS and Azure. The README has the per-provider checklist.
+
+### Local server — `trade-backend/` (Hono + Drizzle + SQLite on bun)
+```bash
+cd trade-backend
+make run-local       # seeds data/trade.db from yahoo-finance-stocks/prod-data, serves http://localhost:8080
+make test            # bun test (engine, service, repository contract, API)
+make smoke           # scripts/smoke.sh against the local server; pass URL=... for any other deployment
+```
+Port 8080 (the FastAPI backend uses 8000). Layout: `src/core` (pure rules + repository ports), `src/adapters/{dynamodb,sqlite}`, `src/api/app.ts` (Hono routes), `src/entrypoints/server.ts`, `src/handlers` (AWS Lambda, thin). API contract: `api-contract/openapi.yaml` — plain JSON on every deployment.
+
+### Local Kubernetes — `trade-backend/deploy/k8s/` (Docker Desktop cluster, plain kubectl)
+```bash
+cd trade-backend
+make validate-k8s    # client + server dry-run only; changes nothing in the cluster
+make k8s-build       # docker build -> trade-backend-ts:latest (context is the repo root)
+make k8s-apply       # PVC + Deployment (1 replica, SQLite on the volume) + Service
+make k8s-forward     # http://localhost:8081  (K8S_PORT=...); then: make smoke URL=http://localhost:8081
+make k8s-delete      # keeps the data volume; k8s-delete-data removes it too
+```
+Names are `trade-backend-ts` (image, Deployment, Service, PVC) so they don't clash with the Python `trade-backend` manifest in `trade-backend-k8s/k8s/`. The image seeds SQLite on start from the CSVs baked in at build time.
+
+### Azure — `trade-backend/deploy/azure-terraform/` (Cosmos DB + Functions + API Management)
+```bash
+cd trade-backend
+make validate-azure   # offline: terraform fmt/validate (Docker image if terraform is not installed) + Function bundle
+make build-function   # deploy/azure-terraform/function/dist/function.zip
+```
+Deploy steps are in `deploy/azure-terraform/README.md` (terraform apply, `publish-function.sh`, `scripts/seed-cosmos.ts`, then `scripts/smoke.sh`). Cosmos adapter tests against the local emulator: see the header of `tests/cosmos.contract.test.ts` (`COSMOS_EMULATOR_URL`); they are skipped otherwise.
 
 ### FastAPI backend — `trade-backend-k8s/`
 ```bash
@@ -114,14 +146,14 @@ Data lives in `prod-data/`, `test-data/`, `exploratory-data/`; see `README_IMPOR
 
 ## Architecture
 
-### AWS Infrastructure (`trade-backend-aws`, 3 CDK Stacks)
+### AWS Infrastructure (`trade-backend`, 3 CDK Stacks)
 
 **TradeDbStack** — creates DynamoDB tables:
 - `market_price` (PK: `symbol`) — daily OHLCV data per ticker
 - `market_symbol` (PK: `symbol`) — ticker metadata (name, sector, industry)
 - `trade` (PK: `trade_id`, SK: `trade_timestamp`) — executed trades, with GSI `idx_trade_customer_name` (PK: `customer_name`, SK: `trade_timestamp`)
 
-**TradeControllerStack** — API Gateway REST API at `/prod`:
+**TradeControllerStack** — API Gateway REST API at `/prod` (the DynamoDB-integrated routes use response mapping templates from `deploy/aws-cdk/lib/dynamodb-vtl.ts` so every route returns plain JSON, per `api-contract/openapi.yaml`):
 - `GET /listAllTrades` — DynamoDB Scan integration (no Lambda)
 - `POST /listTradesByCustomerName` — DynamoDB Query via GSI (no Lambda)
 - `GET /listMarketPrices` — DynamoDB Scan integration (no Lambda)
@@ -131,14 +163,15 @@ Data lives in `prod-data/`, `test-data/`, `exploratory-data/`; see `README_IMPOR
 
 Handlers also exist for `listMarketPrices.ts` and `sellStock.ts`; models in `src/models/`, logic in `src/services/`.
 
-**TradeUiStack** — S3 + CloudFront for the built Vue app. The built UI assets must be placed in `trade-backend-aws/website/` before deploying this stack.
+**TradeUiStack** — S3 + CloudFront for the built Vue app. The built UI assets must be placed in `trade-backend/deploy/aws-cdk/website/` before deploying this stack.
 
-### Trade Execution Logic (`trade-backend-aws/src/services/tradeService.ts`)
+### Trade Execution Logic (`trade-backend/src/core/tradeEngine.ts`, used by `core/tradeService.ts`)
 
-Three `price_mode` values affect how `executed_price` and `status_trade` are determined:
-- `market` — random between `lowest_price` and 72% of `highest_price`; always succeeds
-- `agent` — random between 70–100% of `highest_price`; always succeeds
-- `manual` — user provides `bid_price`; succeeds only if bid is ≤ `lowest + 45% × (highest − lowest)`, otherwise the trade is recorded as failed (`status_trade: false`)
+Five `price_mode` values affect how `executed_price` and `status_trade` are determined (range = `highest − lowest`):
+- `market` — random between `lowest + 48% × range` and `highest`; always succeeds
+- `agent_aggressive` / `agent_moderate` / `agent_conservative` — random within `lowest + [0–50%]`, `[5–45%]`, `[10–40%]` of the range; always succeed
+- `manual` — user provides `bid_price`: ≥ highest executes at highest (success); ≤ lowest fails at the bid; in between executes at the bid and succeeds only if a random point in the range exceeds `lowest + 45% × range`
+- `agent` is legacy: it only appears on old stored trades and is rejected for new ones
 
 The FastAPI backend (`trade-backend-k8s`) is a separate, SQLite-backed implementation of the same domain (see `ddl/` for its schema); verify its logic in `app/services/` rather than assuming it matches the above.
 
@@ -149,7 +182,7 @@ Vue 3 SPA using Pinia stores and Vue Router (hash history). Three routes:
 - `/market-prices` — MarketPricesView: browse available stocks with prices
 - `/leaderboard` — LeaderboardView: ranking by player
 
-When targeting the AWS backend, the UI reads DynamoDB items returned as raw DynamoDB JSON (e.g., `{ S: "AAPL" }`), not plain JSON — parsing happens in the Pinia stores.
+Every backend (AWS, local/k8s Hono, Python) must return plain JSON per `trade-backend/api-contract/openapi.yaml`; the Pinia stores no longer parse DynamoDB-typed JSON.
 
 The two UIs are near-copies; `trade-ui-basic` adds `components/Toast.vue` and `stores/notifications.ts`, and they differ in `App.vue`, `TradeList.vue`, `TradeLeaderboard.vue`, `services/api.ts`, and the `marketPrices`/`trades` stores. Unifying them is an open TODO in `_PENDING.md` — check whether a change needs to be applied to both.
 

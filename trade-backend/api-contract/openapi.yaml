@@ -1,0 +1,104 @@
+openapi: 3.0.3
+info:
+  title: Trade API
+  version: 1.0.0
+  description: >
+    Single contract for every deployment (AWS API Gateway, Azure API Management,
+    local Bun server, Kubernetes). All responses are plain JSON, never DynamoDB-typed JSON.
+    Verify any deployment with scripts/smoke.sh <base-url>.
+paths:
+  /listAllTrades:
+    get:
+      responses:
+        '200': { description: All trades, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Trade' } } } } }
+  /listTradesByCustomerName:
+    post:
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [customer_name], properties: { customer_name: { type: string } } } } }
+      responses:
+        '200': { description: Trades for the customer, newest first by trade_timestamp, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Trade' } } } } }
+        '400': { $ref: '#/components/responses/Error' }
+  /listMarketPrices:
+    get:
+      responses:
+        '200': { description: All market prices, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/MarketPrice' } } } } }
+  /getMarketPrice:
+    get:
+      parameters: [{ name: symbol, in: query, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Price, content: { application/json: { schema: { $ref: '#/components/schemas/MarketPrice' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /getMarketSymbol:
+    get:
+      parameters: [{ name: symbol, in: query, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: Symbol metadata, content: { application/json: { schema: { $ref: '#/components/schemas/MarketSymbol' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /buyStock:
+    post:
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/BuyStockRequest' } } }
+      responses:
+        '201': { description: Trade executed (status_trade may be false for a failed manual bid), content: { application/json: { schema: { $ref: '#/components/schemas/Trade' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+  /sellStock:
+    post:
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [trade_id, trade_timestamp], properties: { trade_id: { type: string }, trade_timestamp: { type: string } } } } }
+      responses:
+        '200': { description: Marked as sold, content: { application/json: { schema: { type: object, properties: { success: { type: boolean } } } } } }
+        '400': { $ref: '#/components/responses/Error' }
+components:
+  responses:
+    Error:
+      description: Error
+      content: { application/json: { schema: { type: object, required: [error], properties: { error: { type: string } } } } }
+  schemas:
+    BuyStockRequest:
+      type: object
+      required: [symbol, customer_name, price_mode]
+      properties:
+        symbol: { type: string }
+        customer_name: { type: string }
+        price_mode: { type: string, enum: [manual, market, agent_conservative, agent_moderate, agent_aggressive] }
+        bid_price: { type: number, minimum: 0, description: Required when price_mode is manual }
+    Trade:
+      type: object
+      properties:
+        trade_id: { type: string }
+        symbol: { type: string }
+        customer_name: { type: string }
+        executed_price: { type: number }
+        open_price: { type: number }
+        close_price: { type: number }
+        price_difference: { type: number }
+        status_trade: { type: boolean }
+        status_sell: { type: boolean }
+        trade_source: { type: string, description: 'One of the price modes, or legacy "agent" on old trades' }
+        trade_timestamp: { type: string, description: 'HH:MM:SS, America/Los_Angeles' }
+    MarketPrice:
+      type: object
+      properties:
+        symbol: { type: string }
+        open_price: { type: number }
+        close_price: { type: number }
+        highest_price: { type: number }
+        lowest_price: { type: number }
+        volume: { type: number }
+    MarketSymbol:
+      type: object
+      properties:
+        symbol: { type: string }
+        name: { type: string }
+        lastSale: { type: string }
+        marketCap: { type: string }
+        ipoYear: { type: string }
+        sector: { type: string }
+        industry: { type: string }
+        summaryQuote: { type: string }
