@@ -1,0 +1,75 @@
+# SQLite lives on a PersistentVolume, so there is exactly one replica
+# and the old pod is stopped before the new one starts (strategy: Recreate).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: trade-backend-ts-data
+  labels:
+    app: trade-backend-ts
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trade-backend-ts
+  labels:
+    app: trade-backend-ts
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: trade-backend-ts
+  template:
+    metadata:
+      labels:
+        app: trade-backend-ts
+    spec:
+      containers:
+        - name: trade-backend-ts
+          image: trade-backend-ts:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: DB_PATH
+              value: /data/trade.db
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet: { path: /health, port: 8080 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 8080 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: trade-backend-ts-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trade-backend-ts
+  labels:
+    app: trade-backend-ts
+spec:
+  type: ClusterIP
+  selector:
+    app: trade-backend-ts
+  ports:
+    - port: 8080
+      targetPort: 8080

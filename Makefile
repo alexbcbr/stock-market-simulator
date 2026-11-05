@@ -9,19 +9,19 @@ create-db-sqlite3:
 
 # CDK commands
 deploy-ui:
-	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeUiStack
+	cd trade-backend && bun install && bun run build && bun run cdk deploy TradeUiStack
 
 deploy-db:
-	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeDbStack
+	cd trade-backend && bun install && bun run build && bun run cdk deploy TradeDbStack
 
 deploy-controller:
-	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy TradeControllerStack
+	cd trade-backend && bun install && bun run build && bun run cdk deploy TradeControllerStack
 
 deploy-all:
-	cd trade-backend-aws && bun install && bun run build && bunx cdk deploy
+	cd trade-backend && bun install && bun run build && bun run cdk deploy --all
 
 diff-controller:
-	cd trade-backend-aws && bunx cdk diff TradeControllerStack
+	cd trade-backend && bun run cdk diff TradeControllerStack
 
 deploy:
 	cdk deploy TradeDbStack
