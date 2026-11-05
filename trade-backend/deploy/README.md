@@ -25,7 +25,7 @@ From `trade-backend/`:
 | `make validate-all` | all of the above, plus `docker build` of the image |
 | `make aws-diff` | what a deploy would change in AWS (read-only, but uploads the template asset to the CDK bootstrap bucket) |
 
-Optional, needs Docker: `COSMOS_EMULATOR_URL=http://localhost:8083 bun test tests/cosmos.contract.test.ts` runs the Cosmos adapter against the local emulator (see the file header for the `docker run`).
+Optional, needs Docker: `COSMOS_EMULATOR_URL=http://localhost:8083 COSMOS_EMULATOR_KEY=<emulator key> bun test tests/cosmos.contract.test.ts` runs the Cosmos adapter against the local emulator. The key is the public one in Microsoft's emulator docs (not stored in the repo, so secret scanners stay quiet); see the file header for the `docker run`.
 
 ## Deployment order and what to check at each provider
 Do one target at a time; run the smoke test after each.

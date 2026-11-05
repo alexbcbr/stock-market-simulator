@@ -83,7 +83,7 @@ cd trade-backend
 make validate-azure   # offline: terraform fmt/validate (Docker image if terraform is not installed) + Function bundle
 make build-function   # deploy/azure-terraform/function/dist/function.zip
 ```
-Deploy steps are in `deploy/azure-terraform/README.md` (terraform apply, `publish-function.sh`, `scripts/seed-cosmos.ts`, then `scripts/smoke.sh`). Cosmos adapter tests against the local emulator: see the header of `tests/cosmos.contract.test.ts` (`COSMOS_EMULATOR_URL`); they are skipped otherwise.
+Deploy steps are in `deploy/azure-terraform/README.md` (terraform apply, `publish-function.sh`, `scripts/seed-cosmos.ts`, then `scripts/smoke.sh`). Cosmos adapter tests against the local emulator: see the header of `tests/cosmos.contract.test.ts` (`COSMOS_EMULATOR_URL` and `COSMOS_EMULATOR_KEY`, the public key from Microsoft's emulator docs); they are skipped otherwise.
 
 ### FastAPI backend — `trade-backend-k8s/`
 ```bash
