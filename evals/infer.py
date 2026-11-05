@@ -32,18 +32,22 @@ for ex in examples:
     question = ex["additional_properties"]["question"]
     start = time.time()
 
-    result = model.invoke([
-        SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=question),
-    ])
+    result = model.invoke(
+        [
+            SystemMessage(content=SYSTEM_PROMPT),
+            HumanMessage(content=question),
+        ]
+    )
     output_text = result.content
 
     latency_ms = round((time.time() - start) * 1000)
-    runs.append({
-        "example_id": ex["id"],
-        "output": output_text,
-        "metadata": {"model": MODEL_ID, "latency_ms": latency_ms},
-    })
+    runs.append(
+        {
+            "example_id": ex["id"],
+            "output": output_text,
+            "metadata": {"model": MODEL_ID, "latency_ms": latency_ms},
+        }
+    )
     print(f"  {ex['id']}: {latency_ms}ms", file=sys.stderr)
 
 json.dump(runs, sys.stdout, indent=2)

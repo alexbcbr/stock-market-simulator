@@ -30,26 +30,30 @@ load_dotenv()
 
 SYSTEM_PROMPT = "You're a financial assistant. Don't answer question outside of the context of financial market."
 
-mcp_client = MultiServerMCPClient({
-    "stocks": {
-        "url": "http://127.0.0.1:8001/mcp",
-        "transport": "http",
+mcp_client = MultiServerMCPClient(
+    {
+        "stocks": {
+            "url": "http://127.0.0.1:8001/mcp",
+            "transport": "http",
+        }
     }
-})
+)
 
 checkpointer = InMemorySaver()
+
 
 def build_agent(tools):
     return create_agent(
         model=init_chat_model(
-            model='us.anthropic.claude-sonnet-4-5-20250929-v1:0',
-            model_provider='bedrock_converse',
+            model="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            model_provider="bedrock_converse",
             temperature=0.1,
         ),
         tools=tools,
         system_prompt=SYSTEM_PROMPT,
         checkpointer=checkpointer,
     )
+
 
 async def inference(agent, question: str, thread_id: str):
     config = {"configurable": {"thread_id": thread_id}}
@@ -59,6 +63,7 @@ async def inference(agent, question: str, thread_id: str):
     )
     return result["messages"][-1].content
 
+
 async def main():
     tools = await mcp_client.get_tools()
     agent = build_agent(tools)
@@ -66,10 +71,11 @@ async def main():
     print("*** Welcome to the Financial Bot. How can I help? ***")
     print("***************************************************")
     thread_id = "cli-session"
-    while(True):
+    while True:
         question = await asyncio.to_thread(input, ">> ")
         print(await inference(agent, question, thread_id))
         print("***************************************************")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

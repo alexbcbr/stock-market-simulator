@@ -1,13 +1,12 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
-
 from app.schemas.market_price import MarketPrice
 from app.services.market_price_services import (
     create_market_price,
     list_market_prices,
     remove_market_price,
 )
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 

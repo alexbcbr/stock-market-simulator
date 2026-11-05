@@ -4,8 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import instrumentation  # must be imported before claude_agent_sdk below
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, AssistantMessage, TextBlock, ResultMessage
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+    ResultMessage,
+    TextBlock,
+)
 
 options = ClaudeAgentOptions(
     model="claude-haiku-4-5-20251001",
@@ -14,7 +19,7 @@ options = ClaudeAgentOptions(
     env={"CLAUDE_CODE_USE_BEDROCK": "1"},
 )
 
-#permission_mode="bypassPermissions",
+# permission_mode="bypassPermissions",
 
 RESEARCH_PROMPT = "Research {tickers}. Focus on: {focus}. Use web search."
 
@@ -23,6 +28,7 @@ WRITE_PROMPT = (
     "Do not ask for approval or confirm the structure first — just write the final report directly. "
     "Output the report as plain text in your response only — do not create or save any files."
 )
+
 
 async def financial_report(tickers: str, focus: str) -> str:
     async with ClaudeSDKClient(options=options) as client:
@@ -39,7 +45,7 @@ async def financial_report(tickers: str, focus: str) -> str:
 
         # Turn 2: Write report
 
-        print(f"--- Writing report ---")
+        print("--- Writing report ---")
         await client.query(WRITE_PROMPT)
         report = ""
         async for message in client.receive_response():

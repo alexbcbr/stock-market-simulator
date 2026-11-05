@@ -1,10 +1,10 @@
-from app.db import get_connection
 import pytest
-
-from app.repositories import trade_repository as trade
+from app.db import get_connection
 from app.repositories import market_price_repository as mp
+from app.repositories import trade_repository as trade
 from app.schemas.market_price import MarketPrice
 from app.schemas.trade import Trade
+
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_module_data():
@@ -12,12 +12,18 @@ def setup_module_data():
         with get_connection() as conn:
             conn.execute("DELETE FROM trade")
             conn.execute("DELETE FROM market_price")
+
     _clear()
     yield
     _clear()
 
+
 def test_confirm_trade():
-    mp.add(MarketPrice(symbol="GART", open_price=10, high_price=12, low_price=9, close_price=11))
+    mp.add(
+        MarketPrice(
+            symbol="GART", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
     trade.add(
         Trade(
             symbol="GART",
@@ -31,4 +37,3 @@ def test_confirm_trade():
     )
     rows = trade.find_by_customer("Alex")
     assert {row["customer_name"] for row in rows} == {"Alex"}
-

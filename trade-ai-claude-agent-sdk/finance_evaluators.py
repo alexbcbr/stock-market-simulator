@@ -1,6 +1,7 @@
-
 import re
+
 from phoenix.evals import create_evaluator
+
 
 @create_evaluator(name="mentions_ticker", kind="code")
 def mentions_ticker(input, output):
@@ -52,8 +53,18 @@ def contains_price_data(input, output):
 
 
 ACTION_WORDS = (
-    "buy", "sell", "hold", "accumulate", "avoid", "overweight", "underweight",
-    "recommend", "recommendation", "upgrade", "downgrade", "outperform",
+    "buy",
+    "sell",
+    "hold",
+    "accumulate",
+    "avoid",
+    "overweight",
+    "underweight",
+    "recommend",
+    "recommendation",
+    "upgrade",
+    "downgrade",
+    "outperform",
     "underperform",
 )
 

@@ -43,8 +43,12 @@ Does the assistant's answer convey the same key information as the reference ans
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--examples", required=True, help="Path to exported dataset JSON")
-    parser.add_argument("--runs", required=True, help="Path to exported experiment runs JSON")
+    parser.add_argument(
+        "--examples", required=True, help="Path to exported dataset JSON"
+    )
+    parser.add_argument(
+        "--runs", required=True, help="Path to exported experiment runs JSON"
+    )
     args = parser.parse_args()
 
     judge_model = init_chat_model(
@@ -70,12 +74,18 @@ def main():
         )
         result = judge_model.invoke([HumanMessage(content=prompt)])
         label = result.content.strip().lower()
-        label = "correct" if "correct" in label and "incorrect" not in label else "incorrect"
+        label = (
+            "correct"
+            if "correct" in label and "incorrect" not in label
+            else "incorrect"
+        )
 
-        annotations.append({
-            "record_id": run["id"],
-            "values": [{"name": "correctness", "label": label}],
-        })
+        annotations.append(
+            {
+                "record_id": run["id"],
+                "values": [{"name": "correctness", "label": label}],
+            }
+        )
         print(f"  run {run['id']}: {label}", file=sys.stderr)
 
     json.dump(annotations, sys.stdout, indent=2)

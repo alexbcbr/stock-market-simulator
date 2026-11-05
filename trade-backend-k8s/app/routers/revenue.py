@@ -1,8 +1,7 @@
 import logging
 
-from fastapi import APIRouter
-
 from app.services.market_price_services import getRevenue
+from fastapi import APIRouter
 
 logger = logging.getLogger(__name__)
 
