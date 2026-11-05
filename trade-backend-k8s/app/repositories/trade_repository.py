@@ -1,10 +1,12 @@
+import logging
+
 from app.db import get_connection
 from app.schemas.trade import Trade
 from app.utils.logging import setup_logging
-import logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
+
 
 def add(trade: Trade):
     with get_connection() as conn:
@@ -26,10 +28,14 @@ def add(trade: Trade):
         )
         logger.info("End Transaction record in Trade table")
 
+
 def find_by_customer(customer_name: str):
     with get_connection() as conn:
-        rows = conn.execute("SELECT * FROM trade WHERE customer_name = ?", (customer_name,)).fetchall()
+        rows = conn.execute(
+            "SELECT * FROM trade WHERE customer_name = ?", (customer_name,)
+        ).fetchall()
         return [dict(row) for row in rows]
+
 
 def get_all():
     with get_connection() as conn:

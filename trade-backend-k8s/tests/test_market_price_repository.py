@@ -1,11 +1,12 @@
 import sqlite3
-import pytest
 
+import pytest
 from app.db import get_connection
 from app.repositories import market_price_repository as mp
 from app.schemas.market_price import MarketPrice
 
 SYMBOLS = ("AAPL", "GART")
+
 
 @pytest.fixture(autouse=True)
 def clear_market_price():
@@ -21,34 +22,76 @@ def clear_market_price():
 
 
 def test_insert_market_price():
-    mp.add(MarketPrice(symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11))
+    mp.add(
+        MarketPrice(
+            symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
 
     rows = mp.get_all("AAPL")
     assert rows == [
-        {"symbol": "AAPL", "open_price": 10, "high_price": 12, "low_price": 9, "close_price": 11}
+        {
+            "symbol": "AAPL",
+            "open_price": 10,
+            "high_price": 12,
+            "low_price": 9,
+            "close_price": 11,
+        }
     ]
 
 
 def test_insert_market_price_duplicate_symbol_raises():
-    mp.add(MarketPrice(symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11))
+    mp.add(
+        MarketPrice(
+            symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
 
     with pytest.raises(sqlite3.IntegrityError):
-        mp.add(MarketPrice(symbol="AAPL", open_price=20, high_price=22, low_price=19, close_price=21))
+        mp.add(
+            MarketPrice(
+                symbol="AAPL",
+                open_price=20,
+                high_price=22,
+                low_price=19,
+                close_price=21,
+            )
+        )
 
 
 def test_insert_market_price_invalid_symbol_raises():
     with pytest.raises(sqlite3.IntegrityError):
-        mp.add(MarketPrice(symbol="aapl", open_price=10, high_price=12, low_price=9, close_price=11))
+        mp.add(
+            MarketPrice(
+                symbol="aapl", open_price=10, high_price=12, low_price=9, close_price=11
+            )
+        )
 
 
 def test_insert_market_price_negative_price_raises():
     with pytest.raises(sqlite3.IntegrityError):
-        mp.add(MarketPrice(symbol="AAPL", open_price=-10, high_price=12, low_price=9, close_price=11))
+        mp.add(
+            MarketPrice(
+                symbol="AAPL",
+                open_price=-10,
+                high_price=12,
+                low_price=9,
+                close_price=11,
+            )
+        )
 
 
 def test_select_market_prices_returns_all():
-    mp.add(MarketPrice(symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11))
-    mp.add(MarketPrice(symbol="GART", open_price=20, high_price=22, low_price=19, close_price=21))
+    mp.add(
+        MarketPrice(
+            symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
+    mp.add(
+        MarketPrice(
+            symbol="GART", open_price=20, high_price=22, low_price=19, close_price=21
+        )
+    )
 
     rows = mp.get_all()
 
@@ -57,13 +100,27 @@ def test_select_market_prices_returns_all():
 
 
 def test_select_market_prices_filters_by_symbol():
-    mp.add(MarketPrice(symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11))
-    mp.add(MarketPrice(symbol="GART", open_price=20, high_price=22, low_price=19, close_price=21))
+    mp.add(
+        MarketPrice(
+            symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
+    mp.add(
+        MarketPrice(
+            symbol="GART", open_price=20, high_price=22, low_price=19, close_price=21
+        )
+    )
 
     rows = mp.get_all("GART")
 
     assert rows == [
-        {"symbol": "GART", "open_price": 20, "high_price": 22, "low_price": 19, "close_price": 21}
+        {
+            "symbol": "GART",
+            "open_price": 20,
+            "high_price": 22,
+            "low_price": 19,
+            "close_price": 21,
+        }
     ]
 
 
@@ -72,7 +129,11 @@ def test_select_market_prices_unknown_symbol_returns_empty():
 
 
 def test_delete_market_price_removes_row():
-    mp.add(MarketPrice(symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11))
+    mp.add(
+        MarketPrice(
+            symbol="AAPL", open_price=10, high_price=12, low_price=9, close_price=11
+        )
+    )
 
     deleted = mp.remove("AAPL")
 

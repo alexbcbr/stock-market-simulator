@@ -1,10 +1,9 @@
 import logging
 
+from app.routers import market_price, revenue, trade
+from app.utils.logging import setup_logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.utils.logging import setup_logging
-from app.routers import market_price, revenue, trade
 
 setup_logging()
 logger = logging.getLogger(__name__)

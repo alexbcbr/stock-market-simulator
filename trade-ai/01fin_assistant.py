@@ -22,14 +22,15 @@ checkpointer = InMemorySaver()
 
 agent = create_agent(
     model=init_chat_model(
-        model='us.anthropic.claude-sonnet-4-5-20250929-v1:0',
-        model_provider='bedrock_converse',
+        model="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        model_provider="bedrock_converse",
         temperature=0.1,
     ),
     tools=[],
     system_prompt=SYSTEM_PROMPT,
     checkpointer=checkpointer,
 )
+
 
 def inference(question: str, thread_id: str):
     config = {"configurable": {"thread_id": thread_id}}
@@ -39,11 +40,12 @@ def inference(question: str, thread_id: str):
     )
     return result["messages"][-1].content
 
+
 if __name__ == "__main__":
     print("*** Welcome to the Financial Bot. How can I help? ***")
     print("***************************************************")
     thread_id = "cli-session"
-    while(True):
+    while True:
         question = input(">> ")
         print(inference(question, thread_id))
         print("***************************************************")

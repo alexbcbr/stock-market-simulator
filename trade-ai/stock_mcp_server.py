@@ -1,8 +1,8 @@
-from dotenv import load_dotenv
 import json
 import urllib.error
 import urllib.request
 
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
 load_dotenv()
@@ -10,7 +10,7 @@ load_dotenv()
 mcp = FastMCP("stocks", host="127.0.0.1", port=8001)
 BASE_URL = "http://127.0.0.1:8000"
 
-users_authorized=["alex", "john", "sue", "maria", "jim"]
+users_authorized = ["alex", "john", "sue", "maria", "jim"]
 
 
 class ApiError(Exception):
@@ -32,32 +32,35 @@ def _request(method, path, payload=None):
     except urllib.error.URLError as exc:
         raise ApiError(f"Could not reach {url}: {exc.reason}") from exc
 
+
 @mcp.tool()
 def check_user(user_name: str) -> bool:
     """Find if the user is authorized to execute a transaction"""
-    if user_name in users_authorized:
-        return True
+    return user_name in users_authorized
 
-    return False
 
 @mcp.tool()
 def buy_stock(ticker: str) -> bool:
     """Buy a stock"""
     return True
 
+
 @mcp.tool()
 def list_market_prices():
     """List all the stocks in the market"""
     return _request("GET", "/market-price")
+
 
 @mcp.tool()
 def list_trades():
     """List all the trades available"""
     return _request("GET", "/trade")
 
+
 @mcp.tool()
 def create_trade(trade):
     """Submit a Trade"""
     return _request("POST", "/trade", trade)
 
-mcp.run(transport='streamable-http')
+
+mcp.run(transport="streamable-http")

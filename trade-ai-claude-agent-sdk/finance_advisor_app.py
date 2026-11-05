@@ -39,8 +39,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import instrumentation  # must be imported before claude_agent_sdk below
-
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,

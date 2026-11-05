@@ -32,7 +32,5 @@ def get_all(symbol=None):
 
 def remove(symbol):
     with get_connection() as conn:
-        cursor = conn.execute(
-            "DELETE FROM market_price WHERE symbol = ?", (symbol,)
-        )
+        cursor = conn.execute("DELETE FROM market_price WHERE symbol = ?", (symbol,))
         return cursor.rowcount

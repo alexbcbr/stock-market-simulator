@@ -24,38 +24,43 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import instrumentation  # must be imported before langchain/mcp below
-
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
+from langchain_aws.middleware.prompt_caching import BedrockPromptCachingMiddleware
 from langchain_core.messages import HumanMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_aws.middleware.prompt_caching import BedrockPromptCachingMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 
 SYSTEM_PROMPT = "You're a financial assistant. Don't answer question outside of the context of financial market."
 
-mcp_client = MultiServerMCPClient({
-    "stocks": {
-        "url": "http://127.0.0.1:8001/mcp",
-        "transport": "http",
+mcp_client = MultiServerMCPClient(
+    {
+        "stocks": {
+            "url": "http://127.0.0.1:8001/mcp",
+            "transport": "http",
+        }
     }
-})
+)
 
 checkpointer = InMemorySaver()
+
 
 def build_agent(tools):
     return create_agent(
         model=init_chat_model(
-            model='us.anthropic.claude-sonnet-4-5-20250929-v1:0',
-            model_provider='bedrock_converse',
+            model="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            model_provider="bedrock_converse",
             temperature=0.1,
             reasoning_effort="medium",
         ),
         tools=tools,
         system_prompt=SYSTEM_PROMPT,
         checkpointer=checkpointer,
-        middleware=[BedrockPromptCachingMiddleware(ttl="5m")], #5m default other option 1h
+        middleware=[
+            BedrockPromptCachingMiddleware(ttl="5m")
+        ],  # 5m default other option 1h
     )
+
 
 async def inference(agent, question: str, thread_id: str):
     config = {"configurable": {"thread_id": thread_id}}
@@ -65,6 +70,7 @@ async def inference(agent, question: str, thread_id: str):
     )
     return result["messages"][-1].content
 
+
 async def main():
     tools = await mcp_client.get_tools()
     agent = build_agent(tools)
@@ -73,13 +79,14 @@ async def main():
     print("***************************************************")
     thread_id = "cli-session"
     try:
-        while(True):
+        while True:
             question = await asyncio.to_thread(input, ">> ")
             print(await inference(agent, question, thread_id))
             print("***************************************************")
     finally:
         instrumentation.tracer_provider.force_flush()
         instrumentation.tracer_provider.shutdown()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,0 +1,2 @@
+# Vendored third-party skills (pinned by skills-lock.json); don't lint or reformat them.
+extend-exclude = [".claude/skills"]

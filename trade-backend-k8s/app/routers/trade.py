@@ -1,9 +1,8 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
-
 from app.schemas.trade import TradeIn
 from app.services.trade_services import create_trade, list_trades
+from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
 

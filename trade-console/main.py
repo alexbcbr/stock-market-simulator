@@ -18,9 +18,7 @@ def print_table(rows):
         print("No records found.")
         return
     headers = list(rows[0].keys())
-    widths = [
-        max(len(h), *(len(str(row[h])) for row in rows)) for h in headers
-    ]
+    widths = [max(len(h), *(len(str(row[h])) for row in rows)) for h in headers]
     print(" | ".join(h.ljust(w) for h, w in zip(headers, widths)))
     print("-" * (sum(widths) + 3 * (len(headers) - 1)))
     for row in rows:
