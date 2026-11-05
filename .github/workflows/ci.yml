@@ -21,11 +21,24 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
+      # Output is saved to ruff.log so report-failure can put it in the issue.
       - name: Ruff lint
-        run: uvx ruff check .
+        run: |
+          set -o pipefail
+          uvx ruff check . --output-format=concise 2>&1 | tee ruff.log
 
       - name: Ruff format check
-        run: uvx ruff format --check .
+        if: ${{ !cancelled() }} # still run (and log) when lint failed
+        run: |
+          set -o pipefail
+          uvx ruff format --check . 2>&1 | tee -a ruff.log
+
+      - name: Upload lint log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-python-log
+          path: ruff.log
 
   # Opens (or comments on) a GitHub issue when CI fails on main.
   # Skipped for PR runs: the red check on the PR is enough.
@@ -34,6 +47,13 @@ jobs:
     if: failure() && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - name: Download failure logs
+        continue-on-error: true # no log if a job without log upload failed
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-log"
+          path: logs
+
       - name: Open or update issue
         env:
           GH_TOKEN: ${{ github.token }}
@@ -41,12 +61,24 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           title="CI failing on main"
-          body="CI failed on commit ${GITHUB_SHA::7}. Run: $RUN_URL"
+          {
+            echo "CI failed on commit ${GITHUB_SHA::7}. Run: $RUN_URL"
+            for f in logs/*/*.log; do
+              [ -f "$f" ] || continue
+              echo
+              echo "### $(basename "$(dirname "$f")")"
+              echo '````'
+              head -c 30000 "$f"
+              echo '````'
+            done
+          } > body.md
+          # GitHub caps bodies at 65536 chars
+          head -c 60000 body.md > body.trimmed.md
           existing=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body "$body"
+            gh issue comment "$existing" --body-file body.trimmed.md
           else
-            gh issue create --title "$title" --body "$body"
+            gh issue create --title "$title" --body-file body.trimmed.md
           fi
 
   # Later:
