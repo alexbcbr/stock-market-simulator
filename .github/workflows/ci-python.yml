@@ -1,4 +1,4 @@
-name: CI
+name: CI Python
 
 # Runs on PRs into main (before merge) and on pushes to main (after merge).
 # Pushes to dev don't trigger it; use "Run workflow" for a manual run on any branch.

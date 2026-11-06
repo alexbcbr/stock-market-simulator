@@ -1,0 +1,60 @@
+name: CI TypeScript
+
+# Runs on PRs into main (before merge) and on pushes to main (after merge).
+# Pushes to dev don't trigger it; use "Run workflow" for a manual run on any branch.
+# Python checks live in ci-python.yml.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trade-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: trade-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      # --frozen-lockfile fails if bun.lock is out of sync with package.json.
+      - run: bun install --frozen-lockfile
+
+      - name: Type-check and compile
+        run: bun run build
+
+      - name: Tests
+        run: bun test
+
+  trade-ui:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # report both UIs even if one fails
+      matrix:
+        project: [trade-ui, trade-ui-basic]
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      # Check only: the package "lint" script uses --fix, which would edit files in CI.
+      # TODO: eslint reports ~10 existing errors in each UI (multi-word component names,
+      # shims-vue.d.ts types). Not blocking until they are fixed; then remove continue-on-error.
+      - name: Lint
+        continue-on-error: true
+        run: bunx eslint .
+
+      - name: Type-check and build
+        run: bun run build
