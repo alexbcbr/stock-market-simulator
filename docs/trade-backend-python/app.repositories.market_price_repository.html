@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module app.repositories.market_price_repository</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="app.html" class="white">app</a>.<a href="app.repositories.html" class="white">repositories</a>.market_price_repository</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/repositories/market_price_repository.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/repositories/market_price_repository.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-add"><strong>add</strong></a>(market_price: MarketPrice)</dt><dd><span class="code">Insert&nbsp;a&nbsp;market&nbsp;price&nbsp;row.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;market_price:&nbsp;Row&nbsp;to&nbsp;insert.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sqlite3.IntegrityError:&nbsp;On&nbsp;a&nbsp;duplicate&nbsp;symbol&nbsp;or&nbsp;a&nbsp;failed&nbsp;CHECK&nbsp;(symbol<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;length&nbsp;or&nbsp;case,&nbsp;negative&nbsp;price).</span></dd></dl>
+ <dl><dt><a name="-get_all"><strong>get_all</strong></a>(symbol=None)</dt><dd><span class="code">Read&nbsp;market&nbsp;prices.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;symbol:&nbsp;Exact,&nbsp;case-sensitive&nbsp;symbol,&nbsp;or&nbsp;None&nbsp;for&nbsp;every&nbsp;row.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list[dict]:&nbsp;Rows&nbsp;as&nbsp;column-name&nbsp;mappings;&nbsp;empty&nbsp;when&nbsp;nothing&nbsp;matches.</span></dd></dl>
+ <dl><dt><a name="-remove"><strong>remove</strong></a>(symbol)</dt><dd><span class="code">Delete&nbsp;the&nbsp;row&nbsp;for&nbsp;a&nbsp;symbol.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;symbol:&nbsp;Exact,&nbsp;case-sensitive&nbsp;symbol.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int:&nbsp;Number&nbsp;of&nbsp;rows&nbsp;deleted,&nbsp;0&nbsp;when&nbsp;the&nbsp;symbol&nbsp;does&nbsp;not&nbsp;exist.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sqlite3.IntegrityError:&nbsp;If&nbsp;a&nbsp;trade&nbsp;references&nbsp;the&nbsp;symbol&nbsp;(foreign&nbsp;key&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;``ON&nbsp;DELETE&nbsp;RESTRICT``).</span></dd></dl>
+</td></tr></table>
+</body></html>

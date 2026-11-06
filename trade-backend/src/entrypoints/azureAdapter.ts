@@ -1,6 +1,16 @@
 import type { HttpRequest, HttpResponseInit } from '@azure/functions';
 
-// Minimal bridge between an Azure Functions HTTP trigger and a Hono app (or any fetch handler).
+/**
+ * Bridges an Azure Functions HTTP trigger to a Hono app, or to any fetch handler.
+ *
+ * @remarks
+ * Copies method, URL, headers and body in, and status, headers and body out. The request body is read whole (and
+ * skipped for GET and HEAD), and the response body is always read as text, so streaming and binary responses are
+ * not supported.
+ *
+ * @param fetchHandler - A standard fetch handler, such as `hono.fetch`.
+ * @returns A function with the signature Azure Functions expects for an HTTP trigger.
+ */
 export function toAzureHandler(fetchHandler: (request: Request) => Response | Promise<Response>) {
   return async (req: HttpRequest): Promise<HttpResponseInit> => {
     const hasBody = req.method !== 'GET' && req.method !== 'HEAD';

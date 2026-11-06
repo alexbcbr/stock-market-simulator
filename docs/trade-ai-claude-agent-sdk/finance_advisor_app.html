@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module finance_advisor_app</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">finance_advisor_app</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_advisor_app.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_advisor_app.py</a></td></tr></table>
+    <p><span class="code">Financial&nbsp;assistant&nbsp;with&nbsp;MCP&nbsp;stock&nbsp;tools,&nbsp;built&nbsp;on&nbsp;the&nbsp;Claude&nbsp;Agent&nbsp;SDK.<br>
+&nbsp;<br>
+Port&nbsp;of&nbsp;trade-ai/04fin_assistant_bp.py&nbsp;from&nbsp;LangChain/LangGraph&nbsp;to&nbsp;the&nbsp;Claude<br>
+Agent&nbsp;SDK,&nbsp;routed&nbsp;through&nbsp;AWS&nbsp;Bedrock&nbsp;instead&nbsp;of&nbsp;calling&nbsp;LangChain's&nbsp;chat<br>
+model&nbsp;wrapper&nbsp;directly.&nbsp;Same&nbsp;MCP&nbsp;tools&nbsp;(list_market_prices,&nbsp;list_trades,<br>
+create_trade,&nbsp;check_user,&nbsp;buy_stock)&nbsp;served&nbsp;by&nbsp;stock_mcp_server.py&nbsp;over&nbsp;HTTP.<br>
+&nbsp;<br>
+The&nbsp;Agent&nbsp;SDK&nbsp;drives&nbsp;Claude&nbsp;via&nbsp;a&nbsp;bundled&nbsp;Claude&nbsp;Code&nbsp;CLI&nbsp;subprocess&nbsp;rather<br>
+than&nbsp;making&nbsp;in-process&nbsp;API&nbsp;calls,&nbsp;so&nbsp;this&nbsp;agent&nbsp;is&nbsp;locked&nbsp;down&nbsp;to&nbsp;behave&nbsp;like<br>
+a&nbsp;narrow&nbsp;financial&nbsp;assistant&nbsp;instead&nbsp;of&nbsp;a&nbsp;general&nbsp;coding&nbsp;agent:<br>
+-&nbsp;tools=[]&nbsp;disables&nbsp;all&nbsp;built-in&nbsp;Claude&nbsp;Code&nbsp;tools&nbsp;(Bash,&nbsp;Read,&nbsp;Edit,&nbsp;...).<br>
+-&nbsp;setting_sources=[]&nbsp;skips&nbsp;this&nbsp;repo's&nbsp;CLAUDE.md&nbsp;/&nbsp;.claude/settings.json,&nbsp;so<br>
+&nbsp;&nbsp;no&nbsp;unrelated&nbsp;project&nbsp;instructions&nbsp;or&nbsp;MCP&nbsp;servers&nbsp;leak&nbsp;in.<br>
+-&nbsp;strict_mcp_config=True&nbsp;restricts&nbsp;MCP&nbsp;servers&nbsp;to&nbsp;exactly&nbsp;what's&nbsp;configured<br>
+&nbsp;&nbsp;here&nbsp;(the&nbsp;"stocks"&nbsp;server),&nbsp;ignoring&nbsp;any&nbsp;global/project&nbsp;MCP&nbsp;config.<br>
+-&nbsp;allowed_tools&nbsp;whitelists&nbsp;the&nbsp;stocks&nbsp;MCP&nbsp;tools&nbsp;so&nbsp;calls&nbsp;never&nbsp;hit&nbsp;a<br>
+&nbsp;&nbsp;permission&nbsp;prompt,&nbsp;which&nbsp;would&nbsp;otherwise&nbsp;hang&nbsp;this&nbsp;non-interactive&nbsp;loop.<br>
+&nbsp;<br>
+ClaudeSDKClient&nbsp;keeps&nbsp;one&nbsp;persistent&nbsp;session&nbsp;across&nbsp;the&nbsp;whole&nbsp;REPL&nbsp;loop,<br>
+which&nbsp;is&nbsp;this&nbsp;SDK's&nbsp;equivalent&nbsp;of&nbsp;LangGraph's&nbsp;thread_id-scoped&nbsp;checkpointer&nbsp;-<br>
+conversation&nbsp;history&nbsp;lives&nbsp;in&nbsp;the&nbsp;session&nbsp;instead&nbsp;of&nbsp;a&nbsp;separate&nbsp;memory&nbsp;store.<br>
+&nbsp;<br>
+Tracing:&nbsp;instrumentation.py&nbsp;can&nbsp;send&nbsp;turn-level&nbsp;spans&nbsp;to&nbsp;Arize&nbsp;AX&nbsp;through<br>
+openinference-instrumentation-claude-agent-sdk,&nbsp;but&nbsp;this&nbsp;module&nbsp;does&nbsp;not&nbsp;import<br>
+it,&nbsp;so&nbsp;no&nbsp;traces&nbsp;are&nbsp;sent&nbsp;unless&nbsp;``import&nbsp;instrumentation``&nbsp;is&nbsp;added&nbsp;before&nbsp;the<br>
+``claude_agent_sdk``&nbsp;import.&nbsp;Even&nbsp;then&nbsp;the&nbsp;spans&nbsp;cover&nbsp;only&nbsp;the&nbsp;SDK's&nbsp;own&nbsp;calls<br>
+(connect,&nbsp;query,&nbsp;receive_response);&nbsp;they&nbsp;do&nbsp;not&nbsp;show&nbsp;inside&nbsp;the&nbsp;bundled&nbsp;CLI<br>
+subprocess&nbsp;that&nbsp;talks&nbsp;to&nbsp;Bedrock,&nbsp;so&nbsp;they&nbsp;are&nbsp;coarser&nbsp;than&nbsp;the&nbsp;per-LLM-call<br>
+spans&nbsp;of&nbsp;the&nbsp;LangChain&nbsp;version.<br>
+&nbsp;<br>
+Constraint:&nbsp;``permission_mode="bypassPermissions"``&nbsp;is&nbsp;safe&nbsp;here&nbsp;only&nbsp;because<br>
+``tools=[]``&nbsp;removes&nbsp;every&nbsp;built-in&nbsp;tool&nbsp;and&nbsp;``allowed_tools``&nbsp;lists&nbsp;just&nbsp;the<br>
+stocks&nbsp;tools.&nbsp;Adding&nbsp;a&nbsp;tool&nbsp;to&nbsp;either&nbsp;list&nbsp;widens&nbsp;what&nbsp;the&nbsp;agent&nbsp;can&nbsp;do&nbsp;without<br>
+asking.<br>
+&nbsp;<br>
+Requires&nbsp;stock_mcp_server.py&nbsp;(from&nbsp;trade-ai/)&nbsp;running&nbsp;on&nbsp;<a href="http://127.0.0.1:8001">http://127.0.0.1:8001</a><br>
+and&nbsp;the&nbsp;trade-backend&nbsp;API&nbsp;running&nbsp;on&nbsp;<a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.&nbsp;Requires<br>
+CLAUDE_CODE_USE_BEDROCK=1&nbsp;and&nbsp;AWS&nbsp;credentials&nbsp;available&nbsp;via&nbsp;the&nbsp;standard&nbsp;AWS<br>
+credential&nbsp;chain&nbsp;(profile,&nbsp;env&nbsp;vars,&nbsp;or&nbsp;instance&nbsp;role).</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-inference"><strong>inference</strong></a>(client: claude_agent_sdk.client.ClaudeSDKClient, question: str) -&gt; str</dt><dd><span class="code">Send&nbsp;one&nbsp;question&nbsp;in&nbsp;the&nbsp;open&nbsp;session&nbsp;and&nbsp;collect&nbsp;the&nbsp;text&nbsp;of&nbsp;the&nbsp;reply.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;client:&nbsp;Connected&nbsp;client.&nbsp;Its&nbsp;session&nbsp;holds&nbsp;the&nbsp;conversation,&nbsp;so&nbsp;earlier<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;questions&nbsp;in&nbsp;the&nbsp;same&nbsp;client&nbsp;are&nbsp;remembered.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;question:&nbsp;The&nbsp;user's&nbsp;message.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;assistant's&nbsp;text&nbsp;blocks&nbsp;joined&nbsp;without&nbsp;a&nbsp;separator.&nbsp;Tool&nbsp;calls&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results&nbsp;are&nbsp;not&nbsp;included.&nbsp;Empty&nbsp;if&nbsp;the&nbsp;reply&nbsp;has&nbsp;no&nbsp;text&nbsp;block.</span></dd></dl>
+ <dl><dt>async <a name="-main"><strong>main</strong></a>()</dt><dd><span class="code">Open&nbsp;one&nbsp;session&nbsp;and&nbsp;run&nbsp;the&nbsp;question&nbsp;loop&nbsp;until&nbsp;the&nbsp;process&nbsp;is&nbsp;stopped.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Exception:&nbsp;SDK&nbsp;or&nbsp;connection&nbsp;errors&nbsp;if&nbsp;the&nbsp;MCP&nbsp;server&nbsp;or&nbsp;the&nbsp;bundled&nbsp;CLI<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cannot&nbsp;start.&nbsp;The&nbsp;loop&nbsp;has&nbsp;no&nbsp;exit&nbsp;command;&nbsp;stop&nbsp;it&nbsp;with&nbsp;Ctrl+C&nbsp;or&nbsp;end<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of&nbsp;input&nbsp;(``EOFError``).</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>AGENT_OPTIONS</strong> = ClaudeAgentOptions(tools=[], allowed_tools=['mcp...atched', load_timeout_ms=60000, task_budget=None)<br>
+<strong>MODEL</strong> = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'<br>
+<strong>STOCK_TOOLS</strong> = ['mcp__stocks__check_user', 'mcp__stocks__buy_stock', 'mcp__stocks__list_market_prices', 'mcp__stocks__list_trades', 'mcp__stocks__create_trade']<br>
+<strong>SYSTEM_PROMPT</strong> = "You're a financial assistant. Don't answer question outside of the context of financial market."</td></tr></table>
+</body></html>

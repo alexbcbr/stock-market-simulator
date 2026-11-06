@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module stock_mcp_client</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">stock_mcp_client</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai/stock_mcp_client.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai/stock_mcp_client.py</a></td></tr></table>
+    <p><span class="code">Smoke&nbsp;test&nbsp;of&nbsp;the&nbsp;MCP&nbsp;stocks&nbsp;server&nbsp;with&nbsp;a&nbsp;one-shot&nbsp;LangChain&nbsp;agent.<br>
+&nbsp;<br>
+Asks&nbsp;a&nbsp;single&nbsp;hard-coded&nbsp;question&nbsp;("list&nbsp;all&nbsp;the&nbsp;stocks&nbsp;which&nbsp;are&nbsp;available&nbsp;for<br>
+buying?"),&nbsp;prints&nbsp;the&nbsp;answer&nbsp;and&nbsp;exits.&nbsp;Use&nbsp;it&nbsp;to&nbsp;check&nbsp;that&nbsp;the&nbsp;MCP&nbsp;server&nbsp;and<br>
+the&nbsp;AWS&nbsp;Bedrock&nbsp;credentials&nbsp;work;&nbsp;the&nbsp;conversational&nbsp;agents&nbsp;are&nbsp;the&nbsp;numbered<br>
+``0N_fin_assistant``&nbsp;files.<br>
+&nbsp;<br>
+Requires&nbsp;``stock_mcp_server.py``&nbsp;running&nbsp;on&nbsp;``<a href="http://127.0.0.1:8001">http://127.0.0.1:8001</a>``&nbsp;and&nbsp;AWS<br>
+credentials&nbsp;with&nbsp;access&nbsp;to&nbsp;the&nbsp;Bedrock&nbsp;model.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-main"><strong>main</strong></a>()</dt><dd><span class="code">Ask&nbsp;one&nbsp;question&nbsp;through&nbsp;an&nbsp;agent&nbsp;that&nbsp;has&nbsp;the&nbsp;MCP&nbsp;tools&nbsp;and&nbsp;print&nbsp;the&nbsp;reply.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Exception:&nbsp;Connection&nbsp;errors&nbsp;from&nbsp;the&nbsp;MCP&nbsp;client&nbsp;if&nbsp;the&nbsp;server&nbsp;is&nbsp;not<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;running,&nbsp;or&nbsp;Bedrock&nbsp;errors&nbsp;if&nbsp;credentials&nbsp;or&nbsp;model&nbsp;access&nbsp;are&nbsp;missing.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nothing&nbsp;is&nbsp;caught.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>client</strong> = &lt;langchain_mcp_adapters.client.MultiServerMCPClient object&gt;</td></tr></table>
+</body></html>

@@ -4,22 +4,39 @@ import { MarketSymbol } from '../../core/models/marketSymbol';
 import { Trade } from '../../core/models/trade';
 import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
 
-// Cosmos DB (NoSQL API) containers, created by deploy/azure-terraform:
-//   market_price  partition key /symbol      (id = symbol)
-//   market_symbol partition key /symbol      (id = symbol)
-//   trade         partition key /trade_id    (id = trade_id)
-// Trades are partitioned by trade_id so that create and sell are point operations.
-// Listing by customer is a cross-partition query, which is fine at demo scale.
+/**
+ * Cosmos DB (NoSQL API) adapter.
+ *
+ * @remarks
+ * Containers are created by `deploy/azure-terraform`:
+ *
+ * - `market_price`: partition key `/symbol`, `id` = symbol
+ * - `market_symbol`: partition key `/symbol`, `id` = symbol
+ * - `trade`: partition key `/trade_id`, `id` = trade_id
+ *
+ * Trades are partitioned by `trade_id` so that create and sell are point operations. Listing by customer is a
+ * cross-partition query, which is fine at demo scale but costs more request units as the data grows.
+ *
+ * @packageDocumentation
+ */
 
 const SYSTEM_FIELDS = ['id', '_rid', '_self', '_etag', '_attachments', '_ts'];
 
-/** Removes the fields Cosmos adds, so documents match the API contract exactly. */
+/** Removes `id` and the `_`-prefixed system fields Cosmos adds, so documents match the API contract exactly. */
 function clean<T>(doc: Record<string, unknown>): T {
   const copy = { ...doc };
   for (const field of SYSTEM_FIELDS) delete copy[field];
   return copy as T;
 }
 
+/**
+ * Trades in Cosmos DB.
+ *
+ * @remarks
+ * `create` fails with a conflict error if the `trade_id` already exists. `markSold` is a conditional patch
+ * that matches on the timestamp too; an unknown id or a wrong timestamp is swallowed (HTTP 404 or 412), as in
+ * the other adapters, and any other error is rethrown.
+ */
 export class CosmosTradeRepository implements TradeRepository {
   constructor(private container: Container) {}
 
@@ -57,6 +74,9 @@ export class CosmosTradeRepository implements TradeRepository {
   }
 }
 
+/**
+ * Market prices in Cosmos DB. Reads are point reads by symbol, exact and case-sensitive.
+ */
 export class CosmosMarketPriceRepository implements MarketPriceRepository {
   constructor(private container: Container) {}
 
@@ -71,6 +91,9 @@ export class CosmosMarketPriceRepository implements MarketPriceRepository {
   }
 }
 
+/**
+ * Company data in Cosmos DB. The symbol is upper-cased before the point read.
+ */
 export class CosmosMarketSymbolRepository implements MarketSymbolRepository {
   constructor(private container: Container) {}
 
@@ -81,6 +104,12 @@ export class CosmosMarketSymbolRepository implements MarketSymbolRepository {
   }
 }
 
+/**
+ * Builds the three repositories on one database.
+ *
+ * @param database - Handle from `openCosmosDatabase`; the `trade`, `market_price` and `market_symbol`
+ * containers must already exist.
+ */
 export function createCosmosRepositories(database: Database) {
   return {
     trades: new CosmosTradeRepository(database.container('trade')),
@@ -90,8 +119,17 @@ export function createCosmosRepositories(database: Database) {
 }
 
 /**
- * Passwordless by default: DefaultAzureCredential uses the Function App's managed identity (or `az login` locally).
- * A key is only for the local emulator.
+ * Connects to a Cosmos DB database.
+ *
+ * @remarks
+ * Passwordless by default: `DefaultAzureCredential` uses the Function App's managed identity, or your
+ * `az login` on a developer machine. The account has key access switched off, so a key works only against the
+ * local emulator. The connection is lazy: nothing is sent until the first query, so a wrong endpoint or a
+ * missing role shows up then (a 403 can last a few minutes after a role assignment).
+ *
+ * @param endpoint - Account URL, such as `https://name.documents.azure.com:443/`.
+ * @param databaseName - Database holding the three containers.
+ * @param key - Emulator key; omit it everywhere else.
  */
 export async function openCosmosDatabase(endpoint: string, databaseName: string, key?: string): Promise<Database> {
   if (key) return new CosmosClient({ endpoint, key }).database(databaseName);

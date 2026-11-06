@@ -28,9 +28,13 @@ IMAGE ?= trade-backend-ts:latest
 k8s-build:        ## build the image (context = repository root)
 	docker build -f deploy/k8s/Dockerfile -t $(IMAGE) ..
 
-k8s-apply:        ## create/update PVC, Deployment and Service on the current kubectl context
+k8s-apply:        ## create/update PVC, Deployment and Service; restarts the pod so a rebuilt :latest image is picked up
 	kubectl apply -f deploy/k8s/deployment.yaml
+	kubectl rollout restart deployment/trade-backend-ts
 	kubectl rollout status deployment/trade-backend-ts --timeout=120s
+
+k8s-image-check:  ## run the image's startup seeding once (no cluster needed); catches files missing from the image
+	docker run --rm -e DB_PATH=/tmp/check.db $(IMAGE) bun scripts/seed.ts /seed/prices.csv /seed/symbols.csv
 
 k8s-forward:      ## expose the Service on http://localhost:$(K8S_PORT) (Ctrl-C to stop)
 	kubectl port-forward svc/trade-backend-ts $(K8S_PORT):8080
@@ -48,7 +52,7 @@ validate-k8s:     ## no changes to the cluster: client + server dry-run, and an 
 	kubectl apply --dry-run=client -f deploy/k8s/deployment.yaml
 	kubectl apply --dry-run=server -f deploy/k8s/deployment.yaml
 
-.PHONY: k8s-build k8s-apply k8s-forward k8s-logs k8s-delete k8s-delete-data validate-k8s
+.PHONY: k8s-image-check k8s-build k8s-apply k8s-forward k8s-logs k8s-delete k8s-delete-data validate-k8s
 
 # --- AWS (read-only: build, tests, cdk synth; nothing is deployed) ---
 validate-aws:     ## tsc + bun test + cdk synth (no AWS calls). `make aws-diff` also compares with the deployed stacks
@@ -56,9 +60,16 @@ validate-aws:     ## tsc + bun test + cdk synth (no AWS calls). `make aws-diff` 
 	bun test
 	bun run cdk synth --quiet
 
+aws-deploy:
+	bun run cdk deploy TradeDbStack
+	bun run cdk deploy TradeControllerStack
+
 aws-diff:         ## read-only against your AWS account, but cdk uploads the template asset to the CDK bootstrap bucket
 	bun run cdk diff
 
+azure-deploy:
+	az login
+	terraform apply
 # --- Azure (nothing here talks to Azure until you run terraform apply yourself) ---
 validate-azure:   ## terraform fmt/validate (via Docker if terraform is missing) + Function App bundle build
 	bash deploy/azure-terraform/validate.sh
@@ -69,6 +80,6 @@ build-function:   ## bundle the Function App into deploy/azure-terraform/functio
 .PHONY: validate-azure build-function validate-aws aws-diff validate-all
 
 # Every offline check in one go: AWS build/synth, k8s dry-run + image build, Azure terraform validate.
-validate-all: validate-aws k8s-build validate-k8s validate-azure
+validate-all: validate-aws k8s-build k8s-image-check validate-k8s validate-azure
 	@echo "All offline checks passed"
 

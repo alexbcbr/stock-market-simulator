@@ -4,15 +4,46 @@ import { MarketPriceRepository, MarketSymbolRepository } from '../core/ports';
 import { SymbolNotAvailableError, TradeService } from '../core/tradeService';
 import { validateBuyStockRequest } from '../core/validation';
 
+/**
+ * The HTTP routes for the local, Kubernetes and Azure targets.
+ *
+ * @remarks
+ * Route names, status codes and JSON shapes follow `api-contract/openapi.yaml`, the same contract the AWS
+ * API Gateway deployment exposes. Errors are returned as `{ "error": message }`.
+ *
+ * @packageDocumentation
+ */
+
+/** What the app needs from the outside. Each target builds these from its own database adapter. */
 export interface AppDeps {
+  /** Business operations for buying, selling and listing trades. */
   tradeService: TradeService;
+  /** Source of market prices for the two price routes and `/listMarketPrices`. */
   prices: MarketPriceRepository;
+  /** Source of company data for `/getMarketSymbol`. */
   symbols: MarketSymbolRepository;
 }
 
-// Route names, status codes and JSON shapes follow api-contract/openapi.yaml
-// (the same contract the AWS API Gateway deployment exposes).
-// `cors: false` when a gateway in front (Azure API Management) already adds the CORS headers.
+/**
+ * Builds the Hono app with all routes.
+ *
+ * @remarks
+ * Routes: `GET /health`, `GET /listAllTrades`, `POST /listTradesByCustomerName`, `GET /listMarketPrices`,
+ * `GET /getMarketPrice`, `GET /getMarketSymbol`, `POST /buyStock` and `POST /sellStock`.
+ *
+ * Status codes: 400 for a missing or malformed body, a missing field or a missing query parameter; 404 for
+ * an unknown symbol; 500 `{ "error": "Internal server error" }` for anything unexpected, with the real error
+ * only in the log. A body that is not valid JSON is a 400, which differs from the AWS Lambda handlers (500).
+ * `POST /sellStock` answers `{ "success": true }` even when no trade matched.
+ *
+ * Symbol case differs by route: `/buyStock` and `/getMarketSymbol` upper-case the symbol, but `/getMarketPrice`
+ * matches it exactly, so `?symbol=aaon` is a 404 there on every target.
+ *
+ * @param deps - Services and repositories to serve from.
+ * @param options - `cors` adds permissive CORS headers (default true). Pass `false` when a gateway in front,
+ * such as Azure API Management, already adds them, so the headers are not duplicated.
+ * @returns A Hono app; pass `app.fetch` to a server or adapter.
+ */
 export function createApp({ tradeService, prices, symbols }: AppDeps, options: { cors?: boolean } = {}) {
   const app = new Hono();
   if (options.cors ?? true) app.use('*', cors());

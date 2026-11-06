@@ -43,6 +43,14 @@ checkpointer = InMemorySaver()
 
 
 def build_agent(tools):
+    """Create the agent with the given tools and the shared system prompt.
+
+    Args:
+        tools: LangChain tools loaded from the MCP server.
+
+    Returns:
+        The compiled agent, sharing the module-level in-memory checkpointer.
+    """
     return create_agent(
         model=init_chat_model(
             model="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
@@ -56,6 +64,16 @@ def build_agent(tools):
 
 
 async def inference(agent, question: str, thread_id: str):
+    """Answer one question.
+
+    Args:
+        agent: Agent from ``build_agent``.
+        question: The user's message.
+        thread_id: Conversation key; calls with the same id share history.
+
+    Returns:
+        The assistant's reply text.
+    """
     config = {"configurable": {"thread_id": thread_id}}
     result = await agent.ainvoke(
         {"messages": [HumanMessage(content=question)]},
@@ -65,6 +83,12 @@ async def inference(agent, question: str, thread_id: str):
 
 
 async def main():
+    """Load the MCP tools and run the question loop until the process is stopped.
+
+    Raises:
+        Exception: Connection errors if the MCP server is not running. The loop has
+            no exit command; stop it with Ctrl+C or end of input (``EOFError``).
+    """
     tools = await mcp_client.get_tools()
     agent = build_agent(tools)
 

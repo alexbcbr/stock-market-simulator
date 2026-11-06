@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module 02fin_assistant_with_tools</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">02fin_assistant_with_tools</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai/02fin_assistant_with_tools.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai/02fin_assistant_with_tools.py</a></td></tr></table>
+    <p><span class="code">Financial&nbsp;assistant&nbsp;with&nbsp;MCP&nbsp;stock&nbsp;tools,&nbsp;sync&nbsp;REPL&nbsp;over&nbsp;an&nbsp;async&nbsp;client.<br>
+&nbsp;<br>
+Adds&nbsp;the&nbsp;MCP&nbsp;tools&nbsp;from&nbsp;stock_mcp_server.py&nbsp;(list_market_prices,&nbsp;list_trades,<br>
+create_trade,&nbsp;etc.)&nbsp;via&nbsp;MultiServerMCPClient&nbsp;over&nbsp;HTTP,&nbsp;so&nbsp;the&nbsp;agent&nbsp;can&nbsp;look<br>
+up&nbsp;real&nbsp;data&nbsp;instead&nbsp;of&nbsp;just&nbsp;answering&nbsp;from&nbsp;its&nbsp;own&nbsp;knowledge.<br>
+&nbsp;<br>
+MultiServerMCPClient.get_tools()&nbsp;and&nbsp;agent.ainvoke()&nbsp;are&nbsp;async-only,&nbsp;but&nbsp;the<br>
+REPL&nbsp;loop&nbsp;here&nbsp;stays&nbsp;synchronous&nbsp;(input()/print())&nbsp;like&nbsp;01fin_assistant.py&nbsp;-<br>
+each&nbsp;turn&nbsp;wraps&nbsp;the&nbsp;async&nbsp;call&nbsp;with&nbsp;asyncio.run(),&nbsp;which&nbsp;creates&nbsp;and&nbsp;tears<br>
+down&nbsp;a&nbsp;new&nbsp;event&nbsp;loop&nbsp;per&nbsp;call.&nbsp;Simple,&nbsp;but&nbsp;has&nbsp;that&nbsp;per-turn&nbsp;overhead.<br>
+&nbsp;<br>
+See&nbsp;03fin_assistant_async.py&nbsp;for&nbsp;the&nbsp;version&nbsp;that&nbsp;runs&nbsp;the&nbsp;whole&nbsp;REPL&nbsp;inside<br>
+one&nbsp;event&nbsp;loop&nbsp;instead&nbsp;(no&nbsp;per-turn&nbsp;asyncio.run()).<br>
+&nbsp;<br>
+Requires&nbsp;stock_mcp_server.py&nbsp;running&nbsp;on&nbsp;<a href="http://127.0.0.1:8001">http://127.0.0.1:8001</a>&nbsp;and&nbsp;the<br>
+trade-backend&nbsp;API&nbsp;running&nbsp;on&nbsp;<a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-ainference"><strong>ainference</strong></a>(agent, question: str, thread_id: str)</dt><dd><span class="code">Answer&nbsp;one&nbsp;question&nbsp;with&nbsp;the&nbsp;async&nbsp;agent&nbsp;API.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;agent:&nbsp;Agent&nbsp;from&nbsp;``build_agent``.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;question:&nbsp;The&nbsp;user's&nbsp;message.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;thread_id:&nbsp;Conversation&nbsp;key;&nbsp;calls&nbsp;with&nbsp;the&nbsp;same&nbsp;id&nbsp;share&nbsp;history.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;assistant's&nbsp;reply&nbsp;text.</span></dd></dl>
+ <dl><dt><a name="-build_agent"><strong>build_agent</strong></a>(tools)</dt><dd><span class="code">Create&nbsp;the&nbsp;agent&nbsp;with&nbsp;the&nbsp;given&nbsp;tools&nbsp;and&nbsp;the&nbsp;shared&nbsp;system&nbsp;prompt.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tools:&nbsp;LangChain&nbsp;tools&nbsp;loaded&nbsp;from&nbsp;the&nbsp;MCP&nbsp;server.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;compiled&nbsp;agent.&nbsp;It&nbsp;uses&nbsp;the&nbsp;module-level&nbsp;in-memory&nbsp;checkpointer,&nbsp;so<br>
+&nbsp;&nbsp;&nbsp;&nbsp;every&nbsp;agent&nbsp;built&nbsp;here&nbsp;shares&nbsp;the&nbsp;same&nbsp;conversation&nbsp;store.</span></dd></dl>
+ <dl><dt><a name="-inference"><strong>inference</strong></a>(agent, question: str, thread_id: str)</dt><dd><span class="code">Answer&nbsp;one&nbsp;question&nbsp;from&nbsp;synchronous&nbsp;code.<br>
+&nbsp;<br>
+Runs&nbsp;``ainference``&nbsp;with&nbsp;``asyncio.run``,&nbsp;which&nbsp;creates&nbsp;and&nbsp;closes&nbsp;an&nbsp;event<br>
+loop&nbsp;on&nbsp;every&nbsp;call.&nbsp;Do&nbsp;not&nbsp;call&nbsp;it&nbsp;from&nbsp;inside&nbsp;a&nbsp;running&nbsp;event&nbsp;loop;&nbsp;it&nbsp;raises<br>
+``RuntimeError``&nbsp;there.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;agent:&nbsp;Agent&nbsp;from&nbsp;``build_agent``.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;question:&nbsp;The&nbsp;user's&nbsp;message.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;thread_id:&nbsp;Conversation&nbsp;key;&nbsp;calls&nbsp;with&nbsp;the&nbsp;same&nbsp;id&nbsp;share&nbsp;history.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;assistant's&nbsp;reply&nbsp;text.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>SYSTEM_PROMPT</strong> = "You're a financial assistant. Don't answer question outside of the context of financial market."<br>
+<strong>checkpointer</strong> = &lt;langgraph.checkpoint.memory.InMemorySaver object&gt;<br>
+<strong>mcp_client</strong> = &lt;langchain_mcp_adapters.client.MultiServerMCPClient object&gt;</td></tr></table>
+</body></html>

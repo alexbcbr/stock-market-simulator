@@ -33,6 +33,20 @@ agent = create_agent(
 
 
 def inference(question: str, thread_id: str):
+    """Answer one question, keeping the conversation per thread.
+
+    Args:
+        question: The user's message.
+        thread_id: Conversation key. Calls with the same id share history; the
+            history lives in memory and is lost when the process exits.
+
+    Returns:
+        The assistant's reply text.
+
+    Raises:
+        Exception: Bedrock errors (credentials, model access, throttling) are not
+            caught.
+    """
     config = {"configurable": {"thread_id": thread_id}}
     result = agent.invoke(
         {"messages": [HumanMessage(content=question)]},

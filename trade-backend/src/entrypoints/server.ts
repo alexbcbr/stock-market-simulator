@@ -1,4 +1,14 @@
-// Local / Kubernetes entrypoint: Hono on Bun with a SQLite file.
+/**
+ * Local and Kubernetes entrypoint: Hono on Bun with a SQLite file.
+ *
+ * @remarks
+ * Run with `make run-local` (after seeding) or as the container command. Reads `DB_PATH` (default
+ * `./data/trade.db`) and `PORT` (default 8080). Starting it opens the database, creates the tables if
+ * needed and begins serving; it does not load market data, which the seed script does. There is no graceful
+ * shutdown handling.
+ *
+ * @packageDocumentation
+ */
 import { openDatabase } from '../adapters/sqlite/db';
 import { createSqliteRepositories } from '../adapters/sqlite/repositories';
 import { createApp } from '../api/app';

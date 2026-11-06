@@ -1,3 +1,8 @@
+/**
+ * AWS Lambda handler for `GET /getMarketSymbol`, behind API Gateway.
+ *
+ * @packageDocumentation
+ */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { createDynamoRepositories } from '../adapters/dynamodb';
 
@@ -10,6 +15,16 @@ const headers = {
   'Access-Control-Allow-Methods': 'GET,OPTIONS',
 };
 
+/**
+ * Returns one symbol's company data.
+ *
+ * @remarks
+ * Answers 200 with the data, 400 without `symbol`, 404 for an unknown symbol. The symbol is upper-cased by the
+ * repository, so lower case works here.
+ *
+ * @param event - API Gateway proxy event; only `queryStringParameters.symbol` is read.
+ * @returns A proxy result with CORS headers (`GET,OPTIONS`, any origin).
+ */
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {

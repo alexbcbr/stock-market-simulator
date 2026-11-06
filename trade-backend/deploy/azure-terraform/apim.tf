@@ -19,7 +19,7 @@ resource "azurerm_api_management_api" "trade" {
   display_name          = "Trade API"
   path                  = "trade"
   protocols             = ["https"]
-  service_url           = "https://${azurerm_linux_function_app.api.default_hostname}"
+  service_url           = "https://${azurerm_function_app_flex_consumption.api.default_hostname}"
   subscription_required = false # public demo API, like the API Gateway stage
 
   import {

@@ -20,12 +20,18 @@ ClaudeSDKClient keeps one persistent session across the whole REPL loop,
 which is this SDK's equivalent of LangGraph's thread_id-scoped checkpointer -
 conversation history lives in the session instead of a separate memory store.
 
-Tracing is sent to Arize AX via openinference-instrumentation-claude-agent-sdk,
-which wraps ClaudeSDKClient.connect/query/receive_response (see
-instrumentation.py). This captures turn-level spans from the SDK's own calls;
-it does not see inside the bundled Claude Code CLI subprocess that actually
-talks to Bedrock, so it's not a 1:1 replacement for the original's per-LLM-call
-LangChain spans.
+Tracing: instrumentation.py can send turn-level spans to Arize AX through
+openinference-instrumentation-claude-agent-sdk, but this module does not import
+it, so no traces are sent unless ``import instrumentation`` is added before the
+``claude_agent_sdk`` import. Even then the spans cover only the SDK's own calls
+(connect, query, receive_response); they do not show inside the bundled CLI
+subprocess that talks to Bedrock, so they are coarser than the per-LLM-call
+spans of the LangChain version.
+
+Constraint: ``permission_mode="bypassPermissions"`` is safe here only because
+``tools=[]`` removes every built-in tool and ``allowed_tools`` lists just the
+stocks tools. Adding a tool to either list widens what the agent can do without
+asking.
 
 Requires stock_mcp_server.py (from trade-ai/) running on http://127.0.0.1:8001
 and the trade-backend API running on http://127.0.0.1:8000. Requires
@@ -78,6 +84,17 @@ AGENT_OPTIONS = ClaudeAgentOptions(
 
 
 async def inference(client: ClaudeSDKClient, question: str) -> str:
+    """Send one question in the open session and collect the text of the reply.
+
+    Args:
+        client: Connected client. Its session holds the conversation, so earlier
+            questions in the same client are remembered.
+        question: The user's message.
+
+    Returns:
+        The assistant's text blocks joined without a separator. Tool calls and
+        results are not included. Empty if the reply has no text block.
+    """
     await client.query(question)
     reply_parts = []
     async for message in client.receive_response():
@@ -89,6 +106,13 @@ async def inference(client: ClaudeSDKClient, question: str) -> str:
 
 
 async def main():
+    """Open one session and run the question loop until the process is stopped.
+
+    Raises:
+        Exception: SDK or connection errors if the MCP server or the bundled CLI
+            cannot start. The loop has no exit command; stop it with Ctrl+C or end
+            of input (``EOFError``).
+    """
     async with ClaudeSDKClient(options=AGENT_OPTIONS) as client:
         print("*** Welcome to the Financial Bot. How can I help? ***")
         print("***************************************************")

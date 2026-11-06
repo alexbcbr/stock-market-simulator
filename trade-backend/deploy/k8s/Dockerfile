@@ -7,7 +7,7 @@ COPY trade-backend/package.json trade-backend/bun.lock ./
 RUN bun install --frozen-lockfile --production
 
 COPY trade-backend/src ./src
-COPY trade-backend/scripts/seed.ts ./scripts/seed.ts
+COPY trade-backend/scripts/seed.ts trade-backend/scripts/seedData.ts ./scripts/
 # Market data used to seed SQLite on first start
 COPY yahoo-finance-stocks/prod-data/2026-01-21.csv /seed/prices.csv
 COPY yahoo-finance-stocks/prod-data/nasdaq.csv /seed/symbols.csv

@@ -1,3 +1,12 @@
+/**
+ * AWS Lambda handler for `POST /buyStock`, behind API Gateway.
+ *
+ * @remarks
+ * Thin wrapper over `TradeService`. Importing the file creates the DynamoDB client, so table names must be in
+ * the environment before the module loads.
+ *
+ * @packageDocumentation
+ */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { TradeService, SymbolNotAvailableError } from '../core/tradeService';
 import { validateBuyStockRequest } from '../core/validation';
@@ -13,6 +22,17 @@ const headers = {
   'Access-Control-Allow-Methods': 'POST,OPTIONS',
 };
 
+/**
+ * Creates a trade from the request body.
+ *
+ * @remarks
+ * Answers 201 with the stored trade, 400 for a missing body or a failed validation, 404 for an unknown symbol, and
+ * 500 `{ "error": "Internal server error" }` otherwise. A body that is not valid JSON is a 500 here, because the parse
+ * error is caught by the general handler; the Hono app answers 400 for the same input, so the targets differ.
+ *
+ * @param event - API Gateway proxy event; only `body` is read.
+ * @returns A proxy result with CORS headers (`POST,OPTIONS`, any origin).
+ */
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {

@@ -1,5 +1,3 @@
-- [ ] add spec-driven-development
-
 - [ ] unify the UI. Do I need 1 or 2
 - [ ] kafka generating PDF with LaTex
 - [ ] add skills, agents for development (book style)
@@ -10,7 +8,6 @@
 - [ ] test SonarQUBE
 - [ ] test SAST/DAST (opensource)
 - [ ] test sandboxing (daytona or claude code)
-- [ ] test doc generation
 - [ ] test OpenAPI
 
 
