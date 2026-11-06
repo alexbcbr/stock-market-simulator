@@ -17,7 +17,7 @@ paths:
         required: true
         content: { application/json: { schema: { type: object, required: [customer_name], properties: { customer_name: { type: string } } } } }
       responses:
-        '200': { description: Trades for the customer, newest first by trade_timestamp, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Trade' } } } } }
+        '200': { description: 'Trades for the customer, newest first by trade_timestamp', content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Trade' } } } } }
         '400': { $ref: '#/components/responses/Error' }
   /listMarketPrices:
     get:

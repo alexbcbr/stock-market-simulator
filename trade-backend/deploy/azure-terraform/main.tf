@@ -1,6 +1,6 @@
 # Azure counterpart of the AWS stacks:
 #   DynamoDB          -> Cosmos DB (serverless, NoSQL API)
-#   Lambda            -> Azure Functions (one HTTP trigger running the Hono app)
+#   Lambda            -> Azure Functions, Flex Consumption plan (one HTTP trigger running the Hono app)
 #   API Gateway       -> API Management (imports api-contract/openapi.yaml)
 #   IAM role          -> managed identity + Cosmos DB data-plane role (no keys in app settings)
 
@@ -88,32 +88,45 @@ resource "azurerm_storage_account" "func" {
   account_replication_type = "LRS"
 }
 
+# Flex Consumption (FC1): the current serverless plan for Azure Functions, with its own quota
+# (the older Linux Consumption Y1 plan has quota 0 on many new subscriptions).
 resource "azurerm_service_plan" "func" {
   name                = "plan-${local.name}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   os_type             = "Linux"
-  sku_name            = "Y1" # Consumption
+  sku_name            = "FC1"
 }
 
-resource "azurerm_linux_function_app" "api" {
-  name                       = "func-${local.name}"
-  resource_group_name        = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  service_plan_id            = azurerm_service_plan.func.id
-  storage_account_name       = azurerm_storage_account.func.name
-  storage_account_access_key = azurerm_storage_account.func.primary_access_key
-  https_only                 = true
+# Flex Consumption keeps the deployed code package in a blob container.
+resource "azurerm_storage_container" "deployment" {
+  name                  = "function-releases"
+  storage_account_id    = azurerm_storage_account.func.id
+  container_access_type = "private"
+}
+
+resource "azurerm_function_app_flex_consumption" "api" {
+  name                = "func-${local.name}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  service_plan_id     = azurerm_service_plan.func.id
+  https_only          = true
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.func.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+  storage_authentication_type = "StorageAccountConnectionString"
+  storage_access_key          = azurerm_storage_account.func.primary_access_key
+
+  runtime_name           = "node"
+  runtime_version        = "20"
+  maximum_instance_count = 40 # lowest allowed; keeps a demo cheap
+  instance_memory_in_mb  = 2048
 
   identity {
     type = "SystemAssigned"
   }
 
-  site_config {
-    application_stack {
-      node_version = "20"
-    }
-  }
+  site_config {}
 
   app_settings = {
     COSMOS_ENDPOINT = azurerm_cosmosdb_account.main.endpoint
@@ -131,7 +144,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "function" {
   resource_group_name = azurerm_resource_group.main.name
   account_name        = azurerm_cosmosdb_account.main.name
   role_definition_id  = local.cosmos_data_contributor
-  principal_id        = azurerm_linux_function_app.api.identity[0].principal_id
+  principal_id        = azurerm_function_app_flex_consumption.api.identity[0].principal_id
   scope               = azurerm_cosmosdb_account.main.id
 }
 

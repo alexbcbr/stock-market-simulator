@@ -33,7 +33,9 @@ spec:
       containers:
         - name: trade-backend-ts
           image: trade-backend-ts:latest
-          imagePullPolicy: IfNotPresent
+          # Always: the node keeps its own copy of trade-backend-ts:latest, so with IfNotPresent a rebuilt
+          # image is never picked up. Docker Desktop's mirror serves the image you built locally.
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

@@ -1,0 +1,24 @@
+B=http://<URL>
+
+# health and market data
+curl $B/health
+curl $B/listMarketPrices
+curl "$B/getMarketPrice?symbol=AAON"
+curl "$B/getMarketSymbol?symbol=AAON"
+
+# buy: market, an agent mode, and a manual bid
+curl -X POST $B/buyStock -H 'Content-Type: application/json' \
+    -d '{"symbol":"AAON","customer_name":"alex","price_mode":"market"}'
+
+curl -X POST $B/buyStock -H 'Content-Type: application/json' \
+    -d '{"symbol":"AAON","customer_name":"alex","price_mode":"agent_aggressive"}'
+
+curl -X POST $B/buyStock -H 'Content-Type: application/json' \
+    -d '{"symbol":"AAON","customer_name":"alex","price_mode":"manual","bid_price":95}'
+
+# list
+curl $B/listAllTrades
+curl -X POST $B/listTradesByCustomerName -H 'Content-Type: application/json' \
+
+# Error
+curl -i "$B/getMarketPrice?symbol=ZZZZZZ"

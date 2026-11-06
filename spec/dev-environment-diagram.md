@@ -9,10 +9,11 @@ flowchart TD
     DEV(["Developer<br/>macOS + IDE"])
 
     subgraph Local["Local toolchain"]
-        BUN["bun / bunx<br/>JS/TS: CDK, trade-ui, trade-ui-basic"]
+        BUN["bun / bunx<br/>JS/TS: trade-backend, CDK, trade-ui, trade-ui-basic"]
         UV["uv<br/>Python: FastAPI, console, AI, evals"]
-        DOCKER["Docker + kubectl<br/>trade-backend-k8s container"]
-        MAKE["Makefiles<br/>root: CDK deploys<br/>per-project: run-local, test"]
+        DOCKER["Docker + kubectl<br/>trade-backend-k8s and trade-backend-ts containers"]
+        TF["terraform + az CLI<br/>Azure deploys"]
+        MAKE["Makefiles<br/>root: CDK deploys<br/>trade-backend: run-local, test, smoke,<br/>k8s-*, validate-*"]
         TESTS["pytest / eslint / prettier / tsc"]
     end
 
@@ -38,7 +39,11 @@ flowchart TD
     subgraph Deploy["Manual deploy targets"]
         CDK["cdk deploy<br/>TradeDbStack, TradeControllerStack, TradeUiStack"]
         AWS["AWS<br/>DynamoDB, API Gateway, Lambda,<br/>S3 + CloudFront"]
-        K8S["Kubernetes<br/>kubectl apply k8s/deployment.yaml"]
+        TFA["terraform apply +<br/>publish-function.sh"]
+        AZ["Azure<br/>Cosmos DB, Functions (Flex), API Management"]
+        K8S["Kubernetes (Docker Desktop)<br/>make k8s-apply (trade-backend-ts)<br/>kubectl apply (trade-backend-k8s)"]
+        LOC["Local server<br/>make run-local (Bun + SQLite)"]
+        SMK["scripts/smoke.sh &lt;base-url&gt;<br/>same check on every target"]
     end
 
     subgraph LLMOps["LLM ops"]
@@ -48,9 +53,9 @@ flowchart TD
     end
 
     DEV -->|edits code| CC
-    DEV --> BUN & UV & DOCKER
+    DEV --> BUN & UV & DOCKER & TF
     CC --> SKILLS
-    CC -->|runs commands| BUN & UV & MAKE
+    CC -->|runs commands| BUN & UV & MAKE & TF
     BUN & UV --> TESTS
     MAKE --> BUN & UV
 
@@ -66,7 +71,11 @@ flowchart TD
 
     MAKE -->|deploy-db / controller / ui / all| CDK
     CDK --> AWS
+    TF --> TFA
+    TFA --> AZ
     DOCKER -->|build + apply| K8S
+    MAKE -->|run-local| LOC
+    SMK -.->|verifies| AWS & AZ & K8S & LOC
 
     UV -->|agents| BED
     UV -->|traces| ARIZE
@@ -84,7 +93,7 @@ sequenceDiagram
     participant P as .githooks/pre-commit
     participant G as GitHub
     participant A as GitHub Actions
-    participant X as CDK / kubectl
+    participant X as CDK / terraform / kubectl
 
     D->>C: request change
     C->>C: edit, bun/uv run, tests
@@ -96,7 +105,7 @@ sequenceDiagram
     G->>A: trigger Secret scan
     A-->>G: pass / fail (.env check + gitleaks)
     Note over D,X: No automated CD yet — deploys are manual
-    D->>X: make deploy-all (cdk) or kubectl apply
+    D->>X: make deploy-all (cdk), terraform apply + publish-function.sh, or make k8s-apply
 ```
 
 ## Notes
@@ -104,4 +113,5 @@ sequenceDiagram
 - **Three secret layers:** Claude Code hook (Claude-initiated commits/pushes), tracked `pre-commit` (anyone), GitHub Actions (after push).
 - **Wiki:** the project wiki lives in DeepWiki: <https://app.devin.ai/org/alexbcbr/wiki/alexbcbr/stock-market-simulator?branch=main>
 - **Package managers:** bun for JS/TS, uv for Python. Don't reintroduce `package-lock.json` (two lockfiles break CDK synth).
-- **Not automated today:** build, tests and deploys have no CI; they run locally. CD could be added as a workflow that runs `bun run build` + `cdk deploy`.
+- **Four targets, one check.** AWS (CDK), Azure (Terraform + `publish-function.sh`), local (`make run-local`) and Kubernetes (`make k8s-apply`) are all verified with `scripts/smoke.sh <base-url>`. Details: `trade-backend/deploy/README.md`.
+- **Not automated today:** build, tests and deploys have no CI; they run locally. CD could be added as a workflow that runs `bun run build` + `cdk deploy`, or `terraform apply` for Azure.

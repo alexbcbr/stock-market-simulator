@@ -29,6 +29,7 @@ The smoke test must pass exactly as it does for local, Kubernetes and AWS.
 - Cosmos partition keys: `/symbol` for prices and symbols, `/trade_id` for trades (create and sell are point operations; listing by customer is a cross-partition query, fine at demo scale).
 - Cosmos account keys are disabled; the seed script and the app use Entra ID. Terraform grants the data role to you and to the Function App.
 - The Function App allows anonymous calls, so it is reachable without going through API Management. Acceptable for a demo; restrict it for anything real.
+- The Function App uses the Flex Consumption plan (FC1). The older Linux Consumption plan (Y1) failed with "Current Limit (Y1 VMs): 0" on a new subscription; Flex has its own quota. It is published with `az functionapp deployment source config-zip` (`az functionapp deploy --type zip` answered 415 on Flex).
 - APIM Consumption tier is used so the deploy is fast; Developer/Basic tiers can take 30-45 minutes.
 - No `.terraform.lock.hcl` is committed yet; run `terraform init` once and commit it after the first real deploy.
 - Status: verified offline only. The Cosmos adapter passes the shared contract and the 15-step smoke test against the local Cosmos emulator; the Functions host, APIM import and role assignments are only proven by a real deploy.
