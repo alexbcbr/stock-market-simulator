@@ -11,7 +11,7 @@ flowchart TD
     subgraph Local["Local toolchain"]
         BUN["bun / bunx<br/>JS/TS: trade-backend, CDK, trade-ui, trade-ui-basic"]
         UV["uv<br/>Python: FastAPI, console, AI, evals"]
-        DOCKER["Docker + kubectl<br/>trade-backend-k8s and trade-backend-ts containers"]
+        DOCKER["Docker + kubectl<br/>trade-backend-python and trade-backend-ts containers"]
         TF["terraform + az CLI<br/>Azure deploys"]
         MAKE["Makefiles<br/>root: CDK deploys<br/>trade-backend: run-local, test, smoke,<br/>k8s-*, validate-*"]
         TESTS["pytest / eslint / prettier / tsc"]
@@ -41,7 +41,7 @@ flowchart TD
         AWS["AWS<br/>DynamoDB, API Gateway, Lambda,<br/>S3 + CloudFront"]
         TFA["terraform apply +<br/>publish-function.sh"]
         AZ["Azure<br/>Cosmos DB, Functions (Flex), API Management"]
-        K8S["Kubernetes (Docker Desktop)<br/>make k8s-apply (trade-backend-ts)<br/>kubectl apply (trade-backend-k8s)"]
+        K8S["Kubernetes (Docker Desktop)<br/>make k8s-apply (trade-backend-ts)<br/>kubectl apply (trade-backend-python)"]
         LOC["Local server<br/>make run-local (Bun + SQLite)"]
         SMK["scripts/smoke.sh &lt;base-url&gt;<br/>same check on every target"]
     end

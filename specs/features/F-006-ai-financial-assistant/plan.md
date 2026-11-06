@@ -8,6 +8,6 @@
    2. Write the requirement and a test that bypasses the model and calls the tool directly.
 5. **Point agents at the TypeScript backend** (planned, fixes G4)
    1. Add a base-URL setting or a second MCP server for the TypeScript API contract (the route names differ from the FastAPI ones).
-   2. Decide whether `trade-backend-k8s` stays as a teaching example.
+   2. Decide whether `trade-backend-python` stays as a teaching example.
    3. Re-run the evals (F-007) to confirm no regression.
 6. **Voice AI** (planned): separate feature F-008 when started.

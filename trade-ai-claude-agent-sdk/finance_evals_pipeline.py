@@ -1,3 +1,20 @@
+"""Score recent agent traces with the code evaluators and write results to Arize.
+
+This is a script, not a library: all the work runs at import time. It exports the
+last 7 days of spans from the Arize project ``trade-ai-claude-agent-sdk``, keeps
+only root spans (one per agent turn), runs every evaluator in ``EVALUATORS``
+with tracing suppressed, and logs each result back as span annotations.
+
+Environment:
+    ARIZE_API_KEY: Required.
+    ARIZE_SPACE_ID: Required.
+
+Constraints:
+    The Claude agents send no traces unless instrumentation.py is imported (see
+    that file), so the export can be empty and nothing is annotated. Re-running
+    overwrites the annotations of the same evaluators on the same spans.
+"""
+
 import os
 
 from arize.client import ArizeClient
@@ -33,6 +50,21 @@ with suppress_tracing():
 
 
 def log_eval_to_ax(eval_results_df, eval_name):
+    """Write one evaluator's results back to Arize as span annotations.
+
+    Reshapes the evaluation frame into the columns Arize expects
+    (``eval.<name>.label``, ``.score``, ``.explanation``). The explanation column is
+    forced to string because Arize rejects an all-null column, which code
+    evaluators produce when nothing fails.
+
+    Args:
+        eval_results_df: Output of ``evaluate_dataframe``, indexed by span id.
+        eval_name: Evaluator name, for example ``"mentions_ticker"``. It must match
+            the evaluator's score column in the frame.
+
+    Raises:
+        Exception: Arize client errors on upload are not caught.
+    """
     annotations = to_annotation_dataframe(
         dataframe=eval_results_df, score_names=[eval_name]
     )

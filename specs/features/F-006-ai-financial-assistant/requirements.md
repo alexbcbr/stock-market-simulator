@@ -6,7 +6,7 @@ status: implemented
 # F-006 AI financial assistant
 
 ## Context
-The point of the project: show agents working in a critical workflow. An assistant answers finance questions, looks up prices and trades, and places trades for authorized users, only through a narrow tool interface (MCP). Three implementations of the same assistant exist: `trade-ai/` (LangChain / LangGraph; files `01` to `04` are progressive versions, `04fin_assistant_bp.py` is the current one), `trade-ai-claude-agent-sdk/` and `trade-ai-microsoft-agent-framework/` (has a server and a Dockerfile). The tools call the Python FastAPI backend (`trade-backend-k8s`, port 8000), not the TypeScript backend.
+The point of the project: show agents working in a critical workflow. An assistant answers finance questions, looks up prices and trades, and places trades for authorized users, only through a narrow tool interface (MCP). Three implementations of the same assistant exist: `trade-ai/` (LangChain / LangGraph; files `01` to `04` are progressive versions, `04fin_assistant_bp.py` is the current one), `trade-ai-claude-agent-sdk/` and `trade-ai-microsoft-agent-framework/` (has a server and a Dockerfile). The tools call the Python FastAPI backend (`trade-backend-python`, port 8000), not the TypeScript backend.
 
 ## User stories
 | ID | Priority | Story | Requirements |

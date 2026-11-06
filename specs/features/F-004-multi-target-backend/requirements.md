@@ -36,7 +36,7 @@ One TypeScript business-logic core must run on four targets with an identical pl
 - **R10** `make validate-all` SHALL run every offline check (tsc, tests, `cdk synth`, kubectl dry-runs, terraform validate, Function bundle, docker build) without creating cloud resources.
 
 ## Out of scope
-Multiple replicas on SQLite, automatic deploys (CI/CD), cloud-managed Kubernetes, replacing `trade-backend-k8s`.
+Multiple replicas on SQLite, automatic deploys (CI/CD), cloud-managed Kubernetes, replacing `trade-backend-python`.
 
 ## Decisions
 - D1: Ports and adapters. Hono only for local, Kubernetes and Azure; AWS keeps API Gateway + VTL so list routes need no Lambda.

@@ -25,7 +25,7 @@ The game plays against real historical prices, loaded before play. Original spec
 - **R5** Each seeder SHALL accept a prices CSV path and a symbols CSV path as arguments.
 - **R6** The loader SHALL skip a price row whose `Ticker` is empty or whose `Close`, `High`, `Low`, `Open` or `Volume` is empty or not a number (current behavior: the row is dropped without a warning).
 - **R7** Symbols SHALL be stored uppercase.
-- **R8** WHEN the Python backend is set up, `make create-db` and `make seed` in `trade-backend-k8s/` SHALL create `data/market_stock.db` from `ddl/*.sql`.
+- **R8** WHEN the Python backend is set up, `make create-db` and `make seed` in `trade-backend-python/` SHALL create `data/market_stock.db` from `ddl/*.sql`.
 
 ## Out of scope
 Scheduled or live feeds, intraday history, a UI for uploading files.

@@ -9,6 +9,16 @@ logger = logging.getLogger(__name__)
 
 
 def add(trade: Trade):
+    """Insert a trade row.
+
+    Args:
+        trade: Trade to insert; ``trade_id`` is assigned by the database.
+
+    Raises:
+        sqlite3.IntegrityError: If the symbol has no market price (rejected by the
+            ``prevent_trade_without_market_price`` trigger and the foreign key), or
+            a CHECK fails (symbol length or case, negative price).
+    """
     with get_connection() as conn:
         logger.info("Begin Insert record in Trade table")
         conn.execute(
@@ -30,6 +40,16 @@ def add(trade: Trade):
 
 
 def find_by_customer(customer_name: str):
+    """Read the trades of one customer.
+
+    Not used by any route today.
+
+    Args:
+        customer_name: Exact, case-sensitive name.
+
+    Returns:
+        list[dict]: Matching rows; empty when none. No guaranteed order.
+    """
     with get_connection() as conn:
         rows = conn.execute(
             "SELECT * FROM trade WHERE customer_name = ?", (customer_name,)
@@ -38,6 +58,11 @@ def find_by_customer(customer_name: str):
 
 
 def get_all():
+    """Read every trade.
+
+    Returns:
+        list[dict]: All rows; no guaranteed order.
+    """
     with get_connection() as conn:
         rows = conn.execute("SELECT * FROM trade").fetchall()
         return [dict(row) for row in rows]

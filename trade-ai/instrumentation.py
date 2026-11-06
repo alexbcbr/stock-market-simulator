@@ -3,6 +3,18 @@
 Import this module before any LangChain or mcp import - instrumentation must be
 wired before those libraries are imported, or their calls won't be patched.
 
+Environment:
+    ARIZE_SPACE_ID: Required.
+    ARIZE_API_KEY: Required.
+    ARIZE_OTLP_ENDPOINT: Required.
+    ARIZE_PROJECT_NAME: Optional; defaults to ``trade-ai``.
+
+Raises:
+    KeyError: At import time, if a required variable is missing. Load ``.env``
+        (``load_dotenv()``) before importing this module.
+
+Attributes:
+    tracer_provider: Provider the agents flush and shut down on exit.
 """
 
 import os

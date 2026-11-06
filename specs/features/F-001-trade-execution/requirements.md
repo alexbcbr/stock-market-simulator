@@ -64,4 +64,4 @@ Real money, order books, partial fills, short selling, prices from outside the l
 - **G2** No reset action (S7).
 - **G3** The API allows selling a trade whose `status_trade` is false; only the UI hides the Sell button.
 - **G4** `POST /sellStock` answers `{ "success": true }` for an unknown `trade_id` or a wrong `trade_timestamp`, although nothing changes.
-- **G5** The Python backend (`trade-backend-k8s`) has its own `create_trade` and may not follow R1 to R14.
+- **G5** The Python backend (`trade-backend-python`) has its own `create_trade` and may not follow R1 to R14.

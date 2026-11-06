@@ -2,6 +2,21 @@
 
 Import this module before any claude_agent_sdk import - instrumentation must
 be wired before that library is imported, or its calls won't be patched.
+
+Environment:
+    ARIZE_SPACE_ID: Required.
+    ARIZE_API_KEY: Required.
+    ARIZE_OTLP_ENDPOINT: Required.
+    ARIZE_PROJECT_NAME: Optional; defaults to ``trade-ai-claude-agent-sdk``.
+        The evals pipeline reads spans from this project name.
+
+Raises:
+    KeyError: At import time, if a required variable is missing.
+
+Note:
+    No application module imports this file today, so the agents send no traces
+    until you add ``import instrumentation`` before the ``claude_agent_sdk``
+    import.
 """
 
 import os

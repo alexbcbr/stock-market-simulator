@@ -1,6 +1,6 @@
 # System Diagram
 
-How the projects in this monorepo connect. The TypeScript `trade-backend` runs on four targets (AWS, Azure, local, Kubernetes) from one core and one API contract; the Python `trade-backend-k8s` is a separate implementation of the same domain. The UIs, console client and AI agents talk to one backend at a time.
+How the projects in this monorepo connect. The TypeScript `trade-backend` runs on four targets (AWS, Azure, local, Kubernetes) from one core and one API contract; the Python `trade-backend-python` is a separate implementation of the same domain. The UIs, console client and AI agents talk to one backend at a time.
 
 ```mermaid
 flowchart LR
@@ -44,7 +44,7 @@ flowchart LR
         end
     end
 
-    subgraph K8S["trade-backend-k8s"]
+    subgraph K8S["trade-backend-python"]
         API["FastAPI :8000<br/>docker / Kubernetes"]
         SQLITE[("SQLite<br/>data/market_stock.db")]
     end
@@ -118,7 +118,7 @@ flowchart LR
 - **One contract.** `api-contract/openapi.yaml` defines the routes and plain-JSON shapes. AWS answers it through API Gateway, Azure imports it into API Management, and the Hono app implements it for local and Kubernetes. `scripts/smoke.sh <base-url>` checks any deployment against it.
 - **AWS keeps API Gateway.** The three list routes (`listAllTrades`, `listTradesByCustomerName`, `listMarketPrices`) go straight to DynamoDB through VTL mapping templates with no Lambda; the templates convert DynamoDB-typed items to plain JSON. The other routes go through Lambda handlers that call the core.
 - **Azure** is defined in Terraform and verified offline only so far (see `trade-backend/deploy/README.md`). Local and Kubernetes share the same Bun server; on Kubernetes SQLite sits on a PVC, so there is one replica.
-- **`trade-backend-k8s` is separate.** The Python FastAPI + SQLite backend implements the same domain on its own, so its trade logic may differ; check it separately. Its Kubernetes names (`trade-backend`) differ from the TypeScript ones (`trade-backend-ts`).
+- **`trade-backend-python` is separate.** The Python FastAPI + SQLite backend implements the same domain on its own, so its trade logic may differ; check it separately. Its Kubernetes names (`trade-backend`) differ from the TypeScript ones (`trade-backend-ts`).
 - **The AI agents only use the FastAPI backend**, through the MCP server (`:8001`) which calls FastAPI (`:8000`). Start order: FastAPI -> MCP server -> agent.
 - **UI data shape.** Both UIs expect plain JSON from the TypeScript backend on every target; they no longer parse DynamoDB-typed JSON.
 - **Market data** is loaded into DynamoDB by `yahoo-finance-stocks/`, into the TypeScript backend's SQLite and Cosmos DB from the same CSVs by `scripts/seed.ts` and `scripts/seed-cosmos.ts`, and into the Python backend's SQLite from `ddl/`.

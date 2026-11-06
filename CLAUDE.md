@@ -10,7 +10,7 @@ A stock market simulation game for education. Players submit trades against real
 
 ```
 trade-backend/        # Multi-target TypeScript backend (AWS CDK today; Azure, local, k8s planned) — DynamoDB, API Gateway, Lambda, S3/CloudFront
-trade-backend-k8s/    # FastAPI backend (Python, uv) + SQLite, Dockerfile, k8s manifest
+trade-backend-python/    # FastAPI backend (Python, uv) + SQLite, Dockerfile, k8s manifest
 trade-ui/             # Vue 3 + Vite frontend (TypeScript) — graphs, mobile-friendly layout
 trade-ui-basic/       # Simpler variant of trade-ui (adds Toast + notifications store)
 trade-console/        # Python terminal client for the FastAPI backend
@@ -19,9 +19,9 @@ trade-ai-claude-agent-sdk/          # Same assistant ported to the Claude Agent 
 trade-ai-microsoft-agent-framework/ # Same assistant hosted with Microsoft Agent Framework (Dockerfile)
 evals/                # Arize datasets, inference + LLM-as-judge pipeline for the assistant
 yahoo-finance-stocks/ # Python scripts for importing market data into DynamoDB
-data/                 # Local SQLite DB (market_stock.db) used by trade-backend-k8s
+data/                 # Local SQLite DB (market_stock.db) used by trade-backend-python
 ddl/                  # SQL schemas + seed (market_price.sql, trade.sql, seed.sql)
-spec/                 # Application spec (spec.md)
+specs/                # Spec-driven docs: mission.md, tech-stack.md, roadmap.md, features/F-NNN-*/ (requirements, plan, validation), original spec.md, diagrams
 design/               # Architecture diagrams (design/architecture.md — Mermaid)
 docs/                 # Development notes (docs/development.md — k8s/docker/git cheatsheet)
 .claude/, .agents/    # Claude Code settings, hooks, and installed skills (Arize, frontend-design)
@@ -29,7 +29,7 @@ _PENDING.md           # Personal TODO list for the repo
 Makefile              # Root-level CDK deploy shortcuts
 ```
 
-> `docs/development.md` still references the old names `trade-backend/` (the old Python backend, now `trade-backend-k8s/`) and `trade-backend-py`. Note `trade-backend/` now means the multi-target TypeScript backend (formerly `trade-backend-aws/`). Prefer the paths above.
+> `docs/development.md` still references the old names `trade-backend/` (the old Python backend, now `trade-backend-python/`) and `trade-backend-py`. Note `trade-backend/` now means the multi-target TypeScript backend (formerly `trade-backend-aws/`). Prefer the paths above.
 
 ## Tooling
 
@@ -75,7 +75,7 @@ make k8s-apply       # PVC + Deployment (1 replica, SQLite on the volume) + Serv
 make k8s-forward     # http://localhost:8081  (K8S_PORT=...); then: make smoke URL=http://localhost:8081
 make k8s-delete      # keeps the data volume; k8s-delete-data removes it too
 ```
-Names are `trade-backend-ts` (image, Deployment, Service, PVC) so they don't clash with the Python `trade-backend` manifest in `trade-backend-k8s/k8s/`. The image seeds SQLite on start from the CSVs baked in at build time.
+Names are `trade-backend-ts` (image, Deployment, Service, PVC) so they don't clash with the Python `trade-backend` manifest in `trade-backend-python/k8s/`. The image seeds SQLite on start from the CSVs baked in at build time.
 
 ### Azure — `trade-backend/deploy/azure-terraform/` (Cosmos DB + Functions + API Management)
 ```bash
@@ -85,9 +85,9 @@ make build-function   # deploy/azure-terraform/function/dist/function.zip
 ```
 Deploy steps are in `deploy/azure-terraform/README.md` (terraform apply, `publish-function.sh`, `scripts/seed-cosmos.ts`, then `scripts/smoke.sh`). Cosmos adapter tests against the local emulator: see the header of `tests/cosmos.contract.test.ts` (`COSMOS_EMULATOR_URL` and `COSMOS_EMULATOR_KEY`, the public key from Microsoft's emulator docs); they are skipped otherwise.
 
-### FastAPI backend — `trade-backend-k8s/`
+### FastAPI backend — `trade-backend-python/`
 ```bash
-cd trade-backend-k8s
+cd trade-backend-python
 uv sync
 make run-local       # uv run uvicorn app.main:app --reload  (http://127.0.0.1:8000)
 make test            # uv run pytest
@@ -122,7 +122,7 @@ uv run main.py       # talks to the FastAPI backend via api_client.py (BASE_URL 
 ### AI assistants — `trade-ai*/`
 The agents call tools through an MCP server, which in turn calls the FastAPI backend, so start things in this order:
 ```bash
-# 1. FastAPI backend on :8000 (trade-backend-k8s, make run-local)
+# 1. FastAPI backend on :8000 (trade-backend-python, make run-local)
 # 2. MCP stocks server on :8001
 cd trade-ai && uv sync && uv run stock_mcp_server.py
 # 3. An agent
@@ -173,7 +173,7 @@ Five `price_mode` values affect how `executed_price` and `status_trade` are dete
 - `manual` — user provides `bid_price`: ≥ highest executes at highest (success); ≤ lowest fails at the bid; in between executes at the bid and succeeds only if a random point in the range exceeds `lowest + 45% × range`
 - `agent` is legacy: it only appears on old stored trades and is rejected for new ones
 
-The FastAPI backend (`trade-backend-k8s`) is a separate, SQLite-backed implementation of the same domain (see `ddl/` for its schema); verify its logic in `app/services/` rather than assuming it matches the above.
+The FastAPI backend (`trade-backend-python`) is a separate, SQLite-backed implementation of the same domain (see `ddl/` for its schema); verify its logic in `app/services/` rather than assuming it matches the above.
 
 ### Frontend (`trade-ui`, `trade-ui-basic`)
 

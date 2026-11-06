@@ -42,6 +42,15 @@ checkpointer = InMemorySaver()
 
 
 def build_agent(tools):
+    """Create the agent with the given tools and the shared system prompt.
+
+    Args:
+        tools: LangChain tools loaded from the MCP server.
+
+    Returns:
+        The compiled agent. It uses the module-level in-memory checkpointer, so
+        every agent built here shares the same conversation store.
+    """
     return create_agent(
         model=init_chat_model(
             model="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
@@ -55,6 +64,16 @@ def build_agent(tools):
 
 
 async def ainference(agent, question: str, thread_id: str):
+    """Answer one question with the async agent API.
+
+    Args:
+        agent: Agent from ``build_agent``.
+        question: The user's message.
+        thread_id: Conversation key; calls with the same id share history.
+
+    Returns:
+        The assistant's reply text.
+    """
     config = {"configurable": {"thread_id": thread_id}}
     result = await agent.ainvoke(
         {"messages": [HumanMessage(content=question)]},
@@ -64,6 +83,20 @@ async def ainference(agent, question: str, thread_id: str):
 
 
 def inference(agent, question: str, thread_id: str):
+    """Answer one question from synchronous code.
+
+    Runs ``ainference`` with ``asyncio.run``, which creates and closes an event
+    loop on every call. Do not call it from inside a running event loop; it raises
+    ``RuntimeError`` there.
+
+    Args:
+        agent: Agent from ``build_agent``.
+        question: The user's message.
+        thread_id: Conversation key; calls with the same id share history.
+
+    Returns:
+        The assistant's reply text.
+    """
     return asyncio.run(ainference(agent, question, thread_id))
 
 

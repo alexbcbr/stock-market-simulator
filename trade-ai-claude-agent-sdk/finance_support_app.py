@@ -1,3 +1,15 @@
+"""Research-and-report example on the Claude Agent SDK, using web search.
+
+Unlike ``finance_advisor_app.py`` this agent does not use the stocks MCP server
+or the trade backend. It searches the public web, so its numbers are real market
+data from the web and are unrelated to the simulator's prices. It runs
+``claude-haiku-4-5`` through AWS Bedrock (``CLAUDE_CODE_USE_BEDROCK=1``), needs
+AWS credentials, and allows only ``WebSearch`` and ``WebFetch``.
+
+Run it with ``uv run finance_support_app.py``; it prints progress and a report
+for the hard-coded ticker AMZN.
+"""
+
 import asyncio
 
 from dotenv import load_dotenv
@@ -31,6 +43,24 @@ WRITE_PROMPT = (
 
 
 async def financial_report(tickers: str, focus: str) -> str:
+    """Research tickers on the web, then write a plain-text report in a second turn.
+
+    Both turns use one session, so the second turn sees the research. Progress
+    lines (the first 200 characters of each text block) are printed as they arrive.
+    The prompt tells the model not to write files, but that is only an instruction:
+    ``permission_mode="acceptEdits"`` would let it edit files if it chose to.
+
+    Args:
+        tickers: Symbols to research, as free text (for example ``"AMZN"``).
+        focus: What to concentrate on, as free text.
+
+    Returns:
+        The report text. Taken from the final result message when present,
+        otherwise the concatenated text blocks of the second turn.
+
+    Raises:
+        Exception: SDK or Bedrock errors are not caught.
+    """
     async with ClaudeSDKClient(options=options) as client:
         # Turn 1: Research
 
@@ -62,6 +92,7 @@ async def financial_report(tickers: str, focus: str) -> str:
 
 
 async def main():
+    """Print a report for the hard-coded example: AMZN, financial performance and growth outlook."""
     result = await financial_report("AMZN", "financial performance and growth outlook")
     print(result)
 

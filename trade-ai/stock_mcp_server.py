@@ -1,3 +1,24 @@
+"""MCP server that exposes the trade backend to the AI agents as tools.
+
+Start it with ``uv run stock_mcp_server.py``. It serves MCP over streamable HTTP
+at ``http://127.0.0.1:8001/mcp`` and forwards every call to the Python FastAPI
+backend at ``http://127.0.0.1:8000`` (``BASE_URL``, fixed in code). Start the
+backend first; the server itself starts without it, and each tool call then
+fails with ``ApiError``.
+
+Tools: ``check_user``, ``buy_stock``, ``list_market_prices``, ``list_trades``,
+``create_trade``. The docstring of each tool is sent to the model as its
+description, so those docstrings are written for the model. Editing one changes
+agent behavior and can move the eval scores in ``evals/``.
+
+Constraints:
+    ``mcp.run`` executes at import time and blocks, so this module cannot be
+    imported by other code. ``users_authorized`` is a fixed allow-list and is
+    only advice to the model: ``create_trade`` does not check it.
+    ``buy_stock`` is a stub that always returns True and buys nothing; the real
+    purchase is ``create_trade``.
+"""
+
 import json
 import urllib.error
 import urllib.request
@@ -14,10 +35,29 @@ users_authorized = ["alex", "john", "sue", "maria", "jim"]
 
 
 class ApiError(Exception):
-    pass
+    """Raised when a backend call fails.
+
+    The message is the backend's ``detail`` field for an HTTP error, or the
+    connection failure text when the backend cannot be reached.
+    """
 
 
 def _request(method, path, payload=None):
+    """Call the FastAPI backend and parse the JSON answer.
+
+    Args:
+        method: HTTP method, for example ``"GET"`` or ``"POST"``.
+        path: Path under ``BASE_URL``, starting with ``/``.
+        payload: Body to send as JSON, or None for no body.
+
+    Returns:
+        The decoded JSON response.
+
+    Raises:
+        ApiError: On an HTTP error status or when the backend is unreachable. An
+            HTTP error whose body is not JSON raises ``json.JSONDecodeError``
+            instead, since the body is decoded to read ``detail``.
+    """
     url = f"{BASE_URL}{path}"
     data = json.dumps(payload).encode() if payload is not None else None
     req = urllib.request.Request(

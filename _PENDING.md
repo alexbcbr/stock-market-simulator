@@ -1,5 +1,3 @@
-- [ ] add spec-driven-development
-
 - [ ] unify the UI. Do I need 1 or 2
 - [ ] kafka generating PDF with LaTex
 - [ ] add skills, agents for development (book style)

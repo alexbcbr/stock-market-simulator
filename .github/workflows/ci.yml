@@ -82,5 +82,5 @@ jobs:
           fi
 
   # Later:
-  # test-backend:      cd trade-backend-k8s && uv run pytest
+  # test-backend:      cd trade-backend-python && uv run pytest
   # security:          dependency audit / SAST (or a separate security.yml)

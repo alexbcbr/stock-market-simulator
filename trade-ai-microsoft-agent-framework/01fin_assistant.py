@@ -25,12 +25,32 @@ sessions = {}
 
 
 async def inference(question: str, thread_id: str) -> str:
+    """Answer one question, keeping the conversation per thread.
+
+    Args:
+        question: The user's message.
+        thread_id: Conversation key. Sessions are created on first use and kept in
+            the module-level ``sessions`` dict, so history is shared by every caller
+            of this process and lost on exit; there is no eviction.
+
+    Returns:
+        The assistant's reply text.
+
+    Raises:
+        Exception: Errors from the model client (configuration, auth, throttling)
+            are not caught.
+    """
     session = sessions.setdefault(thread_id, agent.create_session())
     result = await agent.run(question, session=session)
     return result.text
 
 
 async def main():
+    """Run a console question loop until the process is stopped.
+
+    ``input()`` blocks the event loop while waiting, which is harmless for this
+    single-user loop but means nothing else can run in the same loop.
+    """
     print("*** Welcome to the Financial Bot. How can I help? ***")
     print("***************************************************")
     thread_id = "cli-session"
