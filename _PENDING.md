@@ -8,7 +8,6 @@
 - [ ] test SonarQUBE
 - [ ] test SAST/DAST (opensource)
 - [ ] test sandboxing (daytona or claude code)
-- [ ] test doc generation
 - [ ] test OpenAPI
 
 

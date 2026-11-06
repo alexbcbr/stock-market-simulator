@@ -43,4 +43,4 @@ Live prices, price history across days, search or filter by sector.
 - **G1** `listMarketPrices` is an unpaged Scan (about 1 MB on DynamoDB).
 - **G2** The list header is hard-coded as "Trading Day: January 21, 2026" instead of coming from the data.
 - **G3** Two near-identical UIs; every change is made twice until they are unified.
-- **G4** Symbol lookup is inconsistent across targets: DynamoDB, Cosmos and the SQLite symbol lookup uppercase the input, but the SQLite price lookup does not, so `getMarketPrice?symbol=aaon` answers 404 on local and Kubernetes only. This breaks R6.
+- **G4** Symbol case is inconsistent between routes: `getMarketSymbol` and `buyStock` upper-case the symbol, but `getMarketPrice` matches it exactly, so `getMarketPrice?symbol=aaon` answers 404 on every target while `getMarketSymbol?symbol=aaon` answers 200.

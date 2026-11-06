@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module app.main</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="app.html" class="white">app</a>.main</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/main.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/main.py</a></td></tr></table>
+    <p><span class="code">FastAPI&nbsp;application&nbsp;entry&nbsp;point&nbsp;for&nbsp;the&nbsp;Python&nbsp;trade&nbsp;backend.<br>
+&nbsp;<br>
+Run&nbsp;with&nbsp;``uv&nbsp;run&nbsp;uvicorn&nbsp;app.main:app&nbsp;--reload``&nbsp;(port&nbsp;8000).&nbsp;The&nbsp;AI&nbsp;agents&nbsp;reach<br>
+this&nbsp;API&nbsp;through&nbsp;the&nbsp;MCP&nbsp;server&nbsp;in&nbsp;``trade-ai/stock_mcp_server.py``,&nbsp;and&nbsp;the<br>
+console&nbsp;client&nbsp;calls&nbsp;it&nbsp;directly.<br>
+&nbsp;<br>
+Constraints:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;CORS&nbsp;allows&nbsp;only&nbsp;the&nbsp;Vite&nbsp;dev&nbsp;server&nbsp;origins&nbsp;(``localhost:5173``&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;``127.0.0.1:5173``).&nbsp;A&nbsp;browser&nbsp;app&nbsp;served&nbsp;from&nbsp;anywhere&nbsp;else&nbsp;is&nbsp;blocked.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;API&nbsp;has&nbsp;no&nbsp;authentication.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="logging.html">logging</a><br>
+</td><td class="multicolumn"><a href="app.routers.market_price.html">app.routers.market_price</a><br>
+</td><td class="multicolumn"><a href="app.routers.revenue.html">app.routers.revenue</a><br>
+</td><td class="multicolumn"><a href="app.routers.trade.html">app.routers.trade</a><br>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-read_root"><strong>read_root</strong></a>()</dt><dd><span class="code">Return&nbsp;a&nbsp;greeting&nbsp;so&nbsp;callers&nbsp;can&nbsp;check&nbsp;that&nbsp;the&nbsp;API&nbsp;is&nbsp;up.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;``{"message":&nbsp;"Hello&nbsp;from&nbsp;trade-backend!"}``.&nbsp;Does&nbsp;not&nbsp;touch&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database,&nbsp;so&nbsp;it&nbsp;succeeds&nbsp;even&nbsp;when&nbsp;the&nbsp;database&nbsp;file&nbsp;is&nbsp;missing.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>app</strong> = &lt;fastapi.applications.FastAPI object&gt;<br>
+<strong>logger</strong> = &lt;Logger app.main (INFO)&gt;</td></tr></table>
+</body></html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module app.routers.trade</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="app.html" class="white">app</a>.<a href="app.routers.html" class="white">routers</a>.trade</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/routers/trade.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/routers/trade.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="logging.html">logging</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-get_trades"><strong>get_trades</strong></a>()</dt><dd><span class="code">List&nbsp;all&nbsp;trades.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list[dict]:&nbsp;Every&nbsp;stored&nbsp;trade&nbsp;including&nbsp;``trade_id``.&nbsp;There&nbsp;is&nbsp;no&nbsp;filter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;no&nbsp;guaranteed&nbsp;order;&nbsp;filtering&nbsp;by&nbsp;customer&nbsp;exists&nbsp;in&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repository&nbsp;but&nbsp;is&nbsp;not&nbsp;exposed&nbsp;as&nbsp;a&nbsp;route.</span></dd></dl>
+ <dl><dt><a name="-post_trade"><strong>post_trade</strong></a>(trade: TradeIn)</dt><dd><span class="code">Record&nbsp;a&nbsp;trade.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;trade:&nbsp;Trade&nbsp;to&nbsp;store.&nbsp;The&nbsp;service&nbsp;derives&nbsp;``price_difference``;&nbsp;see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;``TradeIn``&nbsp;for&nbsp;the&nbsp;fields&nbsp;and&nbsp;the&nbsp;lack&nbsp;of&nbsp;pricing&nbsp;rules.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;TradeIn:&nbsp;The&nbsp;submitted&nbsp;body&nbsp;(status&nbsp;201).&nbsp;It&nbsp;does&nbsp;not&nbsp;include&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database-assigned&nbsp;``trade_id``&nbsp;or&nbsp;``price_difference``.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;HTTPException:&nbsp;400&nbsp;if&nbsp;the&nbsp;database&nbsp;rejects&nbsp;the&nbsp;trade:&nbsp;unknown&nbsp;symbol<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("Market&nbsp;price&nbsp;not&nbsp;available&nbsp;for&nbsp;symbol"),&nbsp;symbol&nbsp;not&nbsp;4&nbsp;uppercase<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;letters,&nbsp;or&nbsp;a&nbsp;negative&nbsp;price.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>logger</strong> = &lt;Logger app.routers.trade (INFO)&gt;<br>
+<strong>router</strong> = &lt;fastapi.routing.APIRouter object&gt;</td></tr></table>
+</body></html>

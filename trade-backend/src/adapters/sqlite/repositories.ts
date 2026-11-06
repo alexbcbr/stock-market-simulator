@@ -6,6 +6,12 @@ import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '
 import { SqliteDb } from './db';
 import { marketPrice, marketSymbol, trade } from './schema';
 
+/**
+ * Trades in SQLite, through Drizzle.
+ *
+ * @remarks
+ * Calls are synchronous underneath (`bun:sqlite`) and wrapped in promises to match the port.
+ */
 export class SqliteTradeRepository implements TradeRepository {
   constructor(private db: SqliteDb) {}
 
@@ -35,6 +41,9 @@ export class SqliteTradeRepository implements TradeRepository {
   }
 }
 
+/**
+ * Market prices in SQLite. Symbol matching is exact and case-sensitive.
+ */
 export class SqliteMarketPriceRepository implements MarketPriceRepository {
   constructor(private db: SqliteDb) {}
 
@@ -47,6 +56,9 @@ export class SqliteMarketPriceRepository implements MarketPriceRepository {
   }
 }
 
+/**
+ * Company data in SQLite. The symbol is upper-cased before the lookup.
+ */
 export class SqliteMarketSymbolRepository implements MarketSymbolRepository {
   constructor(private db: SqliteDb) {}
 
@@ -55,6 +67,11 @@ export class SqliteMarketSymbolRepository implements MarketSymbolRepository {
   }
 }
 
+/**
+ * Builds the three repositories on one database.
+ *
+ * @param db - Handle from `openDatabase`.
+ */
 export function createSqliteRepositories(db: SqliteDb) {
   return {
     trades: new SqliteTradeRepository(db),

@@ -1,13 +1,35 @@
 import { BuyStockRequest } from './models/trade';
 
-// Request validation shared by every target (Lambda, Hono server, Azure Function),
-// so the same input gets the same answer everywhere.
+/**
+ * Request validation shared by every target (Lambda, Hono server, Azure Function),
+ * so the same input gets the same answer everywhere.
+ *
+ * @packageDocumentation
+ */
 
 // 'agent' is a legacy value that only appears on old stored trades; new trades must use a specific mode.
+/**
+ * The price modes a new buy may use. The legacy `agent` mode is left out on purpose.
+ */
 export const BUY_PRICE_MODES = ['manual', 'market', 'agent_conservative', 'agent_moderate', 'agent_aggressive'] as const;
 
+/**
+ * Result of a validation: either the typed value, or one error message.
+ */
 export type Validation<T> = { ok: true; value: T } | { ok: false; error: string };
 
+/**
+ * Checks the body of a buy request.
+ *
+ * @remarks
+ * Shared by the Lambda handler, the Hono app and the Azure Function, so the same input gets the same
+ * answer everywhere. It stops at the first problem and reports one message. It checks presence and
+ * type only: it does not trim, change case, or look the symbol up, and a `bid_price` sent with a
+ * non-manual mode is ignored.
+ *
+ * @param body - Parsed JSON; `null`, `undefined` or a non-object counts as an empty request.
+ * @returns `ok: true` with the request, or `ok: false` with the message to return as a 400.
+ */
 export function validateBuyStockRequest(body: unknown): Validation<BuyStockRequest> {
   const request = (body ?? {}) as Partial<BuyStockRequest>;
 

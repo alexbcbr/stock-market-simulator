@@ -34,7 +34,25 @@ Arize (tracing via OTLP, datasets, experiments), LLM-as-judge pipeline (`infer.p
 ## Data
 `yahoo-finance-stocks/` Python importers and CSVs (`prod-data/`), loaded into DynamoDB, SQLite (`scripts/seed.ts`) and Cosmos (`scripts/seed-cosmos.ts`).
 
+## Code documentation
+| | Python | TypeScript |
+|---|---|---|
+| Projects | `trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework` | `trade-backend/src` |
+| Comment style | **Google-style docstrings** (`Args:`, `Returns:`, `Raises:`, `Attributes:`) | **TSDoc** (`@param name - description`, `@returns`, `@throws`, `@remarks`, `@packageDocumentation`) |
+| Generator | **pydoc** (`make pydoc`) | **TypeDoc** (`make typedoc`) |
+| Output | `docs/trade-backend-python/`, `docs/trade-ai/`, `docs/trade-ai-claude-agent-sdk/` | `docs/trade-backend/` |
+
+Rules:
+- Comments explain behavior, constraints, exceptions and usage. They do not repeat what the code shows, such as parameter types.
+- Both styles were chosen as the conventional, tool-supported option for each language: pydoc is in the standard library and reads Google-style text as plain text; TSDoc is the Microsoft specification that TypeDoc understands, and TypeScript itself already reads `/** */` comments for editor hints (the older JSDoc tool is not used because it handles TypeScript poorly).
+- The pydoc step **imports** each module, so modules that run work on import are excluded. TypeDoc only reads the source and runs nothing.
+- The docstring of an MCP tool is sent to the model as its description. It is part of the agent's behavior and is changed only with an eval run (F-006, F-007).
+- Output goes to `docs/<project>/`, one folder per project, so same-named modules from different projects (for example `01fin_assistant`, `instrumentation`) never overwrite each other. Regenerating deletes only a project's own HTML files.
+
+Not covered yet: `trade-console`, `yahoo-finance-stocks`, the UIs, the tests and the `deploy/` scripts. There is no lint rule that fails on a missing or malformed docstring.
+
 ## Engineering practices
 - JS/TS: **bun**, not npm; Python: **uv**, not pip. One lockfile per project.
 - CI: GitHub Actions (ruff lint and format, secret scan with gitleaks); optional Claude review on label. Deploys are manual. Branches: `dev` into `main` via PR.
 - Secrets: PreToolUse hook, tracked pre-commit hook, GitHub secret scan.
+- Code documentation: Google-style docstrings with pydoc (Python) and TSDoc with TypeDoc (TypeScript); see the section above.

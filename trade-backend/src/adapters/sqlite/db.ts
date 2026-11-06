@@ -4,6 +4,9 @@ import { dirname } from 'node:path';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import * as schema from './schema';
 
+/**
+ * The Drizzle database handle returned by `openDatabase`.
+ */
 export type SqliteDb = ReturnType<typeof openDatabase>;
 
 const CREATE_TABLES = `
@@ -24,7 +27,18 @@ CREATE TABLE IF NOT EXISTS trade (
 CREATE INDEX IF NOT EXISTS idx_trade_customer_name ON trade (customer_name, trade_timestamp);
 `;
 
-/** Opens (or creates) the SQLite file and makes sure the tables exist. Use ':memory:' in tests. */
+/**
+ * Opens the SQLite database and makes sure the tables exist.
+ *
+ * @remarks
+ * Creates the parent directory and the file when they are missing, switches the journal to WAL, and runs
+ * `CREATE TABLE IF NOT EXISTS`, so it is safe to call on every start and never changes existing data.
+ * Uses `bun:sqlite`, so it runs only under Bun, not Node.
+ *
+ * @param path - File path, or `:memory:` for a throw-away database in tests.
+ * @returns A Drizzle handle bound to the file.
+ * @throws If the directory cannot be created or the file cannot be opened.
+ */
 export function openDatabase(path: string) {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const sqlite = new Database(path, { create: true });

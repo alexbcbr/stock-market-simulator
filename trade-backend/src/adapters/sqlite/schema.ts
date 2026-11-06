@@ -1,6 +1,14 @@
 import { index, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-// Same tables and keys as the DynamoDB design (see TradeDbStack).
+/**
+ * Drizzle table definitions for the SQLite adapter.
+ *
+ * @remarks
+ * Same tables and keys as the DynamoDB design (see `TradeDbStack`). `db.ts` creates the same tables with
+ * raw SQL, so a column change must be made in both files.
+ *
+ * @packageDocumentation
+ */
 
 export const marketPrice = sqliteTable('market_price', {
   symbol: text('symbol').primaryKey(),
@@ -22,6 +30,10 @@ export const marketSymbol = sqliteTable('market_symbol', {
   summaryQuote: text('summaryQuote').notNull(),
 });
 
+/**
+ * Trades. The key is `trade_id` plus `trade_timestamp`; the index on customer and timestamp serves the
+ * newest-first listing. The two status columns are stored as 0 or 1 and read back as booleans.
+ */
 export const trade = sqliteTable(
   'trade',
   {

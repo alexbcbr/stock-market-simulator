@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module app.routers.market_price</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="app.html" class="white">app</a>.<a href="app.routers.html" class="white">routers</a>.market_price</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/routers/market_price.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/routers/market_price.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="logging.html">logging</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-delete_market_price"><strong>delete_market_price</strong></a>(symbol: str)</dt><dd><span class="code">Delete&nbsp;a&nbsp;market&nbsp;price.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;symbol:&nbsp;Exact,&nbsp;case-sensitive&nbsp;symbol&nbsp;to&nbsp;delete.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dict:&nbsp;``{"deleted":&nbsp;symbol}``.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;HTTPException:&nbsp;404&nbsp;if&nbsp;the&nbsp;symbol&nbsp;does&nbsp;not&nbsp;exist.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sqlite3.IntegrityError:&nbsp;If&nbsp;trades&nbsp;still&nbsp;reference&nbsp;the&nbsp;symbol.&nbsp;It&nbsp;is&nbsp;not<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;caught&nbsp;here,&nbsp;so&nbsp;the&nbsp;client&nbsp;receives&nbsp;a&nbsp;500.</span></dd></dl>
+ <dl><dt><a name="-get_market_price"><strong>get_market_price</strong></a>(symbol: str | None = None)</dt><dd><span class="code">List&nbsp;market&nbsp;prices,&nbsp;optionally&nbsp;for&nbsp;one&nbsp;symbol.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;symbol:&nbsp;Exact,&nbsp;case-sensitive&nbsp;symbol&nbsp;to&nbsp;filter&nbsp;by.&nbsp;Omit&nbsp;to&nbsp;list&nbsp;all.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list[dict]:&nbsp;Matching&nbsp;rows.&nbsp;An&nbsp;unknown&nbsp;symbol&nbsp;returns&nbsp;an&nbsp;empty&nbsp;list,&nbsp;never<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;404.</span></dd></dl>
+ <dl><dt><a name="-post_market_price"><strong>post_market_price</strong></a>(market_price: MarketPrice)</dt><dd><span class="code">Create&nbsp;a&nbsp;market&nbsp;price.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;market_price:&nbsp;Price&nbsp;snapshot&nbsp;to&nbsp;store;&nbsp;see&nbsp;``MarketPrice``&nbsp;for&nbsp;the&nbsp;rules.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;MarketPrice:&nbsp;The&nbsp;submitted&nbsp;body,&nbsp;unchanged&nbsp;(status&nbsp;201).<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;HTTPException:&nbsp;400&nbsp;if&nbsp;the&nbsp;database&nbsp;rejects&nbsp;the&nbsp;row:&nbsp;duplicate&nbsp;symbol,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;symbol&nbsp;not&nbsp;4&nbsp;uppercase&nbsp;letters,&nbsp;or&nbsp;a&nbsp;negative&nbsp;price.&nbsp;A&nbsp;malformed&nbsp;body<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;answered&nbsp;by&nbsp;FastAPI&nbsp;with&nbsp;422&nbsp;before&nbsp;this&nbsp;runs.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>logger</strong> = &lt;Logger app.routers.market_price (INFO)&gt;<br>
+<strong>router</strong> = &lt;fastapi.routing.APIRouter object&gt;</td></tr></table>
+</body></html>

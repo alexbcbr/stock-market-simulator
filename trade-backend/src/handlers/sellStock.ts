@@ -1,3 +1,8 @@
+/**
+ * AWS Lambda handler for `POST /sellStock`, behind API Gateway.
+ *
+ * @packageDocumentation
+ */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { TradeService } from '../core/tradeService';
 import { createDynamoRepositories } from '../adapters/dynamodb';
@@ -12,6 +17,17 @@ const headers = {
   'Access-Control-Allow-Methods': 'POST,OPTIONS',
 };
 
+/**
+ * Marks a trade as sold.
+ *
+ * @remarks
+ * Answers 200 `{ "success": true }` even when no trade matched, 400 for a missing body or missing `trade_id` or
+ * `trade_timestamp`, and 500 for anything else. Invalid JSON is a 500 (the Hono app answers 400). It does not check
+ * that the trade succeeded or is not already sold.
+ *
+ * @param event - API Gateway proxy event; only `body` is read.
+ * @returns A proxy result with CORS headers (`POST,OPTIONS`, any origin).
+ */
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "trade-backend",
+  "entryPoints": ["src"],
+  "entryPointStrategy": "expand",
+  "exclude": ["**/*.d.ts", "**/node_modules/**"],
+  "tsconfig": "tsconfig.json",
+  "out": "../docs/trade-backend",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "validation": { "notExported": false, "invalidLink": true, "notDocumented": false },
+  "treatWarningsAsErrors": false
+}

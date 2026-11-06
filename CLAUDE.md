@@ -23,17 +23,27 @@ data/                 # Local SQLite DB (market_stock.db) used by trade-backend-
 ddl/                  # SQL schemas + seed (market_price.sql, trade.sql, seed.sql)
 specs/                # Spec-driven docs: mission.md, tech-stack.md, roadmap.md, features/F-NNN-*/ (requirements, plan, validation), original spec.md, diagrams
 design/               # Architecture diagrams (design/architecture.md — Mermaid)
-docs/                 # Development notes (docs/development.md — k8s/docker/git cheatsheet)
+docs/                 # Generated API docs, one folder per project (docs/trade-backend from `make typedoc`; docs/trade-backend-python, docs/trade-ai, docs/trade-ai-claude-agent-sdk from `make pydoc`)
 .claude/, .agents/    # Claude Code settings, hooks, and installed skills (Arize, frontend-design)
 _PENDING.md           # Personal TODO list for the repo
-Makefile              # Root-level CDK deploy shortcuts
+Makefile              # Root-level CDK deploy shortcuts and the API doc generators (pydoc, typedoc)
 ```
 
-> `docs/development.md` still references the old names `trade-backend/` (the old Python backend, now `trade-backend-python/`) and `trade-backend-py`. Note `trade-backend/` now means the multi-target TypeScript backend (formerly `trade-backend-aws/`). Prefer the paths above.
+> Naming: `trade-backend/` is the multi-target TypeScript backend (formerly `trade-backend-aws/`). The Python backend is `trade-backend-python/` (older names: `trade-backend/`, `trade-backend-k8s/`, `trade-backend-py`). Prefer the paths above.
 
 ## Tooling
 
 Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip/python). Most Python projects are `uv`-managed (`pyproject.toml` + `uv.lock`): use `uv sync` / `uv run`. JS projects (`trade-backend`, `trade-ui`, `trade-ui-basic`) are locked with `bun.lock`; don't reintroduce `package-lock.json` (two lockfiles break CDK synth).
+
+## Code documentation
+
+Document behavior, constraints, exceptions and usage; do not restate what the code already shows (no repeated types, no "returns the result"). Comments are checked by reading, not by a linter: there is no docstring lint rule today.
+
+- **Python** (`trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework`): **Google-style docstrings** (`Args:`, `Returns:`, `Raises:`, `Attributes:`), module docstring at the top of each file. Docs are generated with **pydoc** (`make pydoc`).
+- **TypeScript** (`trade-backend/src`): **TSDoc** comments, `/** ... */` with `@param name - description`, `@returns`, `@throws`, `@remarks`; no `{type}` in tags (the types are in the code); `@packageDocumentation` in the first comment of a file for the module description; avoid curly braces and angle brackets in prose (use backticks). Docs are generated with **TypeDoc** (`make typedoc`).
+- **MCP tool docstrings are not documentation.** In `trade-ai/stock_mcp_server.py` the docstring of each `@mcp.tool()` function is sent to the model as the tool description. Do not reword them without re-running the evals; document the server at module level instead.
+- **pydoc imports what it documents.** Modules that run work on import must stay out of `make pydoc` (for example `stock_mcp_server.py` starts a server, `finance_evals_pipeline.py` runs the Arize pipeline, `04fin_assistant_bp.py` and both `instrumentation.py` files need Arize keys). TypeDoc only reads the source, so it is safe for everything.
+- Not documented yet: `trade-console`, `yahoo-finance-stocks`, the UIs, the tests, `deploy/` scripts, and the Microsoft agent project's pages (its `01fin_assistant` is not in `make pydoc`).
 
 ## Commands
 
@@ -95,13 +105,20 @@ make create-db       # recreate ../data/market_stock.db from ../ddl/*.sql
 make seed            # load ../ddl/seed.sql
 uv run pytest tests/test_trade_repository.py -s --log-cli-level=INFO -q   # single test file
 
-# Container / Kubernetes (see docs/development.md)
+# Container / Kubernetes
 docker build -t trade-backend:latest .
 kubectl apply -f k8s/deployment.yaml
 kubectl port-forward svc/trade-backend 8000:8000
 ```
 Layout: `app/main.py` (FastAPI app + routers), `app/routers/`, `app/services/`, `app/repositories/`, `app/schemas/`, `app/db.py`, `app/utils/`.
 Routes: `GET /`, `GET /revenue`, `/market-price` (POST, GET, DELETE `/{symbol}`), `/trade` (POST, GET).
+
+### API docs (from the repo root)
+```bash
+make pydoc      # HTML into docs/trade-backend-python/, docs/trade-ai/, docs/trade-ai-claude-agent-sdk/
+make typedoc    # HTML site into docs/trade-backend/ (config: trade-backend/typedoc.json)
+```
+`make pydoc` deletes only the `*.html` files inside its own three folders, so it does not touch `docs/trade-backend/`. The generated pages are not git-ignored: decide whether to commit them. `make pydoc` needs `uv`; both targets install dependencies if missing.
 
 ### Frontends — `trade-ui/` and `trade-ui-basic/`
 ```bash

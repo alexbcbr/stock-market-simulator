@@ -13,7 +13,7 @@ flowchart TD
         UV["uv<br/>Python: FastAPI, console, AI, evals"]
         DOCKER["Docker + kubectl<br/>trade-backend-python and trade-backend-ts containers"]
         TF["terraform + az CLI<br/>Azure deploys"]
-        MAKE["Makefiles<br/>root: CDK deploys<br/>trade-backend: run-local, test, smoke,<br/>k8s-*, validate-*"]
+        MAKE["Makefiles<br/>root: CDK deploys<br/>trade-backend: run-local, test, smoke,<br/>k8s-*, validate-*<br/>root: pydoc, typedoc (API docs into docs/)"]
         TESTS["pytest / eslint / prettier / tsc"]
     end
 

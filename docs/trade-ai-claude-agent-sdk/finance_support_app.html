@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module finance_support_app</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">finance_support_app</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_support_app.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_support_app.py</a></td></tr></table>
+    <p><span class="code">Research-and-report&nbsp;example&nbsp;on&nbsp;the&nbsp;Claude&nbsp;Agent&nbsp;SDK,&nbsp;using&nbsp;web&nbsp;search.<br>
+&nbsp;<br>
+Unlike&nbsp;``finance_advisor_app.py``&nbsp;this&nbsp;agent&nbsp;does&nbsp;not&nbsp;use&nbsp;the&nbsp;stocks&nbsp;MCP&nbsp;server<br>
+or&nbsp;the&nbsp;trade&nbsp;backend.&nbsp;It&nbsp;searches&nbsp;the&nbsp;public&nbsp;web,&nbsp;so&nbsp;its&nbsp;numbers&nbsp;are&nbsp;real&nbsp;market<br>
+data&nbsp;from&nbsp;the&nbsp;web&nbsp;and&nbsp;are&nbsp;unrelated&nbsp;to&nbsp;the&nbsp;simulator's&nbsp;prices.&nbsp;It&nbsp;runs<br>
+``claude-haiku-4-5``&nbsp;through&nbsp;AWS&nbsp;Bedrock&nbsp;(``CLAUDE_CODE_USE_BEDROCK=1``),&nbsp;needs<br>
+AWS&nbsp;credentials,&nbsp;and&nbsp;allows&nbsp;only&nbsp;``WebSearch``&nbsp;and&nbsp;``WebFetch``.<br>
+&nbsp;<br>
+Run&nbsp;it&nbsp;with&nbsp;``uv&nbsp;run&nbsp;finance_support_app.py``;&nbsp;it&nbsp;prints&nbsp;progress&nbsp;and&nbsp;a&nbsp;report<br>
+for&nbsp;the&nbsp;hard-coded&nbsp;ticker&nbsp;AMZN.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-financial_report"><strong>financial_report</strong></a>(tickers: str, focus: str) -&gt; str</dt><dd><span class="code">Research&nbsp;tickers&nbsp;on&nbsp;the&nbsp;web,&nbsp;then&nbsp;write&nbsp;a&nbsp;plain-text&nbsp;report&nbsp;in&nbsp;a&nbsp;second&nbsp;turn.<br>
+&nbsp;<br>
+Both&nbsp;turns&nbsp;use&nbsp;one&nbsp;session,&nbsp;so&nbsp;the&nbsp;second&nbsp;turn&nbsp;sees&nbsp;the&nbsp;research.&nbsp;Progress<br>
+lines&nbsp;(the&nbsp;first&nbsp;200&nbsp;characters&nbsp;of&nbsp;each&nbsp;text&nbsp;block)&nbsp;are&nbsp;printed&nbsp;as&nbsp;they&nbsp;arrive.<br>
+The&nbsp;prompt&nbsp;tells&nbsp;the&nbsp;model&nbsp;not&nbsp;to&nbsp;write&nbsp;files,&nbsp;but&nbsp;that&nbsp;is&nbsp;only&nbsp;an&nbsp;instruction:<br>
+``permission_mode="acceptEdits"``&nbsp;would&nbsp;let&nbsp;it&nbsp;edit&nbsp;files&nbsp;if&nbsp;it&nbsp;chose&nbsp;to.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;tickers:&nbsp;Symbols&nbsp;to&nbsp;research,&nbsp;as&nbsp;free&nbsp;text&nbsp;(for&nbsp;example&nbsp;``"AMZN"``).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;focus:&nbsp;What&nbsp;to&nbsp;concentrate&nbsp;on,&nbsp;as&nbsp;free&nbsp;text.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;report&nbsp;text.&nbsp;Taken&nbsp;from&nbsp;the&nbsp;final&nbsp;result&nbsp;message&nbsp;when&nbsp;present,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;otherwise&nbsp;the&nbsp;concatenated&nbsp;text&nbsp;blocks&nbsp;of&nbsp;the&nbsp;second&nbsp;turn.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Exception:&nbsp;SDK&nbsp;or&nbsp;Bedrock&nbsp;errors&nbsp;are&nbsp;not&nbsp;caught.</span></dd></dl>
+ <dl><dt>async <a name="-main"><strong>main</strong></a>()</dt><dd><span class="code">Print&nbsp;a&nbsp;report&nbsp;for&nbsp;the&nbsp;hard-coded&nbsp;example:&nbsp;AMZN,&nbsp;financial&nbsp;performance&nbsp;and&nbsp;growth&nbsp;outlook.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>RESEARCH_PROMPT</strong> = 'Research {tickers}. Focus on: {focus}. Use web search.'<br>
+<strong>WRITE_PROMPT</strong> = 'Now write a concise financial report based on yo... response only — do not create or save any files.'<br>
+<strong>options</strong> = ClaudeAgentOptions(tools=None, allowed_tools=['W...atched', load_timeout_ms=60000, task_budget=None)</td></tr></table>
+</body></html>

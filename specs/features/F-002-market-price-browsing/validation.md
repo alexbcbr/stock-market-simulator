@@ -18,4 +18,4 @@ Mergeable when the checks for every requirement you touched pass, and the global
 ## Open (until the gap tasks are done)
 - G1: after task 3, a list larger than one page returns each symbol exactly once across pages.
 - G2: after task 4, the header date matches the loaded data.
-- G4: after task 5, `getMarketPrice?symbol=aaon` returns AAON on every target (the repository contract test uses a lowercase symbol).
+- G4: after task 5, `getMarketPrice?symbol=aaon` and `getMarketSymbol?symbol=aaon` both return AAON on every target (the repository contract test uses a lowercase symbol).

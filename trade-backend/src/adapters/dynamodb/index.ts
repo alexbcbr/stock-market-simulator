@@ -5,7 +5,15 @@ import {
   DynamoTradeRepository,
 } from './repositories';
 
-/** Composition for the AWS Lambda handlers. Table names come from env vars. */
+/**
+ * Builds the three DynamoDB repositories for the AWS Lambda handlers.
+ *
+ * @remarks
+ * Table names come from the environment variables `TRADE_TABLE`, `MARKET_PRICE_TABLE` and
+ * `MARKET_SYMBOL_TABLE`, falling back to `trade`, `market_price` and `market_symbol`. Region and
+ * credentials come from the Lambda environment. Nothing is checked here: a wrong table name shows up
+ * as an error on the first request.
+ */
 export function createDynamoRepositories() {
   const client = new DynamoDBClient({});
   return {

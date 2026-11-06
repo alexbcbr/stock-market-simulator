@@ -7,5 +7,5 @@
    2. Support it in DynamoDB (VTL), SQLite and Cosmos adapters.
    3. Update the UI to load more.
 4. **Show the real trading day** (planned, fixes G2): return the data date from the API (or the seed) and display it.
-5. **Case-insensitive symbol lookups** (planned, fixes G4): normalize once in the core (not per adapter), add the requirement and a repository contract test with a lowercase symbol.
+5. **Case-insensitive symbol lookups** (planned, fixes G4): normalize the symbol once in the core (not in each adapter or route), so price and symbol lookups agree; add the requirement and a repository contract test with a lowercase symbol.
 6. **Unify the UIs** (planned, fixes G3, shared with F-003): decide the surviving UI, port Toast and notifications if kept, delete the other, update `CLAUDE.md` and deploy scripts.

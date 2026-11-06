@@ -1,3 +1,12 @@
+/**
+ * AWS Lambda handler for listing market prices.
+ *
+ * @remarks
+ * Not deployed. The CDK stack serves `GET /listMarketPrices` straight from DynamoDB through a mapping template,
+ * with no Lambda. The file is kept as the equivalent code path.
+ *
+ * @packageDocumentation
+ */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { createDynamoRepositories } from '../adapters/dynamodb';
 
@@ -10,6 +19,15 @@ const headers = {
   'Access-Control-Allow-Methods': 'GET,OPTIONS',
 };
 
+/**
+ * Returns every market price.
+ *
+ * @remarks
+ * Answers 200 with an array, or 500 with the error `message` included. The DynamoDB scan is unpaged (about 1 MB maximum).
+ *
+ * @param event - API Gateway proxy event; not read.
+ * @returns A proxy result with CORS headers (`GET,OPTIONS`, any origin).
+ */
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {

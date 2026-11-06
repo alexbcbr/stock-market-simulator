@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module app.services.trade_services</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="app.html" class="white">app</a>.<a href="app.services.html" class="white">services</a>.trade_services</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/services/trade_services.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-backend-python/app/services/trade_services.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="sqlite3.html">sqlite3</a><br>
+</td><td class="multicolumn"><a href="app.repositories.trade_repository.html">app.repositories.trade_repository</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-create_trade"><strong>create_trade</strong></a>(trade_in: TradeIn)</dt><dd><span class="code">Derive&nbsp;the&nbsp;profit&nbsp;figure&nbsp;and&nbsp;store&nbsp;a&nbsp;trade.<br>
+&nbsp;<br>
+``price_difference``&nbsp;is&nbsp;``closed_price&nbsp;-&nbsp;open_price``.&nbsp;It&nbsp;ignores<br>
+``executed_price``,&nbsp;so&nbsp;it&nbsp;measures&nbsp;the&nbsp;day's&nbsp;move,&nbsp;not&nbsp;the&nbsp;player's&nbsp;gain.&nbsp;No<br>
+pricing&nbsp;rule&nbsp;is&nbsp;applied&nbsp;and&nbsp;``status_trade``&nbsp;is&nbsp;stored&nbsp;as&nbsp;submitted.<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;trade_in:&nbsp;Trade&nbsp;as&nbsp;submitted&nbsp;by&nbsp;the&nbsp;client.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ValueError:&nbsp;If&nbsp;the&nbsp;database&nbsp;rejects&nbsp;the&nbsp;trade&nbsp;(unknown&nbsp;symbol,&nbsp;malformed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;symbol,&nbsp;negative&nbsp;price).&nbsp;The&nbsp;message&nbsp;is&nbsp;the&nbsp;SQLite&nbsp;error&nbsp;text.</span></dd></dl>
+ <dl><dt><a name="-list_trades"><strong>list_trades</strong></a>()</dt><dd><span class="code">List&nbsp;every&nbsp;stored&nbsp;trade.<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;list[dict]:&nbsp;All&nbsp;rows,&nbsp;with&nbsp;no&nbsp;filter&nbsp;and&nbsp;no&nbsp;guaranteed&nbsp;order.</span></dd></dl>
+</td></tr></table>
+</body></html>

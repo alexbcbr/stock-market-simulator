@@ -12,6 +12,15 @@ import { MarketSymbol } from '../../core/models/marketSymbol';
 import { Trade } from '../../core/models/trade';
 import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
 
+/**
+ * Trades in DynamoDB.
+ *
+ * @remarks
+ * Key: `trade_id` plus `trade_timestamp`. Listing by customer uses the `idx_trade_customer_name` index
+ * with the timestamp descending. `create` is a plain put, so an existing key is overwritten without
+ * error. `listAll` is a single scan with no paging and returns at most about 1 MB; the same limit
+ * applies to the customer query.
+ */
 export class DynamoTradeRepository implements TradeRepository {
   constructor(
     private client: DynamoDBClient,
@@ -53,6 +62,10 @@ export class DynamoTradeRepository implements TradeRepository {
   }
 }
 
+/**
+ * Market prices in DynamoDB. Symbol matching is exact and case-sensitive. `listAll` is an unpaged scan
+ * (about 1 MB maximum).
+ */
 export class DynamoMarketPriceRepository implements MarketPriceRepository {
   constructor(
     private client: DynamoDBClient,
@@ -72,6 +85,10 @@ export class DynamoMarketPriceRepository implements MarketPriceRepository {
   }
 }
 
+/**
+ * Company data in DynamoDB. The symbol is upper-cased before the lookup, and only the eight contract
+ * fields are returned.
+ */
 export class DynamoMarketSymbolRepository implements MarketSymbolRepository {
   constructor(
     private client: DynamoDBClient,

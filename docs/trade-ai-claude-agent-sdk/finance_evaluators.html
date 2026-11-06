@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module finance_evaluators</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title">finance_evaluators</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_evaluators.py">/Users/alexcoqueiro/prd/stock-market-simulator/trade-ai-claude-agent-sdk/finance_evaluators.py</a></td></tr></table>
+    <p><span class="code">Code&nbsp;evaluators&nbsp;for&nbsp;the&nbsp;financial&nbsp;assistant's&nbsp;answers.<br>
+&nbsp;<br>
+Each&nbsp;evaluator&nbsp;is&nbsp;a&nbsp;cheap,&nbsp;deterministic&nbsp;check&nbsp;(no&nbsp;LLM&nbsp;call)&nbsp;that&nbsp;returns<br>
+``{"label",&nbsp;"score"}``&nbsp;and,&nbsp;on&nbsp;failure,&nbsp;an&nbsp;``explanation``.&nbsp;Labels&nbsp;are<br>
+``pass``&nbsp;(score&nbsp;1),&nbsp;``fail``&nbsp;(score&nbsp;0)&nbsp;and&nbsp;``unknown``&nbsp;(score&nbsp;0,&nbsp;input&nbsp;missing<br>
+so&nbsp;the&nbsp;check&nbsp;could&nbsp;not&nbsp;run).&nbsp;Note&nbsp;that&nbsp;``unknown``&nbsp;also&nbsp;scores&nbsp;0,&nbsp;so&nbsp;average<br>
+scores&nbsp;treat&nbsp;it&nbsp;like&nbsp;a&nbsp;failure&nbsp;unless&nbsp;you&nbsp;filter&nbsp;on&nbsp;label.<br>
+&nbsp;<br>
+These&nbsp;are&nbsp;heuristics,&nbsp;not&nbsp;proof&nbsp;of&nbsp;a&nbsp;good&nbsp;answer:&nbsp;they&nbsp;match&nbsp;text&nbsp;patterns&nbsp;and<br>
+can&nbsp;be&nbsp;satisfied&nbsp;by&nbsp;a&nbsp;wrong&nbsp;answer.&nbsp;``EVALUATORS``&nbsp;is&nbsp;the&nbsp;list&nbsp;the&nbsp;pipeline&nbsp;in<br>
+``finance_evals_pipeline.py``&nbsp;runs.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="re.html">re</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>ACTION_WORDS</strong> = ('buy', 'sell', 'hold', 'accumulate', 'avoid', 'overweight', 'underweight', 'recommend', 'recommendation', 'upgrade', 'downgrade', 'outperform', 'underperform')<br>
+<strong>EVALUATORS</strong> = [&lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;, &lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;, &lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;]<br>
+<strong>contains_price_data</strong> = &lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;<br>
+<strong>has_actionable_recommendation</strong> = &lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;<br>
+<strong>mentions_ticker</strong> = &lt;phoenix.evals.evaluators.create_evaluator.&lt;locals&gt;.deco.&lt;locals&gt;._FunctionEvaluator object&gt;</td></tr></table>
+</body></html>

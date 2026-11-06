@@ -19,6 +19,7 @@
     "constructs": "^10.0.0",
     "esbuild": "^0.28.2",
     "ts-node": "^10.9.2",
+    "typedoc": "^0.28.20",
     "typescript": "~5.9.3",
     "velocityjs": "^2.1.7"
   },
