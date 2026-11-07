@@ -2,7 +2,7 @@ name: Claude Review
 
 # Claude Code reviews a PR into main, using AWS Bedrock (us-west-2) via OIDC.
 # Runs ONLY when the "claude-review" label is added to the PR (cost control).
-# Add it with: gh pr edit <n> --add-label claude-review   (or /open-pr cloud-review)
+# Add it with: gh pr edit <n> --add-label claude-review   (or /open-pr claude-review)
 # Required repo variables (Settings > Secrets and variables > Actions > Variables):
 #   AWS_ROLE_ARN       e.g. arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>
 #   BEDROCK_MODEL_ID   Bedrock model / inference-profile ID enabled in us-west-2

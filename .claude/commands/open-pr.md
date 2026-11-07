@@ -1,12 +1,12 @@
 ---
-description: Open a PR from dev into main (optionally request the cloud review)
-argument-hint: "[cloud-review]"
+description: Open a PR from dev into main (optionally request the Claude review)
+argument-hint: "[claude-review]"
 allowed-tools: Bash(git status:*), Bash(git branch:*), Bash(git log:*), Bash(git diff:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh pr create:*), Bash(gh label list:*)
 ---
 
 Open a pull request from `dev` into `main` for this repo. Arguments: `$ARGUMENTS`
 
-- `cloud-review`: add the `claude-review` label so the GitHub Claude review workflow (Bedrock) runs on the PR. It costs tokens, so only do this when asked.
+- `claude-review`: add the `claude-review` label so the GitHub Claude review workflow (Bedrock) runs on the PR. It costs tokens, so only do this when asked.
 
 Work through these steps in order and stop at the first failure.
 
@@ -24,8 +24,8 @@ Read `git log origin/main..dev` and `git diff origin/main...dev --stat`, then th
 - Title: short and imperative, under 70 characters, summarizing the whole change, not just the last commit.
 - Body: a "Summary" section with 2 to 5 bullets of what changed and why, and a "Test plan" section with the checks someone should run. End the body with this exact line:
   `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
-- Run `gh pr create --base main --head dev --title "..." --body "..."` (pass the body with a heredoc). Add `--label claude-review` only if `cloud-review` was passed.
+- Run `gh pr create --base main --head dev --title "..." --body "..."` (pass the body with a heredoc). Add `--label claude-review` only if `claude-review` was passed.
 - Do not use `--web`, and never force-push or merge.
 
 ## 4. Report
-Print the PR URL and say whether a cloud review was requested. Remind me that CI (ruff lint and format) will run on the PR.
+Print the PR URL and say whether a Claude review was requested. Remind me that CI (ruff lint and format) will run on the PR.
