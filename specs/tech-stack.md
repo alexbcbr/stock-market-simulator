@@ -15,7 +15,7 @@ What the code uses today (baseline). Change this file in the same PR as the chan
 | Verification | Unit, repository-contract, API and VTL tests; `scripts/smoke.sh <base-url>`; `make validate-*` |
 
 ## Python backend: `trade-backend-python/`
-FastAPI + SQLite (`data/market_stock.db`, schemas in `ddl/`), `uv`, Dockerfile and Kubernetes manifest. A separate implementation of the same domain; the AI agents and the console client use it. Its rules may differ from the TypeScript core.
+FastAPI + SQLite (`trade-backend-python/data/market_stock.db`, schemas in `ddl/`), `uv`, Dockerfile and Kubernetes manifest. A separate implementation of the same domain; the AI agents and the console client use it. Its rules may differ from the TypeScript core.
 
 ## Frontends: `trade-ui/`, `trade-ui-basic/`
 Vue 3 + Vite + Pinia + Vue Router (hash history), TypeScript; talk to the TypeScript backend in plain JSON. Near-copies (`-basic` adds Toast and notifications).

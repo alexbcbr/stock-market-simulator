@@ -1,6 +1,7 @@
+import { Customer, CustomerAlreadyExistsError } from '../src/core/models/customer';
 import { MarketPrice } from '../src/core/models/marketPrice';
 import { Trade } from '../src/core/models/trade';
-import { MarketPriceRepository, TradeRepository } from '../src/core/ports';
+import { CustomerRepository, MarketPriceRepository, TradeRepository } from '../src/core/ports';
 
 export class InMemoryTradeRepository implements TradeRepository {
   trades: Trade[] = [];
@@ -21,6 +22,20 @@ export class InMemoryMarketPriceRepository implements MarketPriceRepository {
   constructor(private items: MarketPrice[]) {}
   async listAll() { return this.items; }
   async getBySymbol(symbol: string) { return this.items.find((p) => p.symbol === symbol) ?? null; }
+}
+
+export class InMemoryCustomerRepository implements CustomerRepository {
+  customers: Customer[] = [];
+  async create(customer: Customer) {
+    if (this.customers.some((c) => c.customer_name === customer.customer_name)) {
+      throw new CustomerAlreadyExistsError(customer.customer_name);
+    }
+    this.customers.push({ ...customer });
+  }
+  async getByName(customerName: string) {
+    const found = this.customers.find((c) => c.customer_name === customerName);
+    return found ? { ...found } : null;
+  }
 }
 
 export const AAPL: MarketPrice = {

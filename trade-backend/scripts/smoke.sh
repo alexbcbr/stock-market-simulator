@@ -43,4 +43,14 @@ check "sellStock"                       200 POST sellStock '{"trade_id":"'$TRADE
 check "trade is marked sold"            200 POST listTradesByCustomerName '{"customer_name":"'$CUSTOMER'"}' 'any(.[]; .trade_id=="'$TRADE_ID'" and .status_sell==true)'
 check "sellStock missing fields"        400 POST sellStock '{}'
 
+NEW_CUSTOMER="smoke-$(date +%s)-$RANDOM"
+check "createCustomer defaults"         201 POST createCustomer '{"customer_name":"'$NEW_CUSTOMER'"}' \
+  '.customer_name=="'$NEW_CUSTOMER'" and .allowed_contact==false and .crm_managed==false and .fullname==null and .email==null'
+check "createCustomer duplicate"        409 POST createCustomer '{"customer_name":"'$NEW_CUSTOMER'","allowed_contact":true}'
+check "createCustomer invalid body"     400 POST createCustomer '{"customer_name":"x","allowed_contact":"yes"}'
+check "createCustomer missing name"     400 POST createCustomer '{}'
+check "getCustomer"                     200 GET  "getCustomer?customer_name=$NEW_CUSTOMER" "" '.customer_name=="'$NEW_CUSTOMER'" and .allowed_contact==false'
+check "getCustomer unknown name"        404 GET  "getCustomer?customer_name=no-such-customer-$NEW_CUSTOMER"
+check "getCustomer missing name"        400 GET  getCustomer
+
 echo "passed=$pass failed=$fail"; [ "$fail" -eq 0 ]

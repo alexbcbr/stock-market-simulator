@@ -244,6 +244,7 @@ export class TradeControllerStack extends cdk.Stack {
     const tradeTable = dynamodb.Table.fromTableName(this, 'TradeTable', 'trade');
     const marketPriceTable = dynamodb.Table.fromTableName(this, 'MarketPriceTable', 'market_price');
     const marketSymbolTable = dynamodb.Table.fromTableName(this, 'MarketSymbolTable', 'market_symbol');
+    const customersTable = dynamodb.Table.fromTableName(this, 'CustomersTable', 'customers');
 
     // Create Lambda function for buyStock
     const buyStockFunction = new NodejsFunction(this, 'BuyStockFunction', {
@@ -444,6 +445,121 @@ export class TradeControllerStack extends cdk.Stack {
       ],
     });
 
+    // Create Lambda function for createCustomer
+    const createCustomerFunction = new NodejsFunction(this, 'CreateCustomerFunction', {
+      entry: path.join(__dirname, '../../../src/handlers/createCustomer.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        CUSTOMERS_TABLE: customersTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    // Grant Lambda permission to write to customers table (the conditional put needs no read access)
+    customersTable.grantWriteData(createCustomerFunction);
+
+    api.root.addResource('createCustomer').addMethod('POST', new apigateway.LambdaIntegration(createCustomerFunction), {
+      methodResponses: [
+        {
+          statusCode: '201',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '400',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '409',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
+    // Create Lambda function for getCustomer
+    const getCustomerFunction = new NodejsFunction(this, 'GetCustomerFunction', {
+      entry: path.join(__dirname, '../../../src/handlers/getCustomer.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        CUSTOMERS_TABLE: customersTable.tableName,
+      },
+      bundling: {
+        externalModules: [],
+      },
+    });
+
+    customersTable.grantReadData(getCustomerFunction);
+
+    api.root.addResource('getCustomer').addMethod('GET', new apigateway.LambdaIntegration(getCustomerFunction), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '400',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '404',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+        {
+          statusCode: '500',
+          responseModels: {
+            'application/json': apigateway.Model.EMPTY_MODEL,
+          },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiGatewayUrl', {
       value: api.url,
@@ -483,6 +599,16 @@ export class TradeControllerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'SellStockEndpoint', {
       value: `${api.url}sellStock`,
       description: 'Sell Stock Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'CreateCustomerEndpoint', {
+      value: `${api.url}createCustomer`,
+      description: 'Create Customer Endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'GetCustomerEndpoint', {
+      value: `${api.url}getCustomer`,
+      description: 'Get Customer by Name Endpoint',
     });
   }
 }

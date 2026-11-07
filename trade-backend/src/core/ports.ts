@@ -1,3 +1,4 @@
+import { Customer } from './models/customer';
 import { MarketPrice } from './models/marketPrice';
 import { MarketSymbol } from './models/marketSymbol';
 import { Trade } from './models/trade';
@@ -79,4 +80,26 @@ export interface MarketSymbolRepository {
    * @returns The data, or `null` when the symbol is unknown.
    */
   getBySymbol(symbol: string): Promise<MarketSymbol | null>;
+}
+
+/** Storage for customers. Nothing links it to `TradeRepository`: no foreign key, no check on either side. */
+export interface CustomerRepository {
+  /**
+   * Stores a new customer.
+   *
+   * @param customer - The customer to store.
+   * @throws CustomerAlreadyExistsError If `customer_name` is already stored; the stored customer is left as it was.
+   * Every adapter does this, unlike `TradeRepository.create`.
+   */
+  create(customer: Customer): Promise<void>;
+  /**
+   * Finds one customer.
+   *
+   * @remarks
+   * Matches the name exactly, case-sensitive, like `TradeRepository.listByCustomer`.
+   *
+   * @param customerName - Exact customer name.
+   * @returns The customer, or `null` when there is none.
+   */
+  getByName(customerName: string): Promise<Customer | null>;
 }

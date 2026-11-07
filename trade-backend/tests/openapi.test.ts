@@ -8,7 +8,7 @@ test('api-contract/openapi.yaml is a valid OpenAPI document', async () => {
   const api = await SwaggerParser.validate(join(__dirname, '../api-contract/openapi.yaml'));
   const routes = Object.keys((api as { paths: object }).paths).sort();
   expect(routes).toEqual([
-    '/buyStock', '/getMarketPrice', '/getMarketSymbol', '/listAllTrades',
+    '/buyStock', '/createCustomer', '/getCustomer', '/getMarketPrice', '/getMarketSymbol', '/listAllTrades',
     '/listMarketPrices', '/listTradesByCustomerName', '/sellStock',
   ]);
 });

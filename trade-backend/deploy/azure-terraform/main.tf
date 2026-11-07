@@ -78,6 +78,15 @@ resource "azurerm_cosmosdb_sql_container" "trade" {
   partition_key_paths = ["/trade_id"]
 }
 
+# Partitioned by customer_name so create and lookup are point operations. No relation to the trade container.
+resource "azurerm_cosmosdb_sql_container" "customers" {
+  name                = "customers"
+  resource_group_name = azurerm_resource_group.main.name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.trade.name
+  partition_key_paths = ["/customer_name"]
+}
+
 # ---------- Function App ----------
 
 resource "azurerm_storage_account" "func" {

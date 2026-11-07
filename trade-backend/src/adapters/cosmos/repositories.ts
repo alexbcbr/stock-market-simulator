@@ -1,8 +1,9 @@
 import { Container, CosmosClient, Database } from '@azure/cosmos';
+import { Customer, CustomerAlreadyExistsError } from '../../core/models/customer';
 import { MarketPrice } from '../../core/models/marketPrice';
 import { MarketSymbol } from '../../core/models/marketSymbol';
 import { Trade } from '../../core/models/trade';
-import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
+import { CustomerRepository, MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
 
 /**
  * Cosmos DB (NoSQL API) adapter.
@@ -13,6 +14,7 @@ import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '
  * - `market_price`: partition key `/symbol`, `id` = symbol
  * - `market_symbol`: partition key `/symbol`, `id` = symbol
  * - `trade`: partition key `/trade_id`, `id` = trade_id
+ * - `customers`: partition key `/customer_name`, `id` = the URL-encoded customer_name
  *
  * Trades are partitioned by `trade_id` so that create and sell are point operations. Listing by customer is a
  * cross-partition query, which is fine at demo scale but costs more request units as the data grows.
@@ -105,16 +107,43 @@ export class CosmosMarketSymbolRepository implements MarketSymbolRepository {
 }
 
 /**
- * Builds the three repositories on one database.
+ * Customers in Cosmos DB.
  *
- * @param database - Handle from `openCosmosDatabase`; the `trade`, `market_price` and `market_symbol`
- * containers must already exist.
+ * @remarks
+ * Reads are point reads. Cosmos forbids `/`, `\`, `?` and `#` in an `id`, so `id` is the URL-encoded name while
+ * the partition key stays the raw name; the encoded `id` is removed from results. `create` reports an existing
+ * name (HTTP 409) as `CustomerAlreadyExistsError`.
+ */
+export class CosmosCustomerRepository implements CustomerRepository {
+  constructor(private container: Container) {}
+
+  async create(customer: Customer): Promise<void> {
+    try {
+      await this.container.items.create({ id: encodeURIComponent(customer.customer_name), ...customer });
+    } catch (error: any) {
+      if (error?.code === 409) throw new CustomerAlreadyExistsError(customer.customer_name);
+      throw error;
+    }
+  }
+
+  async getByName(customerName: string): Promise<Customer | null> {
+    const { resource } = await this.container.item(encodeURIComponent(customerName), customerName).read();
+    return resource ? clean<Customer>(resource) : null;
+  }
+}
+
+/**
+ * Builds the four repositories on one database.
+ *
+ * @param database - Handle from `openCosmosDatabase`; the `trade`, `market_price`, `market_symbol` and
+ * `customers` containers must already exist.
  */
 export function createCosmosRepositories(database: Database) {
   return {
     trades: new CosmosTradeRepository(database.container('trade')),
     prices: new CosmosMarketPriceRepository(database.container('market_price')),
     symbols: new CosmosMarketSymbolRepository(database.container('market_symbol')),
+    customers: new CosmosCustomerRepository(database.container('customers')),
   };
 }
 
@@ -128,7 +157,7 @@ export function createCosmosRepositories(database: Database) {
  * missing role shows up then (a 403 can last a few minutes after a role assignment).
  *
  * @param endpoint - Account URL, such as `https://name.documents.azure.com:443/`.
- * @param databaseName - Database holding the three containers.
+ * @param databaseName - Database holding the four containers.
  * @param key - Emulator key; omit it everywhere else.
  */
 export async function openCosmosDatabase(endpoint: string, databaseName: string, key?: string): Promise<Database> {
