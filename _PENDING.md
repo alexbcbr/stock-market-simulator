@@ -5,8 +5,6 @@
 - [ ] add voice AI to interact with data
 
 - [ ] test token analytics (Neha's article)
-- [ ] test SonarQUBE
-- [ ] test SAST/DAST (opensource)
 - [ ] test sandboxing (daytona or claude code)
 - [ ] test OpenAPI
 

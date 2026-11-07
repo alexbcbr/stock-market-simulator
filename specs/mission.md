@@ -19,7 +19,7 @@ It is a teaching tool for Gartner customers: it shows how **AI agents can be imp
 2. **One API contract.** Every deployment answers `trade-backend/api-contract/openapi.yaml` with plain JSON, and is verified by `scripts/smoke.sh`.
 3. **Agents are first-class but controlled.** Agents go through a narrow tool interface (MCP), and their behavior is measured with evals and traces.
 4. **Simple and teachable.** Prefer vanilla, readable choices over clever ones; this is a demo others will read.
-5. **Safe by default.** No secrets in the repo (three guardrail layers); deploys are manual and deliberate.
+5. **Safe by default.** No secrets in the repo (three guardrail layers); source code is scanned for vulnerabilities by SonarQube Cloud (see `tech-stack.md`); deploys are manual and deliberate.
 
 ## Non-goals
 - Real-time or live market data, real money, or brokerage integration.

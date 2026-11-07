@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.memory import InMemorySaver
 
 load_dotenv()
@@ -47,7 +48,7 @@ def inference(question: str, thread_id: str):
         Exception: Bedrock errors (credentials, model access, throttling) are not
             caught.
     """
-    config = {"configurable": {"thread_id": thread_id}}
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     result = agent.invoke(
         {"messages": [HumanMessage(content=question)]},
         config=config,

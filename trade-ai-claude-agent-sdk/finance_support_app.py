@@ -61,6 +61,7 @@ async def financial_report(tickers: str, focus: str) -> str:
     Raises:
         Exception: SDK or Bedrock errors are not caught.
     """
+    report = ""
     async with ClaudeSDKClient(options=options) as client:
         # Turn 1: Research
 
@@ -77,7 +78,6 @@ async def financial_report(tickers: str, focus: str) -> str:
 
         print("--- Writing report ---")
         await client.query(WRITE_PROMPT)
-        report = ""
         async for message in client.receive_response():
             if isinstance(message, AssistantMessage):
                 for block in message.content:
@@ -88,7 +88,7 @@ async def financial_report(tickers: str, focus: str) -> str:
             elif isinstance(message, ResultMessage):
                 report = message.result or report
 
-        return report
+    return report
 
 
 async def main():

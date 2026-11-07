@@ -1,4 +1,4 @@
-name: CI
+name: CI Python
 
 # Runs on PRs into main (before merge) and on pushes to main (after merge).
 # Pushes to dev don't trigger it; use "Run workflow" for a manual run on any branch.
@@ -40,10 +40,46 @@ jobs:
           name: lint-python-log
           path: ruff.log
 
+  # Type-check each uv project with the Pyright CLI. Pyright must be pointed at the
+  # project's own .venv (uvx runs it in an isolated env that doesn't see the project deps).
+  pyright:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # report every project even if one fails
+      matrix:
+        include:
+          - project: trade-backend-python
+          - project: trade-ai-claude-agent-sdk
+          - project: trade-ai
+          - project: trade-ai-microsoft-agent-framework
+    defaults:
+      run:
+        working-directory: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project dependencies
+        run: uv sync --frozen
+
+      # Version pinned so a new Pyright release can't break CI on its own; bump it on purpose.
+      - name: Pyright
+        run: |
+          set -o pipefail
+          uvx pyright@1.1.414 --pythonpath .venv/bin/python 2>&1 | tee pyright.log
+
+      - name: Upload Pyright log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyright-${{ matrix.project }}-log
+          path: ${{ matrix.project }}/pyright.log
+
   # Opens (or comments on) a GitHub issue when CI fails on main.
   # Skipped for PR runs: the red check on the PR is enough.
   report-failure:
-    needs: [lint-python] # add new jobs here (tests, security)
+    needs: [lint-python, pyright] # add new jobs here (tests, security)
     if: failure() && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
