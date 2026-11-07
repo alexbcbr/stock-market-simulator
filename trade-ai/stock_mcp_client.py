@@ -22,7 +22,7 @@ client = MultiServerMCPClient(
     {
         "stocks": {
             "url": "http://127.0.0.1:8001/mcp",
-            "transport": "http",
+            "transport": "streamable_http",
         }
     }
 )

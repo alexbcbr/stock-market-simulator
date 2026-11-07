@@ -13,6 +13,9 @@ from agent_framework_foundry_hosting import ResponsesHostServer
 _spec = importlib.util.spec_from_file_location(
     "fin_assistant_01", Path(__file__).parent / "01fin_assistant.py"
 )
+# spec_from_file_location returns None when it can't build a spec for the path.
+if _spec is None or _spec.loader is None:
+    raise ImportError("Cannot load 01fin_assistant.py")
 _fin_assistant = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_fin_assistant)
 
