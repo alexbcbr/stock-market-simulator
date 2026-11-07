@@ -76,10 +76,36 @@ jobs:
           name: pyright-${{ matrix.project }}-log
           path: ${{ matrix.project }}/pyright.log
 
+  # Same command as local `make unit-test-python`: one pytest run for all Python projects, inside the
+  # trade-backend-python environment (its pyproject.toml also holds the pytest config).
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      UV_FROZEN: "1" # never update uv.lock in CI
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install project dependencies
+        run: uv sync --project trade-backend-python
+
+      - name: Pytest
+        run: |
+          set -o pipefail
+          make unit-test-python 2>&1 | tee pytest.log
+
+      - name: Upload test log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-python-log
+          path: pytest.log
+
   # Opens (or comments on) a GitHub issue when CI fails on main.
   # Skipped for PR runs: the red check on the PR is enough.
   report-failure:
-    needs: [lint-python, pyright] # add new jobs here (tests, security)
+    needs: [lint-python, pyright, tests] # add new jobs here (security)
     if: failure() && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -118,5 +144,4 @@ jobs:
           fi
 
   # Later:
-  # test-backend:      cd trade-backend-python && uv run pytest
   # security:          dependency audit / SAST (or a separate security.yml)

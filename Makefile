@@ -51,6 +51,16 @@ pydoc:
 typedoc:
 	cd trade-backend && bun install && bunx typedoc
 
+# Python tests for all projects in a single pytest run. Uses the trade-backend-python environment
+# (--project), whose pyproject.toml also supplies the pytest config (pythonpath). Any project added
+# here must work with that environment's dependencies; otherwise give it its own `uv run` line.
+unit-test-python:
+	uv run --project trade-backend-python \
+		pytest trade-backend-python trade-ai trade-ai-claude-agent-sdk trade-ai-microsoft-agent-framework
+
+unit-test-typescript:
+	bun test
+
 # Run once per clone: enables the tracked git hooks in .githooks/
 setup-hooks:
 	git config core.hooksPath .githooks

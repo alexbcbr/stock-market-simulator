@@ -30,7 +30,7 @@ jobs:
       - name: Type-check and compile
         run: bun run build
 
-      - name: Tests
+      - name: Unit Testing
         run: bun test
 
   trade-ui:
