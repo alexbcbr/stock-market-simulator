@@ -34,7 +34,7 @@ async function getHandler() {
     const repos = createCosmosRepositories(database);
     // API Management adds the CORS headers, so the app must not add them a second time.
     const hono = createApp(
-      { tradeService: new TradeService(repos.trades, repos.prices), prices: repos.prices, symbols: repos.symbols },
+      { tradeService: new TradeService(repos.trades, repos.prices), prices: repos.prices, symbols: repos.symbols, customers: repos.customers },
       { cors: false }
     );
     handler = toAzureHandler(hono.fetch);

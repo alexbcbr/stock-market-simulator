@@ -54,3 +54,15 @@ export const trade = sqliteTable(
     index('idx_trade_customer_name').on(t.customer_name, t.trade_timestamp),
   ]
 );
+
+/**
+ * Customers. The key is `customer_name`; there is deliberately no foreign key to `trade`. The two flags are
+ * stored as 0 or 1 and read back as booleans; `fullname` and `email` are nullable.
+ */
+export const customers = sqliteTable('customers', {
+  customer_name: text('customer_name').primaryKey(),
+  fullname: text('fullname'),
+  email: text('email'),
+  allowed_contact: integer('allowed_contact', { mode: 'boolean' }).notNull(),
+  crm_managed: integer('crm_managed', { mode: 'boolean' }).notNull(),
+});

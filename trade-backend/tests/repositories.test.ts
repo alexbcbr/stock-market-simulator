@@ -1,8 +1,8 @@
 import { openDatabase } from '../src/adapters/sqlite/db';
 import { createSqliteRepositories } from '../src/adapters/sqlite/repositories';
 import { marketPrice, marketSymbol } from '../src/adapters/sqlite/schema';
-import { AAPL, InMemoryMarketPriceRepository, InMemoryTradeRepository } from './helpers';
-import { marketPriceRepositoryContract, tradeRepositoryContract } from './repositoryContract';
+import { AAPL, InMemoryCustomerRepository, InMemoryMarketPriceRepository, InMemoryTradeRepository } from './helpers';
+import { customerRepositoryContract, marketPriceRepositoryContract, tradeRepositoryContract } from './repositoryContract';
 import { describe, expect, test } from 'bun:test';
 
 const sqlite = () => {
@@ -19,6 +19,9 @@ tradeRepositoryContract('in-memory', () => new InMemoryTradeRepository());
 tradeRepositoryContract('sqlite', () => sqlite().trades);
 marketPriceRepositoryContract('in-memory', () => new InMemoryMarketPriceRepository([AAPL]));
 marketPriceRepositoryContract('sqlite', () => sqlite().prices);
+
+customerRepositoryContract('in-memory', () => new InMemoryCustomerRepository());
+customerRepositoryContract('sqlite', () => sqlite().customers);
 
 describe('SqliteMarketSymbolRepository', () => {
   test('getBySymbol is case-insensitive and returns null when missing', async () => {

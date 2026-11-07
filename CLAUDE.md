@@ -10,7 +10,7 @@ A stock market simulation game for education. Players submit trades against real
 
 ```
 trade-backend/        # Multi-target TypeScript backend (AWS CDK today; Azure, local, k8s planned) — DynamoDB, API Gateway, Lambda, S3/CloudFront
-trade-backend-python/    # FastAPI backend (Python, uv) + SQLite, Dockerfile, k8s manifest
+trade-backend-python/    # FastAPI backend (Python, uv) + SQLite (data/market_stock.db inside this folder), Dockerfile, k8s manifest
 trade-ui/             # Vue 3 + Vite frontend (TypeScript) — graphs, mobile-friendly layout
 trade-ui-basic/       # Simpler variant of trade-ui (adds Toast + notifications store)
 trade-console/        # Python terminal client for the FastAPI backend
@@ -19,7 +19,6 @@ trade-ai-claude-agent-sdk/          # Same assistant ported to the Claude Agent 
 trade-ai-microsoft-agent-framework/ # Same assistant hosted with Microsoft Agent Framework (Dockerfile)
 evals/                # Arize datasets, inference + LLM-as-judge pipeline for the assistant
 yahoo-finance-stocks/ # Python scripts for importing market data into DynamoDB
-data/                 # Local SQLite DB (market_stock.db) used by trade-backend-python
 ddl/                  # SQL schemas + seed (market_price.sql, trade.sql, seed.sql)
 specs/                # Spec-driven docs: mission.md, tech-stack.md, roadmap.md, features/F-NNN-*/ (requirements, plan, validation), original spec.md, diagrams
 design/               # Architecture diagrams (design/architecture.md — Mermaid)
@@ -101,7 +100,7 @@ cd trade-backend-python
 uv sync
 make run-local       # uv run uvicorn app.main:app --reload  (http://127.0.0.1:8000)
 make test            # uv run pytest
-make create-db       # recreate ../data/market_stock.db from ../ddl/*.sql
+make create-db       # recreate data/market_stock.db (inside trade-backend-python/) from ../ddl/*.sql
 make seed            # load ../ddl/seed.sql
 uv run pytest tests/test_trade_repository.py -s --log-cli-level=INFO -q   # single test file
 
@@ -168,6 +167,7 @@ Data lives in `prod-data/`, `test-data/`, `exploratory-data/`; see `README_IMPOR
 **TradeDbStack** — creates DynamoDB tables:
 - `market_price` (PK: `symbol`) — daily OHLCV data per ticker
 - `market_symbol` (PK: `symbol`) — ticker metadata (name, sector, industry)
+- `customers` (PK: `customer_name`) — optional contact data per player; no link to `trade` (F-010)
 - `trade` (PK: `trade_id`, SK: `trade_timestamp`) — executed trades, with GSI `idx_trade_customer_name` (PK: `customer_name`, SK: `trade_timestamp`)
 
 **TradeControllerStack** — API Gateway REST API at `/prod` (the DynamoDB-integrated routes use response mapping templates from `deploy/aws-cdk/lib/dynamodb-vtl.ts` so every route returns plain JSON, per `api-contract/openapi.yaml`):
@@ -177,6 +177,8 @@ Data lives in `prod-data/`, `test-data/`, `exploratory-data/`; see `README_IMPOR
 - `GET /getMarketPrice?symbol=X` — Lambda (`src/handlers/getMarketPrice.ts`)
 - `GET /getMarketSymbol?symbol=X` — Lambda (`src/handlers/getMarketSymbol.ts`)
 - `POST /buyStock` — Lambda (`src/handlers/buyStock.ts`)
+- `POST /createCustomer` — Lambda (`src/handlers/createCustomer.ts`); 409 on a duplicate name
+- `GET /getCustomer?customer_name=X` — Lambda (`src/handlers/getCustomer.ts`)
 
 Handlers also exist for `listMarketPrices.ts` and `sellStock.ts`; models in `src/models/`, logic in `src/services/`.
 

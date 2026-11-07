@@ -25,16 +25,16 @@ flowchart LR
         subgraph AWS["AWS (deploy/aws-cdk, 3 CDK stacks)"]
             CF["TradeUiStack<br/>S3 + CloudFront"]
             APIGW["TradeControllerStack<br/>API Gateway /prod"]
-            LAM["Lambda handlers<br/>buy, sell, price, symbol"]
+            LAM["Lambda handlers<br/>buy, sell, price, symbol, customer"]
             ADPD["DynamoDB adapter"]
-            DDB[("TradeDbStack<br/>DynamoDB: market_price,<br/>market_symbol, trade")]
+            DDB[("TradeDbStack<br/>DynamoDB: market_price,<br/>market_symbol, trade, customers")]
         end
 
         subgraph AZ["Azure (deploy/azure-terraform)"]
             APIM["API Management<br/>imports openapi.yaml"]
             FUNC["Azure Function<br/>Hono app, managed identity"]
             ADPC["Cosmos adapter"]
-            COSMOS[("Cosmos DB serverless<br/>market_price, market_symbol, trade")]
+            COSMOS[("Cosmos DB serverless<br/>market_price, market_symbol, trade, customers")]
         end
 
         subgraph LOCAL["Local and Kubernetes (deploy/k8s)"]
@@ -46,7 +46,7 @@ flowchart LR
 
     subgraph K8S["trade-backend-python"]
         API["FastAPI :8000<br/>docker / Kubernetes"]
-        SQLITE[("SQLite<br/>data/market_stock.db")]
+        SQLITE[("SQLite<br/>trade-backend-python/data/market_stock.db")]
     end
 
     subgraph AI["AI financial assistant"]

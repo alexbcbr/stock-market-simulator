@@ -22,6 +22,7 @@ const app = createApp({
   tradeService: new TradeService(repos.trades, repos.prices),
   prices: repos.prices,
   symbols: repos.symbols,
+  customers: repos.customers,
 });
 
 Bun.serve({ port, fetch: app.fetch });

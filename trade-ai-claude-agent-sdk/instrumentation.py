@@ -14,9 +14,9 @@ Raises:
     KeyError: At import time, if a required variable is missing.
 
 Note:
-    No application module imports this file today, so the agents send no traces
-    until you add ``import instrumentation`` before the ``claude_agent_sdk``
-    import.
+    ``finance_advisor_app.py`` imports this file; ``finance_support_app.py`` does
+    not, so that agent still sends no traces until you add
+    ``import instrumentation`` before its ``claude_agent_sdk`` import.
 """
 
 import os

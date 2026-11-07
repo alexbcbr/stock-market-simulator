@@ -54,12 +54,44 @@ paths:
       responses:
         '200': { description: Marked as sold, content: { application/json: { schema: { type: object, properties: { success: { type: boolean } } } } } }
         '400': { $ref: '#/components/responses/Error' }
+  /createCustomer:
+    post:
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateCustomerRequest' } } }
+      responses:
+        '201': { description: Customer created (crm_managed is always false), content: { application/json: { schema: { $ref: '#/components/schemas/Customer' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /getCustomer:
+    get:
+      parameters: [{ name: customer_name, in: query, required: true, schema: { type: string } }]
+      responses:
+        '200': { description: The customer, content: { application/json: { schema: { $ref: '#/components/schemas/Customer' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
 components:
   responses:
     Error:
       description: Error
       content: { application/json: { schema: { type: object, required: [error], properties: { error: { type: string } } } } }
   schemas:
+    CreateCustomerRequest:
+      type: object
+      required: [customer_name]
+      properties:
+        customer_name: { type: string, minLength: 1, description: Same text as customer_name on trades; not enforced by any key }
+        fullname: { type: string }
+        email: { type: string }
+        allowed_contact: { type: boolean, description: Defaults to false when not sent }
+    Customer:
+      type: object
+      properties:
+        customer_name: { type: string }
+        fullname: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        allowed_contact: { type: boolean }
+        crm_managed: { type: boolean, description: Always false on creation; no route changes it }
     BuyStockRequest:
       type: object
       required: [symbol, customer_name, price_mode]

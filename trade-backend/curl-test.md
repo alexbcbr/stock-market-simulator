@@ -22,3 +22,8 @@ curl -X POST $B/listTradesByCustomerName -H 'Content-Type: application/json' \
 
 # Error
 curl -i "$B/getMarketPrice?symbol=ZZZZZZ"
+
+# customers (crm_managed is always false; 409 if the name exists)
+curl -X POST $B/createCustomer -H 'Content-Type: application/json' \
+    -d '{"customer_name":"alex","fullname":"Alex C","email":"alex@example.com","allowed_contact":true}'
+curl "$B/getCustomer?customer_name=alex"

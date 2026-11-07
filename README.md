@@ -29,6 +29,7 @@ flowchart LR
         CORE --> T1["AWS<br/>API Gateway, Lambda, DynamoDB"]
         CORE --> T2["Azure<br/>APIM, Functions, Cosmos DB"]
         CORE --> T3["Local / Kubernetes<br/>Hono, SQLite"]
+        CORE -.-> CRM["CRM<br/>HubSpot (planned)"]
     end
 
     PY["trade-backend-python<br/>FastAPI, SQLite"]

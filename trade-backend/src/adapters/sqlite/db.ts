@@ -25,6 +25,10 @@ CREATE TABLE IF NOT EXISTS trade (
   PRIMARY KEY (trade_id, trade_timestamp)
 );
 CREATE INDEX IF NOT EXISTS idx_trade_customer_name ON trade (customer_name, trade_timestamp);
+CREATE TABLE IF NOT EXISTS customers (
+  customer_name TEXT PRIMARY KEY, fullname TEXT, email TEXT,
+  allowed_contact INTEGER NOT NULL, crm_managed INTEGER NOT NULL
+);
 `;
 
 /**

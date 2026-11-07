@@ -1,8 +1,9 @@
 import { Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { MarketPriceRepository, MarketSymbolRepository } from '../core/ports';
+import { CustomerAlreadyExistsError, newCustomer } from '../core/models/customer';
+import { CustomerRepository, MarketPriceRepository, MarketSymbolRepository } from '../core/ports';
 import { SymbolNotAvailableError, TradeService } from '../core/tradeService';
-import { validateBuyStockRequest } from '../core/validation';
+import { validateBuyStockRequest, validateCreateCustomerRequest } from '../core/validation';
 
 /**
  * The HTTP routes for the local, Kubernetes and Azure targets.
@@ -22,6 +23,8 @@ export interface AppDeps {
   prices: MarketPriceRepository;
   /** Source of company data for `/getMarketSymbol`. */
   symbols: MarketSymbolRepository;
+  /** Storage for `/createCustomer` and `/getCustomer`. */
+  customers: CustomerRepository;
 }
 
 /**
@@ -29,10 +32,11 @@ export interface AppDeps {
  *
  * @remarks
  * Routes: `GET /health`, `GET /listAllTrades`, `POST /listTradesByCustomerName`, `GET /listMarketPrices`,
- * `GET /getMarketPrice`, `GET /getMarketSymbol`, `POST /buyStock` and `POST /sellStock`.
+ * `GET /getMarketPrice`, `GET /getMarketSymbol`, `POST /buyStock`, `POST /sellStock`, `POST /createCustomer` and
+ * `GET /getCustomer`.
  *
  * Status codes: 400 for a missing or malformed body, a missing field or a missing query parameter; 404 for
- * an unknown symbol; 500 `{ "error": "Internal server error" }` for anything unexpected, with the real error
+ * an unknown symbol or customer; 409 when `/createCustomer` gets a name that already exists; 500 `{ "error": "Internal server error" }` for anything unexpected, with the real error
  * only in the log. A body that is not valid JSON is a 400, which differs from the AWS Lambda handlers (500).
  * `POST /sellStock` answers `{ "success": true }` even when no trade matched.
  *
@@ -44,7 +48,7 @@ export interface AppDeps {
  * such as Azure API Management, already adds them, so the headers are not duplicated.
  * @returns A Hono app; pass `app.fetch` to a server or adapter.
  */
-export function createApp({ tradeService, prices, symbols }: AppDeps, options: { cors?: boolean } = {}) {
+export function createApp({ tradeService, prices, symbols, customers }: AppDeps, options: { cors?: boolean } = {}) {
   const app = new Hono();
   if (options.cors ?? true) app.use('*', cors());
 
@@ -103,6 +107,28 @@ export function createApp({ tradeService, prices, symbols }: AppDeps, options: {
     }
     await tradeService.sellTrade(body.trade_id, body.trade_timestamp);
     return c.json({ success: true });
+  });
+
+  app.post('/createCustomer', async (c) => {
+    const body = await readJson(c);
+    if (body === undefined) return c.json({ error: 'Request body is required' }, 400);
+    const validation = validateCreateCustomerRequest(body);
+    if (!validation.ok) return c.json({ error: validation.error }, 400);
+    const customer = newCustomer(validation.value);
+    try {
+      await customers.create(customer);
+    } catch (error) {
+      if (error instanceof CustomerAlreadyExistsError) return c.json({ error: error.message }, 409);
+      throw error;
+    }
+    return c.json(customer, 201);
+  });
+
+  app.get('/getCustomer', async (c) => {
+    const name = c.req.query('customer_name');
+    if (!name) return c.json({ error: 'Query parameter "customer_name" is required' }, 400);
+    const found = await customers.getByName(name);
+    return found ? c.json(found) : c.json({ error: 'Customer not found' }, 404);
   });
 
   app.onError((error, c) => {

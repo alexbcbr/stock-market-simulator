@@ -5,14 +5,15 @@ The schema is not created here: build the database first from ``ddl/*.sql``
 (``make create-db``), otherwise queries fail with "no such table".
 
 Attributes:
-    DB_PATH: Location of the database file, ``data/market_stock.db`` at the
-        repository root. Fixed at import time; there is no environment override.
+    DB_PATH: Location of the database file, ``data/market_stock.db`` inside
+        ``trade-backend-python/`` (next to ``app/``). Fixed at import time; there
+        is no environment override.
 """
 
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parents[2] / "data" / "market_stock.db"
+DB_PATH = Path(__file__).resolve().parents[1] / "data" / "market_stock.db"
 
 
 def get_connection():

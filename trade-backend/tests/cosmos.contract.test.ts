@@ -8,7 +8,7 @@
 import { CosmosClient } from '@azure/cosmos';
 import { createCosmosRepositories } from '../src/adapters/cosmos/repositories';
 import { AAPL } from './helpers';
-import { marketPriceRepositoryContract, tradeRepositoryContract } from './repositoryContract';
+import { customerRepositoryContract, marketPriceRepositoryContract, tradeRepositoryContract } from './repositoryContract';
 
 const url = process.env.COSMOS_EMULATOR_URL;
 const key = process.env.COSMOS_EMULATOR_KEY;
@@ -19,6 +19,7 @@ async function freshRepositories() {
   await database.containers.createIfNotExists({ id: 'trade', partitionKey: { paths: ['/trade_id'] } });
   await database.containers.createIfNotExists({ id: 'market_price', partitionKey: { paths: ['/symbol'] } });
   await database.containers.createIfNotExists({ id: 'market_symbol', partitionKey: { paths: ['/symbol'] } });
+  await database.containers.createIfNotExists({ id: 'customers', partitionKey: { paths: ['/customer_name'] } });
   await database.container('market_price').items.create({ id: AAPL.symbol, ...AAPL });
   return createCosmosRepositories(database);
 }
@@ -26,4 +27,5 @@ async function freshRepositories() {
 if (url && key) {
   tradeRepositoryContract('cosmos emulator', async () => (await freshRepositories()).trades);
   marketPriceRepositoryContract('cosmos emulator', async () => (await freshRepositories()).prices);
+  customerRepositoryContract('cosmos emulator', async () => (await freshRepositories()).customers);
 }
