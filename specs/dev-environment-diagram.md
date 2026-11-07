@@ -1,6 +1,6 @@
 # Development Environment Diagram
 
-Tools, CI/CD and how they relate in the day-to-day workflow. CI is currently limited to secret scanning; deployments are run manually from the developer machine.
+Tools, CI/CD and how they relate in the day-to-day workflow. The diagram below shows the secret-scanning workflow only; the full CI list (lint, type checks, tests) is in `tech-stack.md`. Source-code security scanning is done by SonarQube Cloud outside GitHub Actions (Automatic Analysis, not drawn here). Deployments are run manually from the developer machine.
 
 ## Tooling and workflow
 

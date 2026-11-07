@@ -2,6 +2,7 @@
 
 [![CI Python](https://github.com/alexbcbr/stock-market-simulator/actions/workflows/ci-python.yml/badge.svg)](https://github.com/alexbcbr/stock-market-simulator/actions/workflows/ci-python.yml)
 [![CI TypeScript](https://github.com/alexbcbr/stock-market-simulator/actions/workflows/ci-typescript.yml/badge.svg)](https://github.com/alexbcbr/stock-market-simulator/actions/workflows/ci-typescript.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=alexbcbr_stock-market-simulator&metric=alert_status)](https://sonarcloud.io/project/overview?id=alexbcbr_stock-market-simulator)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 An educational, intraday trading game. Players buy and sell stocks against **real historical market prices**, with no real money and no live market connection.
@@ -110,6 +111,8 @@ GitHub Actions runs on every pull request into `main`:
 - **Python:** ruff lint and format checks, and Pyright type checks for each project.
 - **TypeScript:** build and tests for the backend, lint and build for both UIs.
 - **Security:** secret scanning on every push, plus local pre-commit and Claude Code guardrails against committing secrets.
+
+Source code is also scanned for vulnerabilities and code smells by SonarQube Cloud. The latest results are on the [project dashboard](https://sonarcloud.io/project/overview?id=alexbcbr_stock-market-simulator).
 
 ## Documentation
 
