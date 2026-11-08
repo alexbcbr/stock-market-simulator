@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - trade-backend (TypeScript)
+        - trade-backend-python
+        - trade-ui / trade-ui-basic
+        - AI agents (trade-ai*)
+        - trade-analytics
+        - Deployment (CDK, Terraform, Kubernetes)
+        - Specs or docs
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
