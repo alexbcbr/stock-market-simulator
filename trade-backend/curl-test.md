@@ -25,5 +25,5 @@ curl -i "$B/getMarketPrice?symbol=ZZZZZZ"
 
 # customers (crm_managed is always false; 409 if the name exists)
 curl -X POST $B/createCustomer -H 'Content-Type: application/json' \
-    -d '{"customer_name":"alex","fullname":"Alex C","email":"alex@example.com","allowed_contact":true}'
+    -d '{"customer_name":"alex","fullname":"Alex C","email":"alex@example.com","company":"Contoso","date_of_birth":"1990-04-12","state_residence":"WA","allowed_contact":true}'
 curl "$B/getCustomer?customer_name=alex"

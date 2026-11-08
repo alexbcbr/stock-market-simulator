@@ -57,3 +57,7 @@ target/
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+# Personal data for the CrewAI customer research agent
+trade-ai-crewai/customer_research.csv
+trade-ai-crewai/reports/

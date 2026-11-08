@@ -52,6 +52,7 @@ jobs:
           - project: trade-ai-claude-agent-sdk
           - project: trade-ai
           - project: trade-ai-microsoft-agent-framework
+          - project: trade-ai-crewai
     defaults:
       run:
         working-directory: ${{ matrix.project }}

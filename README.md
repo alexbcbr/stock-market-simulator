@@ -54,6 +54,7 @@ The Python backend is a separate implementation of the same domain, used by the 
 | [`trade-console/`](trade-console/) | Terminal client for the FastAPI backend |
 | [`trade-ai/`](trade-ai/) | Financial assistant (LangChain/LangGraph) and the MCP stocks server |
 | [`trade-ai-claude-agent-sdk/`](trade-ai-claude-agent-sdk/), [`trade-ai-microsoft-agent-framework/`](trade-ai-microsoft-agent-framework/) | The same assistant on other agent frameworks |
+| [`trade-ai-crewai/`](trade-ai-crewai/) | CrewAI crew (researcher, writer, reviewer) that writes a brief with talking points per customer |
 | [`trade-analytics/`](trade-analytics/) | Analytics pipeline: bronze, silver and gold layers (Parquet and Apache Iceberg), synced to Databricks |
 | [`evals/`](evals/) | Datasets and the LLM-as-judge pipeline |
 | [`yahoo-finance-stocks/`](yahoo-finance-stocks/) | Market data importers and CSVs |
