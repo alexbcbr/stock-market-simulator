@@ -1,0 +1,42 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste secrets, `.env` contents or customer data. For security problems use the private report link.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - trade-backend (TypeScript)
+        - trade-backend-python
+        - trade-ui / trade-ui-basic
+        - AI agents (trade-ai*)
+        - trade-analytics
+        - Deployment (CDK, Terraform, Kubernetes)
+        - Specs or docs
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Where did it run?
+      options: [Local, Kubernetes, AWS, Azure, Not applicable]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Commands, requests and the output or error text.
+    validations:
+      required: true
