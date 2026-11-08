@@ -24,17 +24,32 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--date", help="force reprocess of this date (YYYY-MM-DD)")
 args = ap.parse_args()
 
-silver_catalog = SqlCatalog("local", uri=f"sqlite:///{SILVER}/catalog.db", warehouse=f"file://{SILVER}")
-catalog = SqlCatalog("gold", uri=f"sqlite:///{GOLD}/catalog.db", warehouse=f"file://{GOLD}")
-silver = silver_catalog.load_table("silver.trade_market").scan(
-    row_filter="status_trade = 1", selected_fields=tuple(KEYS + ["executed_price"])
-).to_pandas()
+silver_catalog = SqlCatalog(
+    "local", uri=f"sqlite:///{SILVER}/catalog.db", warehouse=f"file://{SILVER}"
+)
+catalog = SqlCatalog(
+    "gold", uri=f"sqlite:///{GOLD}/catalog.db", warehouse=f"file://{GOLD}"
+)
+silver = (
+    silver_catalog.load_table("silver.trade_market")
+    .scan(
+        row_filter="status_trade = 1", selected_fields=tuple(KEYS + ["executed_price"])
+    )
+    .to_pandas()
+)
 
-gold_schema = pa.schema([
-    ("date", pa.date32()), ("customer_name", pa.string()), ("symbol", pa.string()),
-    ("name", pa.string()), ("sector", pa.string()), ("industry", pa.string()),
-    ("trade_count", pa.int64()), ("total_executed_price", pa.float64()),
-])
+gold_schema = pa.schema(
+    [
+        ("date", pa.date32()),
+        ("customer_name", pa.string()),
+        ("symbol", pa.string()),
+        ("name", pa.string()),
+        ("sector", pa.string()),
+        ("industry", pa.string()),
+        ("trade_count", pa.int64()),
+        ("total_executed_price", pa.float64()),
+    ]
+)
 catalog.create_namespace_if_not_exists("gold")
 # First run only: create the table and partition it by month of `date`.
 if not catalog.table_exists("gold.daily_customer_symbol"):

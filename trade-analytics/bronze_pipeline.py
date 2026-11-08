@@ -16,7 +16,12 @@ from dotenv import load_dotenv
 load_dotenv()
 con = sqlite3.connect(os.environ["FILE_PATH"])
 # Every user table, skipping SQLite's internal sqlite_* tables.
-tables = [r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
+tables = [
+    r[0]
+    for r in con.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+    )
+]
 
 for t in tables:
     out = f"trade.bronze/{date.today():%Y%m%d}_{t}.parquet"

@@ -29,22 +29,36 @@ TABLES = {
 }
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--dry-run", action="store_true", help="export locally and print the upload commands only")
-ap.add_argument("--profile", help="~/.databrickscfg profile (default profile if omitted)")
+ap.add_argument(
+    "--dry-run",
+    action="store_true",
+    help="export locally and print the upload commands only",
+)
+ap.add_argument(
+    "--profile", help="~/.databrickscfg profile (default profile if omitted)"
+)
 args = ap.parse_args()
 
 # Fresh export every run, so tables removed locally do not linger.
 shutil.rmtree(EXPORT, ignore_errors=True)
 for layer, (folder, catalog_name, name) in TABLES.items():
     warehouse = os.path.abspath(folder)
-    catalog = SqlCatalog(catalog_name, uri=f"sqlite:///{warehouse}/catalog.db", warehouse=f"file://{warehouse}")
+    catalog = SqlCatalog(
+        catalog_name,
+        uri=f"sqlite:///{warehouse}/catalog.db",
+        warehouse=f"file://{warehouse}",
+    )
     out = f"{EXPORT}/{layer}/{name.split('.')[1]}.parquet"
     os.makedirs(os.path.dirname(out), exist_ok=True)
     df = catalog.load_table(name).scan().to_pandas()
     df.to_parquet(out, index=False)
     print(f"exported {name}: {len(df)} rows -> {out}")
 
-for local, remote in [("trade.bronze", "bronze"), (f"{EXPORT}/silver", "silver"), (f"{EXPORT}/gold", "gold")]:
+for local, remote in [
+    ("trade.bronze", "bronze"),
+    (f"{EXPORT}/silver", "silver"),
+    (f"{EXPORT}/gold", "gold"),
+]:
     cmd = ["databricks", "fs", "cp", "-r", "--overwrite", local, f"{VOLUME}/{remote}"]
     if args.profile:
         cmd += ["--profile", args.profile]

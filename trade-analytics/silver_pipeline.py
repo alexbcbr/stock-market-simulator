@@ -20,29 +20,37 @@ def latest(table):
     """Returns the path of the newest bronze Parquet file for `table`.
 
     Raises:
-        IndexError: If no bronze file exists for the table.
+        ValueError: If no bronze file exists for the table.
     """
-    return sorted(glob(f"trade.bronze/*_{table}.parquet"))[-1]
+    return max(glob(f"trade.bronze/*_{table}.parquet"))
 
 
 trade_file = latest("trade")
 trade = pd.read_parquet(trade_file)
 # trade_timestamp holds only a time of day, so the date comes from the bronze file name.
-trade["date"] =pd.to_datetime(os.path.basename(trade_file)[:8], format="%Y%m%d").date()
+trade["date"] = pd.to_datetime(os.path.basename(trade_file)[:8], format="%Y%m%d").date()
 
 symbol = pd.read_parquet(latest("market_symbol"))
 # Drop the columns that already exist in trade, to avoid duplicates after the join.
-price = pd.read_parquet(latest("market_price")).drop(columns=["open_price", "close_price"])
+price = pd.read_parquet(latest("market_price")).drop(
+    columns=["open_price", "close_price"]
+)
 
 df = trade.merge(symbol, on="symbol", how="left").merge(price, on="symbol", how="left")
 
-catalog = SqlCatalog("local", uri=f"sqlite:///{WAREHOUSE}/catalog.db", warehouse=f"file://{WAREHOUSE}")
+catalog = SqlCatalog(
+    "local", uri=f"sqlite:///{WAREHOUSE}/catalog.db", warehouse=f"file://{WAREHOUSE}"
+)
 catalog.create_namespace_if_not_exists("silver")
 data = pa.Table.from_pandas(df, preserve_index=False)
 table = catalog.create_table_if_not_exists("silver.trade_market", schema=data.schema)
 
 # bronze is a full copy of trade every day: keep the first-seen date of trades already in silver
-first_seen = table.scan(selected_fields=("trade_id", "date")).to_pandas().set_index("trade_id")["date"]
+first_seen = (
+    table.scan(selected_fields=("trade_id", "date"))
+    .to_pandas()
+    .set_index("trade_id")["date"]
+)
 df["date"] = [first_seen.get(i, d) for i, d in zip(df["trade_id"], df["date"])]
 data = pa.Table.from_pandas(df, schema=data.schema, preserve_index=False)
 # Upsert: update trades already in silver, insert new ones. Never creates duplicate trade_id.
