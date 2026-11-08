@@ -1,8 +1,8 @@
 name: Claude Assistant
 
 # Responds when "@claude" is mentioned in issues, issue/PR comments or PR review
-# comments. Uses AWS Bedrock (us-west-2) via OIDC. Only users with write access
-# to the repo can trigger the Action.
+# comments. Uses AWS Bedrock (us-west-2) via OIDC. Only the owner, members and
+# collaborators can trigger it (checked in the job's `if` and again by the action).
 # Uses repo variables AWS_ROLE_ARN and BEDROCK_MODEL_ID.
 # Note: issue_comment workflows run from the default branch (main).
 on:
@@ -11,7 +11,7 @@ on:
   pull_request_review_comment:
     types: [created]
   issues:
-    types: [opened, assigned]
+    types: [opened]
 
 permissions:
   contents: write # lets Claude push commits/branches when asked
@@ -21,10 +21,16 @@ permissions:
 
 jobs:
   claude:
+    # Only the owner, org members and collaborators can start the job. This runs before the AWS role is assumed,
+    # so an outside commenter never gets credentials (the action also checks write access, as a second guard).
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'issues' &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+        (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
