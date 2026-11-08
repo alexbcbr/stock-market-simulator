@@ -13,6 +13,7 @@ It is also a teaching tool for a bigger question: **how can AI agents safely run
 
 - **One set of rules, many platforms.** The trade engine is written once in TypeScript and runs on AWS, Azure, local and Kubernetes, behind a single OpenAPI contract.
 - **AI agents as first-class users.** A financial assistant places trades through a narrow tool interface (MCP). It is implemented three ways: LangChain/LangGraph, the Claude Agent SDK and the Microsoft Agent Framework.
+- **Analytics-ready data.** A daily pipeline ([`trade-analytics/`](trade-analytics/)) copies the trades into bronze, silver and gold layers (Parquet, with Apache Iceberg for silver and gold) and syncs them to Databricks for analysis.
 - **Measured, not guessed.** Agent behavior is traced and scored with LLM-as-judge evals against golden datasets (Arize).
 - **Spec-driven.** Mission, tech stack, roadmap and per-feature requirements live in [`specs/`](specs/).
 
@@ -34,9 +35,14 @@ flowchart LR
 
     PY["trade-backend-python<br/>FastAPI, SQLite"]
     AG -.traces and evals.-> ARIZE["Arize"]
+
+    AN["Analytical layer (trade-analytics)<br/>Bronze, Silver, Gold<br/>Parquet + Apache Iceberg"]
+    T3 -.reads SQLite.-> AN
+    PY -.reads SQLite.-> AN
+    AN -.sync via Databricks CLI.-> DBX["Databricks<br/>analysis in the cloud"]
 ```
 
-The Python backend is a separate implementation of the same domain, used by the console client and the AI agents. More diagrams are in [`specs/system-diagram.md`](specs/system-diagram.md).
+The Python backend is a separate implementation of the same domain, used by the console client and the AI agents. The analytics layer reads the SQLite database of either backend. More diagrams are in [`specs/system-diagram.md`](specs/system-diagram.md).
 
 ## Repository layout
 
@@ -48,6 +54,7 @@ The Python backend is a separate implementation of the same domain, used by the 
 | [`trade-console/`](trade-console/) | Terminal client for the FastAPI backend |
 | [`trade-ai/`](trade-ai/) | Financial assistant (LangChain/LangGraph) and the MCP stocks server |
 | [`trade-ai-claude-agent-sdk/`](trade-ai-claude-agent-sdk/), [`trade-ai-microsoft-agent-framework/`](trade-ai-microsoft-agent-framework/) | The same assistant on other agent frameworks |
+| [`trade-analytics/`](trade-analytics/) | Analytics pipeline: bronze, silver and gold layers (Parquet and Apache Iceberg), synced to Databricks |
 | [`evals/`](evals/) | Datasets and the LLM-as-judge pipeline |
 | [`yahoo-finance-stocks/`](yahoo-finance-stocks/) | Market data importers and CSVs |
 | [`specs/`](specs/), [`design/`](design/), [`docs/`](docs/) | Specs, architecture diagrams and generated API docs |
@@ -86,7 +93,20 @@ Other targets:
 | AWS | `bun run cdk deploy --all`, see [`deploy/README.md`](trade-backend/deploy/README.md) |
 | Azure | Terraform, see [`deploy/azure-terraform`](trade-backend/deploy/azure-terraform/) |
 | FastAPI backend | `make run-local` in `trade-backend-python/` (port 8000) |
+| Analytics | `uv run bronze_pipeline.py`, `silver_pipeline.py`, `gold_pipeline.py` in `trade-analytics/` (needs `FILE_PATH` in `.env`), then `upload_to_databricks.py` to sync. See [`trade-analytics/README.md`](trade-analytics/README.md) |
 | AI assistant | Start the FastAPI backend, then `uv run stock_mcp_server.py` and an agent in `trade-ai/`. Needs AWS Bedrock credentials and, for tracing, Arize keys in a `.env` file |
+
+## Analytics
+
+[`trade-analytics/`](trade-analytics/) turns the trades into a data mart for analysis, as a daily batch in three layers:
+
+| Layer | Content |
+|---|---|
+| Bronze | Raw Parquet copy of every SQLite table, one file per table per day |
+| Silver | `trade_market`: one row per trade joined with symbol and price data (Parquet files managed as an Apache Iceberg table) |
+| Gold | `daily_customer_symbol`: one row per date, customer and symbol, with trade count and total executed price (Apache Iceberg), so queries by customer and day are fast |
+
+The three layers are synced to a Databricks volume with the Databricks CLI, for analysis in the cloud. The local pipeline stays the source of truth. Details: [`specs/features/F-011-trade-analytics/`](specs/features/F-011-trade-analytics/).
 
 ## How a trade is priced
 

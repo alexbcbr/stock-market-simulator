@@ -12,3 +12,4 @@ Convention: `F-NNN-kebab-case-title`, one folder per feature. IDs are permanent:
 | F-006 | [AI financial assistant](F-006-ai-financial-assistant/) | implemented |
 | F-007 | [Evals and observability](F-007-evals-observability/) | implemented |
 | F-010 | [Customer registry](F-010-customer-registry/) | implemented |
+| F-011 | [Trade analytics (medallion pipeline)](F-011-trade-analytics/) | implemented |
