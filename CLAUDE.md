@@ -17,6 +17,7 @@ trade-console/        # Python terminal client for the FastAPI backend
 trade-ai/             # Financial assistant agents (LangChain/LangGraph + Bedrock) + MCP server/client
 trade-ai-claude-agent-sdk/          # Same assistant ported to the Claude Agent SDK
 trade-ai-microsoft-agent-framework/ # Same assistant hosted with Microsoft Agent Framework (Dockerfile)
+trade-ai-crewai/      # CrewAI crew (researcher, writer, reviewer): one markdown brief per customer in customer_research.csv (F-012)
 evals/                # Arize datasets, inference + LLM-as-judge pipeline for the assistant
 yahoo-finance-stocks/ # Python scripts for importing market data into DynamoDB
 ddl/                  # SQL schemas + seed (market_price.sql, trade.sql, seed.sql)
@@ -38,7 +39,7 @@ Use **bun** for JS/TS (instead of npm/npx) and **uv** for Python (instead of pip
 
 Document behavior, constraints, exceptions and usage; do not restate what the code already shows (no repeated types, no "returns the result"). Comments are checked by reading, not by a linter: there is no docstring lint rule today.
 
-- **Python** (`trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework`): **Google-style docstrings** (`Args:`, `Returns:`, `Raises:`, `Attributes:`), module docstring at the top of each file. Docs are generated with **pydoc** (`make pydoc`).
+- **Python** (`trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework`, `trade-ai-crewai`): **Google-style docstrings** (`Args:`, `Returns:`, `Raises:`, `Attributes:`), module docstring at the top of each file. Docs are generated with **pydoc** (`make pydoc`).
 - **TypeScript** (`trade-backend/src`): **TSDoc** comments, `/** ... */` with `@param name - description`, `@returns`, `@throws`, `@remarks`; no `{type}` in tags (the types are in the code); `@packageDocumentation` in the first comment of a file for the module description; avoid curly braces and angle brackets in prose (use backticks). Docs are generated with **TypeDoc** (`make typedoc`).
 - **MCP tool docstrings are not documentation.** In `trade-ai/stock_mcp_server.py` the docstring of each `@mcp.tool()` function is sent to the model as the tool description. Do not reword them without re-running the evals; document the server at module level instead.
 - **pydoc imports what it documents.** Modules that run work on import must stay out of `make pydoc` (for example `stock_mcp_server.py` starts a server, `finance_evals_pipeline.py` runs the Arize pipeline, `04fin_assistant_bp.py` and both `instrumentation.py` files need Arize keys). TypeDoc only reads the source, so it is safe for everything.
@@ -114,7 +115,7 @@ Routes: `GET /`, `GET /revenue`, `/market-price` (POST, GET, DELETE `/{symbol}`)
 
 ### API docs (from the repo root)
 ```bash
-make pydoc      # HTML into docs/trade-backend-python/, docs/trade-ai/, docs/trade-ai-claude-agent-sdk/
+make pydoc      # HTML into docs/trade-backend-python/, docs/trade-ai/, docs/trade-ai-claude-agent-sdk/, docs/trade-ai-crewai/
 make typedoc    # HTML site into docs/trade-backend/ (config: trade-backend/typedoc.json)
 ```
 `make pydoc` deletes only the `*.html` files inside its own three folders, so it does not touch `docs/trade-backend/`. The generated pages are not git-ignored: decide whether to commit them. `make pydoc` needs `uv`; both targets install dependencies if missing.
@@ -145,6 +146,7 @@ cd trade-ai && uv sync && uv run stock_mcp_server.py
 uv run 04fin_assistant_bp.py                       # trade-ai (LangChain/LangGraph; 01..04 are progressive versions)
 cd ../trade-ai-claude-agent-sdk && uv sync && uv run main.py   # Claude Agent SDK (see its README; entry point files are finance_*.py)
 cd ../trade-ai-microsoft-agent-framework && uv run python server.py   # also has a Dockerfile
+cd ../trade-ai-crewai && uv sync && uv run main.py   # independent of the MCP server and backends; reads customer_research.csv (git-ignored), writes reports/ (git-ignored)
 ```
 MCP tools: `check_user`, `buy_stock`, `list_market_prices`, `list_trades`, `create_trade`. Models are served via AWS Bedrock (needs AWS credentials). Tracing goes to Arize and needs `ARIZE_SPACE_ID`, `ARIZE_API_KEY`, `ARIZE_OTLP_ENDPOINT` in `.env` (never commit `.env`).
 

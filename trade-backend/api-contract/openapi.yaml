@@ -96,6 +96,7 @@ components:
         customer_name: { type: string, minLength: 1, description: Same text as customer_name on trades; not enforced by any key }
         fullname: { type: string }
         email: { type: string }
+        company: { type: string, description: Optional. Company the customer works for }
         date_of_birth: { type: string, format: date, description: 'Optional. Past or present date, YYYY-MM-DD' }
         state_residence: { type: string, minLength: 2, maxLength: 2, description: 'Optional. US state code (50 states and DC), e.g. WA; accepted in any case, stored upper case' }
         allowed_contact: { type: boolean, description: Defaults to false when not sent }
@@ -105,6 +106,7 @@ components:
         customer_name: { type: string }
         fullname: { type: string, nullable: true }
         email: { type: string, nullable: true }
+        company: { type: string, nullable: true }
         date_of_birth: { type: string, format: date, nullable: true }
         state_residence: { type: string, nullable: true, description: 2-letter US state code }
         allowed_contact: { type: boolean }

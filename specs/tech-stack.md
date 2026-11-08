@@ -26,6 +26,7 @@ Python terminal client for the FastAPI backend.
 ## AI: `trade-ai*/`
 - MCP stocks server (`trade-ai/stock_mcp_server.py`, :8001) wrapping the FastAPI backend (:8000).
 - Agents: LangChain / LangGraph (`trade-ai`), Claude Agent SDK, Microsoft Agent Framework (has a Dockerfile). Models via AWS Bedrock.
+- `trade-ai-crewai`: CrewAI crew (researcher, writer, reviewer) that writes customer briefs; Claude Haiku on Bedrock, DuckDuckGo search, tracing off (F-012).
 - Python via `uv`.
 
 ## Evals and observability: `evals/`
@@ -37,10 +38,10 @@ Arize (tracing via OTLP, datasets, experiments), LLM-as-judge pipeline (`infer.p
 ## Code documentation
 | | Python | TypeScript |
 |---|---|---|
-| Projects | `trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework` | `trade-backend/src` |
+| Projects | `trade-backend-python`, `trade-ai`, `trade-ai-claude-agent-sdk`, `trade-ai-microsoft-agent-framework`, `trade-ai-crewai` | `trade-backend/src` |
 | Comment style | **Google-style docstrings** (`Args:`, `Returns:`, `Raises:`, `Attributes:`) | **TSDoc** (`@param name - description`, `@returns`, `@throws`, `@remarks`, `@packageDocumentation`) |
 | Generator | **pydoc** (`make pydoc`) | **TypeDoc** (`make typedoc`) |
-| Output | `docs/trade-backend-python/`, `docs/trade-ai/`, `docs/trade-ai-claude-agent-sdk/` | `docs/trade-backend/` |
+| Output | `docs/trade-backend-python/`, `docs/trade-ai/`, `docs/trade-ai-claude-agent-sdk/`, `docs/trade-ai-crewai/` | `docs/trade-backend/` |
 
 Rules:
 - Comments explain behavior, constraints, exceptions and usage. They do not repeat what the code shows, such as parameter types.

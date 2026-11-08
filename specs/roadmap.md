@@ -14,6 +14,7 @@ High-level implementation order. Statuses: `implemented` (baseline, documented f
 | 7 | [F-007 evals and observability](features/F-007-evals-observability/) | implemented |
 | 8 | [F-010 customer registry](features/F-010-customer-registry/) | implemented (code and automation done; not yet deployed) |
 | 9 | [F-011 trade analytics](features/F-011-trade-analytics/) | implemented (local pipeline tested; Databricks upload dry-run only) |
+| 10 | [F-012 customer research agent](features/F-012-customer-research-agent/) | implemented (CrewAI; no unit tests yet) |
 
 ## Phase 1: Close the baseline gaps (planned)
 Small items found while writing the specs; each is a task group in its feature's `plan.md`.

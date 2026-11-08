@@ -65,7 +65,7 @@ export function validateBuyStockRequest(body: unknown): Validation<BuyStockReque
  *
  * @remarks
  * Shared by the Lambda handler and the Hono app. Only `customer_name` is required, as a non-empty string; it is
- * not trimmed. `fullname`, `email`, `date_of_birth`, `state_residence` and `allowed_contact` are optional: `null` counts as not sent, and a value of
+ * not trimmed. `fullname`, `email`, `company`, `date_of_birth`, `state_residence` and `allowed_contact` are optional: `null` counts as not sent, and a value of
  * the wrong type is an error (so `"false"` is rejected, not read as false). The email format is not checked.
  * `date_of_birth` must be a real past or present date as `YYYY-MM-DD`; `state_residence` must be a US state code
  * (50 states and DC), accepted in any case and stored in upper case. Any
@@ -76,12 +76,12 @@ export function validateBuyStockRequest(body: unknown): Validation<BuyStockReque
  */
 export function validateCreateCustomerRequest(body: unknown): Validation<CreateCustomerRequest> {
   const raw = (body ?? {}) as Record<string, unknown>;
-  const { customer_name, fullname, email, date_of_birth, state_residence, allowed_contact } = raw;
+  const { customer_name, fullname, email, company, date_of_birth, state_residence, allowed_contact } = raw;
 
   if (typeof customer_name !== 'string' || customer_name === '') {
     return { ok: false, error: 'customer_name is required' };
   }
-  for (const [field, value] of [['fullname', fullname], ['email', email], ['date_of_birth', date_of_birth], ['state_residence', state_residence]] as const) {
+  for (const [field, value] of [['fullname', fullname], ['email', email], ['company', company], ['date_of_birth', date_of_birth], ['state_residence', state_residence]] as const) {
     if (value != null && typeof value !== 'string') return { ok: false, error: `${field} must be a string` };
   }
   if (date_of_birth != null && !isPastIsoDate(date_of_birth as string)) {
@@ -100,6 +100,7 @@ export function validateCreateCustomerRequest(body: unknown): Validation<CreateC
       customer_name,
       ...(fullname != null && { fullname: fullname as string }),
       ...(email != null && { email: email as string }),
+      ...(company != null && { company: company as string }),
       ...(date_of_birth != null && { date_of_birth: date_of_birth as string }),
       ...(state !== undefined && { state_residence: state }),
       ...(allowed_contact != null && { allowed_contact: allowed_contact as boolean }),

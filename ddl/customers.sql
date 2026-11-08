@@ -5,6 +5,7 @@ CREATE TABLE customers (
     customer_name               TEXT PRIMARY KEY,
     fullname                    TEXT,
     email                       TEXT,
+    company                     TEXT,   -- optional, where the customer works
     date_of_birth               DATE,   -- optional, ISO YYYY-MM-DD
     state_residence             TEXT,   -- optional, 2-letter US state code (e.g. WA, CA)
     allowed_contact             BOOLEAN NOT NULL DEFAULT 0,
