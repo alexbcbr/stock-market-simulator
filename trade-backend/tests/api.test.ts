@@ -73,7 +73,9 @@ describe('API contract', () => {
   test('createCustomer applies defaults and getCustomer returns the stored customer', async () => {
     const res = await post('createCustomer', { customer_name: 'alex' });
     expect(res.status).toBe(201);
-    const expected = { customer_name: 'alex', fullname: null, email: null, allowed_contact: false, crm_managed: false };
+    const expected = {
+      customer_name: 'alex', fullname: null, email: null, date_of_birth: null, state_residence: null, allowed_contact: false, crm_managed: false,
+    };
     expect(await res.json()).toEqual(expected);
     const found = await app.request('/getCustomer?customer_name=alex');
     expect(found.status).toBe(200);
@@ -82,11 +84,13 @@ describe('API contract', () => {
 
   test('createCustomer stores the optional fields and always sets crm_managed to false', async () => {
     const res = await post('createCustomer', {
-      customer_name: 'bob', fullname: 'Bob B', email: 'bob@example.com', allowed_contact: true, crm_managed: true,
+      customer_name: 'bob', fullname: 'Bob B', email: 'bob@example.com', date_of_birth: '1985-09-30', state_residence: 'ca',
+      allowed_contact: true, crm_managed: true,
     });
     expect(res.status).toBe(201);
     expect(await res.json()).toEqual({
-      customer_name: 'bob', fullname: 'Bob B', email: 'bob@example.com', allowed_contact: true, crm_managed: false,
+      customer_name: 'bob', fullname: 'Bob B', email: 'bob@example.com', date_of_birth: '1985-09-30', state_residence: 'CA',
+      allowed_contact: true, crm_managed: false,
     });
   });
 
@@ -97,6 +101,13 @@ describe('API contract', () => {
     [{ customer_name: 'a', allowed_contact: 'false' }, 'allowed_contact must be a boolean'],
     [{ customer_name: 'a', email: 1 }, 'email must be a string'],
     [{ customer_name: 'a', fullname: true }, 'fullname must be a string'],
+    [{ customer_name: 'a', date_of_birth: 19900412 }, 'date_of_birth must be a string'],
+    [{ customer_name: 'a', date_of_birth: '1990-02-30' }, 'date_of_birth must be a valid past date in YYYY-MM-DD format'],
+    [{ customer_name: 'a', date_of_birth: '04/12/1990' }, 'date_of_birth must be a valid past date in YYYY-MM-DD format'],
+    [{ customer_name: 'a', date_of_birth: '2999-01-01' }, 'date_of_birth must be a valid past date in YYYY-MM-DD format'],
+    [{ customer_name: 'a', state_residence: 'ZZ' }, 'state_residence must be a 2-letter US state code (for example WA or CA)'],
+    [{ customer_name: 'a', state_residence: 'WAS' }, 'state_residence must be a 2-letter US state code (for example WA or CA)'],
+    [{ customer_name: 'a', state_residence: 5 }, 'state_residence must be a string'],
   ])('createCustomer %j -> 400', async (body, message) => {
     const res = await post('createCustomer', body);
     expect(res.status).toBe(400);

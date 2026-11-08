@@ -24,6 +24,8 @@ Until now a player existed only as the free-text `customer_name` on each trade (
 | `customer_name` | text | Key; required, non-empty; same text as `trade.customer_name` |
 | `fullname` | text, nullable | Optional |
 | `email` | text, nullable | Optional; format not checked |
+| `date_of_birth` | date (`YYYY-MM-DD`), nullable | Optional; must be a real date, not in the future; 400 otherwise |
+| `state_residence` | text(2), nullable | Optional; US state code (50 states + DC), accepted in any case, stored upper case; 400 otherwise |
 | `allowed_contact` | boolean | Default false |
 | `crm_managed` | boolean | Always false on creation |
 

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS trade (
 );
 CREATE INDEX IF NOT EXISTS idx_trade_customer_name ON trade (customer_name, trade_timestamp);
 CREATE TABLE IF NOT EXISTS customers (
-  customer_name TEXT PRIMARY KEY, fullname TEXT, email TEXT,
+  customer_name TEXT PRIMARY KEY, fullname TEXT, email TEXT, date_of_birth TEXT, state_residence TEXT,
   allowed_contact INTEGER NOT NULL, crm_managed INTEGER NOT NULL
 );
 `;
@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS customers (
  *
  * @remarks
  * Creates the parent directory and the file when they are missing, switches the journal to WAL, and runs
- * `CREATE TABLE IF NOT EXISTS`, so it is safe to call on every start and never changes existing data.
+ * `CREATE TABLE IF NOT EXISTS`, then adds the customer columns `date_of_birth` and `state_residence` to a database
+ * that predates them. It is safe to call on every start and never changes existing rows.
  * Uses `bun:sqlite`, so it runs only under Bun, not Node.
  *
  * @param path - File path, or `:memory:` for a throw-away database in tests.
@@ -48,5 +49,10 @@ export function openDatabase(path: string) {
   const sqlite = new Database(path, { create: true });
   sqlite.exec('PRAGMA journal_mode = WAL;');
   sqlite.exec(CREATE_TABLES);
+  // Databases created before these columns existed: add them in place (CREATE TABLE IF NOT EXISTS does not).
+  const customerColumns = (sqlite.query('PRAGMA table_info(customers)').all() as { name: string }[]).map((c) => c.name);
+  for (const column of ['date_of_birth', 'state_residence']) {
+    if (!customerColumns.includes(column)) sqlite.exec(`ALTER TABLE customers ADD COLUMN ${column} TEXT;`);
+  }
   return drizzle(sqlite, { schema });
 }

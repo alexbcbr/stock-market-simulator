@@ -6,13 +6,19 @@ info:
     Single contract for every deployment (AWS API Gateway, Azure API Management,
     local Bun server, Kubernetes). All responses are plain JSON, never DynamoDB-typed JSON.
     Verify any deployment with scripts/smoke.sh <base-url>.
+tags:
+  - { name: Trades, description: Buy and sell stocks and list trades }
+  - { name: Market, description: Market prices and symbol metadata }
+  - { name: Customers, description: Customer registry }
 paths:
   /listAllTrades:
     get:
+      tags: [Trades]
       responses:
         '200': { description: All trades, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Trade' } } } } }
   /listTradesByCustomerName:
     post:
+      tags: [Trades]
       requestBody:
         required: true
         content: { application/json: { schema: { type: object, required: [customer_name], properties: { customer_name: { type: string } } } } }
@@ -21,10 +27,12 @@ paths:
         '400': { $ref: '#/components/responses/Error' }
   /listMarketPrices:
     get:
+      tags: [Market]
       responses:
         '200': { description: All market prices, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/MarketPrice' } } } } }
   /getMarketPrice:
     get:
+      tags: [Market]
       parameters: [{ name: symbol, in: query, required: true, schema: { type: string } }]
       responses:
         '200': { description: Price, content: { application/json: { schema: { $ref: '#/components/schemas/MarketPrice' } } } }
@@ -32,6 +40,7 @@ paths:
         '404': { $ref: '#/components/responses/Error' }
   /getMarketSymbol:
     get:
+      tags: [Market]
       parameters: [{ name: symbol, in: query, required: true, schema: { type: string } }]
       responses:
         '200': { description: Symbol metadata, content: { application/json: { schema: { $ref: '#/components/schemas/MarketSymbol' } } } }
@@ -39,6 +48,7 @@ paths:
         '404': { $ref: '#/components/responses/Error' }
   /buyStock:
     post:
+      tags: [Trades]
       requestBody:
         required: true
         content: { application/json: { schema: { $ref: '#/components/schemas/BuyStockRequest' } } }
@@ -48,6 +58,7 @@ paths:
         '404': { $ref: '#/components/responses/Error' }
   /sellStock:
     post:
+      tags: [Trades]
       requestBody:
         required: true
         content: { application/json: { schema: { type: object, required: [trade_id, trade_timestamp], properties: { trade_id: { type: string }, trade_timestamp: { type: string } } } } }
@@ -56,6 +67,7 @@ paths:
         '400': { $ref: '#/components/responses/Error' }
   /createCustomer:
     post:
+      tags: [Customers]
       requestBody:
         required: true
         content: { application/json: { schema: { $ref: '#/components/schemas/CreateCustomerRequest' } } }
@@ -65,6 +77,7 @@ paths:
         '409': { $ref: '#/components/responses/Error' }
   /getCustomer:
     get:
+      tags: [Customers]
       parameters: [{ name: customer_name, in: query, required: true, schema: { type: string } }]
       responses:
         '200': { description: The customer, content: { application/json: { schema: { $ref: '#/components/schemas/Customer' } } } }
@@ -83,6 +96,8 @@ components:
         customer_name: { type: string, minLength: 1, description: Same text as customer_name on trades; not enforced by any key }
         fullname: { type: string }
         email: { type: string }
+        date_of_birth: { type: string, format: date, description: 'Optional. Past or present date, YYYY-MM-DD' }
+        state_residence: { type: string, minLength: 2, maxLength: 2, description: 'Optional. US state code (50 states and DC), e.g. WA; accepted in any case, stored upper case' }
         allowed_contact: { type: boolean, description: Defaults to false when not sent }
     Customer:
       type: object
@@ -90,6 +105,8 @@ components:
         customer_name: { type: string }
         fullname: { type: string, nullable: true }
         email: { type: string, nullable: true }
+        date_of_birth: { type: string, format: date, nullable: true }
+        state_residence: { type: string, nullable: true, description: 2-letter US state code }
         allowed_contact: { type: boolean }
         crm_managed: { type: boolean, description: Always false on creation; no route changes it }
     BuyStockRequest:

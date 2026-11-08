@@ -64,6 +64,7 @@ export function marketPriceRepositoryContract(name: string, make: () => MarketPr
 
 export const sampleCustomer = (over: Partial<Customer> = {}): Customer => ({
   customer_name: 'alex', fullname: 'Alex Coqueiro', email: 'alex@example.com',
+  date_of_birth: '1990-04-12', state_residence: 'WA',
   allowed_contact: true, crm_managed: false, ...over,
 });
 
@@ -78,9 +79,9 @@ export function customerRepositoryContract(name: string, make: () => CustomerRep
 
     test('optional text fields come back as null', async () => {
       const repo = await make();
-      await repo.create(sampleCustomer({ fullname: null, email: null, allowed_contact: false }));
+      await repo.create(sampleCustomer({ fullname: null, email: null, date_of_birth: null, state_residence: null, allowed_contact: false }));
       expect(await repo.getByName('alex')).toEqual(
-        sampleCustomer({ fullname: null, email: null, allowed_contact: false })
+        sampleCustomer({ fullname: null, email: null, date_of_birth: null, state_residence: null, allowed_contact: false })
       );
     });
 

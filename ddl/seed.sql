@@ -17,8 +17,8 @@ INSERT INTO trade (symbol, customer_name, executed_price, open_price, closed_pri
 
 -- One customer per distinct customer_name in trade above (no foreign key links them).
 -- crm_managed is 0 for everyone: nothing has been synced to the CRM yet.
-INSERT INTO customers (customer_name, fullname, email, allowed_contact, crm_managed) VALUES
-('Alice', 'Alice Johnson', 'alice.johnson@example.com', 1, 0),
-('Bob', 'Bob Smith', 'bob.smith@example.com', 0, 0),
-('Carla', 'Carla Diaz', 'carla.diaz@example.com', 1, 0),
-('David', NULL, NULL, 0, 0);
+INSERT INTO customers (customer_name, fullname, email, date_of_birth, state_residence, allowed_contact, crm_managed) VALUES
+('Alice', 'Alice Johnson', 'alice.johnson@example.com', '1990-04-12', 'WA', 1, 0),
+('Bob', 'Bob Smith', 'bob.smith@example.com', '1985-09-30', 'CA', 0, 0),
+('Carla', 'Carla Diaz', 'carla.diaz@example.com', NULL, 'TX', 1, 0),
+('David', NULL, NULL, NULL, NULL, 0, 0);

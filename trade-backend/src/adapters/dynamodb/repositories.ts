@@ -152,6 +152,8 @@ export class DynamoCustomerRepository implements CustomerRepository {
       customer_name: item.customer_name,
       fullname: item.fullname ?? null,
       email: item.email ?? null,
+      date_of_birth: item.date_of_birth ?? null,
+      state_residence: item.state_residence ?? null,
       allowed_contact: item.allowed_contact,
       crm_managed: item.crm_managed,
     };
