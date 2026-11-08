@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
+import { Customer, CustomerAlreadyExistsError } from '../src/core/models/customer';
 import { Trade } from '../src/core/models/trade';
-import { MarketPriceRepository, TradeRepository } from '../src/core/ports';
+import { CustomerRepository, MarketPriceRepository, TradeRepository } from '../src/core/ports';
 
 export const sampleTrade = (over: Partial<Trade> = {}): Trade => ({
   trade_id: 'id-1', symbol: 'AAPL', customer_name: 'alex', executed_price: 101.5, open_price: 100,
@@ -57,6 +58,53 @@ export function marketPriceRepositoryContract(name: string, make: () => MarketPr
     });
     test('listAll returns every price', async () => {
       expect((await (await make()).listAll()).length).toBeGreaterThan(0);
+    });
+  });
+}
+
+export const sampleCustomer = (over: Partial<Customer> = {}): Customer => ({
+  customer_name: 'alex', fullname: 'Alex Coqueiro', email: 'alex@example.com',
+  allowed_contact: true, crm_managed: false, ...over,
+});
+
+/** Behavior every CustomerRepository (in-memory, SQLite, DynamoDB, Cosmos) must have. */
+export function customerRepositoryContract(name: string, make: () => CustomerRepository | Promise<CustomerRepository>) {
+  describe(`CustomerRepository contract: ${name}`, () => {
+    test('create then getByName returns the customer unchanged', async () => {
+      const repo = await make();
+      await repo.create(sampleCustomer());
+      expect(await repo.getByName('alex')).toEqual(sampleCustomer());
+    });
+
+    test('optional text fields come back as null', async () => {
+      const repo = await make();
+      await repo.create(sampleCustomer({ fullname: null, email: null, allowed_contact: false }));
+      expect(await repo.getByName('alex')).toEqual(
+        sampleCustomer({ fullname: null, email: null, allowed_contact: false })
+      );
+    });
+
+    test('getByName is exact and case-sensitive, and returns null when missing', async () => {
+      const repo = await make();
+      await repo.create(sampleCustomer());
+      expect(await repo.getByName('Alex')).toBeNull();
+      expect(await repo.getByName('nobody')).toBeNull();
+    });
+
+    test('create with an existing name throws and keeps the stored customer', async () => {
+      const repo = await make();
+      await repo.create(sampleCustomer());
+      await expect(repo.create(sampleCustomer({ fullname: 'Other', allowed_contact: false }))).rejects.toBeInstanceOf(
+        CustomerAlreadyExistsError
+      );
+      expect(await repo.getByName('alex')).toEqual(sampleCustomer());
+    });
+
+    test('names with slashes, spaces and accents round-trip', async () => {
+      const repo = await make();
+      const odd = sampleCustomer({ customer_name: 'ana/maría #1?' });
+      await repo.create(odd);
+      expect(await repo.getByName('ana/maría #1?')).toEqual(odd);
     });
   });
 }

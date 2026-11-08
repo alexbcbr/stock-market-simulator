@@ -1,4 +1,5 @@
 import {
+  ConditionalCheckFailedException,
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
@@ -7,10 +8,11 @@ import {
   UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { Customer, CustomerAlreadyExistsError } from '../../core/models/customer';
 import { MarketPrice } from '../../core/models/marketPrice';
 import { MarketSymbol } from '../../core/models/marketSymbol';
 import { Trade } from '../../core/models/trade';
-import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
+import { CustomerRepository, MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
 
 /**
  * Trades in DynamoDB.
@@ -110,6 +112,48 @@ export class DynamoMarketSymbolRepository implements MarketSymbolRepository {
       sector: item.sector,
       industry: item.industry,
       summaryQuote: item.summaryQuote,
+    };
+  }
+}
+
+/**
+ * Customers in DynamoDB. Key: `customer_name`. `create` is a conditional put, so an existing name is reported as
+ * `CustomerAlreadyExistsError` instead of being overwritten. Reads are point reads, exact and case-sensitive; only
+ * the five contract fields are returned, and a missing `fullname` or `email` comes back as `null`.
+ */
+export class DynamoCustomerRepository implements CustomerRepository {
+  constructor(
+    private client: DynamoDBClient,
+    private tableName = process.env.CUSTOMERS_TABLE || 'customers'
+  ) {}
+
+  async create(customer: Customer): Promise<void> {
+    try {
+      await this.client.send(
+        new PutItemCommand({
+          TableName: this.tableName,
+          Item: marshall(customer),
+          ConditionExpression: 'attribute_not_exists(customer_name)',
+        })
+      );
+    } catch (error) {
+      if (error instanceof ConditionalCheckFailedException) throw new CustomerAlreadyExistsError(customer.customer_name);
+      throw error;
+    }
+  }
+
+  async getByName(customerName: string): Promise<Customer | null> {
+    const result = await this.client.send(
+      new GetItemCommand({ TableName: this.tableName, Key: { customer_name: { S: customerName } } })
+    );
+    if (!result.Item) return null;
+    const item = unmarshall(result.Item) as any;
+    return {
+      customer_name: item.customer_name,
+      fullname: item.fullname ?? null,
+      email: item.email ?? null,
+      allowed_contact: item.allowed_contact,
+      crm_managed: item.crm_managed,
     };
   }
 }

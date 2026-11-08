@@ -57,6 +57,17 @@ export class TradeDbStack extends cdk.Stack {
       projectionType: dynamodb.ProjectionType.ALL,
     });
 
+    // Create customers table. No relation to the trade table: customer_name is the same text, not a foreign key.
+    const customersTable = new dynamodb.Table(this, 'CustomersTable', {
+      tableName: 'customers',
+      partitionKey: {
+        name: 'customer_name',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'MarketPriceTableName', {
       value: marketPriceTable.tableName,
@@ -71,6 +82,11 @@ export class TradeDbStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'TradeTableName', {
       value: tradeTable.tableName,
       description: 'Trade DynamoDB Table',
+    });
+
+    new cdk.CfnOutput(this, 'CustomersTableName', {
+      value: customersTable.tableName,
+      description: 'Customers DynamoDB Table',
     });
   }
 }

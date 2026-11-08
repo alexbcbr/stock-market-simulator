@@ -5,7 +5,7 @@ deploy-ui:
 	cd trade-ui && bun run build && aws s3 sync dist $(S3_BUCKET) --delete
 
 create-db-sqlite3:
-	sqlite3 data/market_stock.db ".tables" && sqlite3 data/market_stock.db ".schema"
+	sqlite3 trade-backend-python/data/market_stock.db ".tables" && sqlite3 trade-backend-python/data/market_stock.db ".schema"
 
 # CDK commands
 deploy-ui:

@@ -25,16 +25,16 @@ flowchart LR
         subgraph AWS["AWS (deploy/aws-cdk, 3 CDK stacks)"]
             CF["TradeUiStack<br/>S3 + CloudFront"]
             APIGW["TradeControllerStack<br/>API Gateway /prod"]
-            LAM["Lambda handlers<br/>buy, sell, price, symbol"]
+            LAM["Lambda handlers<br/>buy, sell, price, symbol, customer"]
             ADPD["DynamoDB adapter"]
-            DDB[("TradeDbStack<br/>DynamoDB: market_price,<br/>market_symbol, trade")]
+            DDB[("TradeDbStack<br/>DynamoDB: market_price,<br/>market_symbol, trade, customers")]
         end
 
         subgraph AZ["Azure (deploy/azure-terraform)"]
             APIM["API Management<br/>imports openapi.yaml"]
             FUNC["Azure Function<br/>Hono app, managed identity"]
             ADPC["Cosmos adapter"]
-            COSMOS[("Cosmos DB serverless<br/>market_price, market_symbol, trade")]
+            COSMOS[("Cosmos DB serverless<br/>market_price, market_symbol, trade, customers")]
         end
 
         subgraph LOCAL["Local and Kubernetes (deploy/k8s)"]
@@ -46,7 +46,7 @@ flowchart LR
 
     subgraph K8S["trade-backend-python"]
         API["FastAPI :8000<br/>docker / Kubernetes"]
-        SQLITE[("SQLite<br/>data/market_stock.db")]
+        SQLITE[("SQLite<br/>trade-backend-python/data/market_stock.db")]
     end
 
     subgraph AI["AI financial assistant"]
@@ -56,6 +56,14 @@ flowchart LR
         AG3["trade-ai-microsoft-agent-framework"]
         BED["AWS Bedrock<br/>(LLM models)"]
     end
+
+    subgraph ANL["Analytical layer (trade-analytics, daily batch)"]
+        BRZ["Bronze<br/>raw Parquet, one file per table per day"]
+        SLV["Silver: silver.trade_market<br/>Parquet + Apache Iceberg"]
+        GLD["Gold: gold.daily_customer_symbol<br/>Parquet + Apache Iceberg"]
+        EXP["upload_to_databricks.py<br/>exports Iceberg to plain Parquet"]
+    end
+    DBX["Databricks (cloud)<br/>Unity Catalog volume, for analysis"]
 
     subgraph Obs["Evaluation & observability"]
         ARIZE["Arize<br/>traces, datasets, experiments"]
@@ -102,6 +110,16 @@ flowchart LR
     CON -->|HTTP| API
     API --> SQLITE
 
+    %% analytics
+    SQL2 -.->|bronze_pipeline.py, via FILE_PATH| BRZ
+    SQLITE -.->|bronze_pipeline.py, via FILE_PATH| BRZ
+    BRZ -->|silver_pipeline.py| SLV
+    SLV -->|gold_pipeline.py| GLD
+    BRZ --> EXP
+    SLV --> EXP
+    GLD --> EXP
+    EXP -->|Databricks CLI: fs cp| DBX
+
     %% AI path
     AG1 & AG2 & AG3 -->|tool calls| MCP
     MCP -->|check_user, buy_stock, list_market_prices,<br/>list_trades, create_trade| API
@@ -122,6 +140,7 @@ flowchart LR
 - **The AI agents only use the FastAPI backend**, through the MCP server (`:8001`) which calls FastAPI (`:8000`). Start order: FastAPI -> MCP server -> agent.
 - **UI data shape.** Both UIs expect plain JSON from the TypeScript backend on every target; they no longer parse DynamoDB-typed JSON.
 - **Market data** is loaded into DynamoDB by `yahoo-finance-stocks/`, into the TypeScript backend's SQLite and Cosmos DB from the same CSVs by `scripts/seed.ts` and `scripts/seed-cosmos.ts`, and into the Python backend's SQLite from `ddl/`.
+- **Analytical layer.** `trade-analytics/` reads the SQLite file of either backend (`FILE_PATH`) and builds bronze (raw Parquet), silver and gold (Parquet files managed as Apache Iceberg tables with a local SQLite catalog). Iceberg metadata holds local paths, so silver and gold are exported to plain Parquet before the upload; Databricks receives bronze, silver and gold in a Unity Catalog volume and is the analysis side only. See F-011.
 - Dashed lines are optional/alternative or non-request paths (static hosting, tracing, contract and verification links).
 - 2 branches (dev and main)
 - GitHub workflows as my CI/CD

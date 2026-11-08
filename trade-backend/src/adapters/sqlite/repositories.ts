@@ -1,10 +1,11 @@
 import { and, desc, eq } from 'drizzle-orm';
+import { Customer, CustomerAlreadyExistsError } from '../../core/models/customer';
 import { MarketPrice } from '../../core/models/marketPrice';
 import { MarketSymbol } from '../../core/models/marketSymbol';
 import { Trade } from '../../core/models/trade';
-import { MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
+import { CustomerRepository, MarketPriceRepository, MarketSymbolRepository, TradeRepository } from '../../core/ports';
 import { SqliteDb } from './db';
-import { marketPrice, marketSymbol, trade } from './schema';
+import { customers, marketPrice, marketSymbol, trade } from './schema';
 
 /**
  * Trades in SQLite, through Drizzle.
@@ -68,7 +69,23 @@ export class SqliteMarketSymbolRepository implements MarketSymbolRepository {
 }
 
 /**
- * Builds the three repositories on one database.
+ * Customers in SQLite. A duplicate name is detected by the primary key and reported as `CustomerAlreadyExistsError`.
+ */
+export class SqliteCustomerRepository implements CustomerRepository {
+  constructor(private db: SqliteDb) {}
+
+  async create(customer: Customer): Promise<void> {
+    const inserted = this.db.insert(customers).values(customer).onConflictDoNothing().returning().all();
+    if (inserted.length === 0) throw new CustomerAlreadyExistsError(customer.customer_name);
+  }
+
+  async getByName(customerName: string): Promise<Customer | null> {
+    return this.db.select().from(customers).where(eq(customers.customer_name, customerName)).get() ?? null;
+  }
+}
+
+/**
+ * Builds the four repositories on one database.
  *
  * @param db - Handle from `openDatabase`.
  */
@@ -77,5 +94,6 @@ export function createSqliteRepositories(db: SqliteDb) {
     trades: new SqliteTradeRepository(db),
     prices: new SqliteMarketPriceRepository(db),
     symbols: new SqliteMarketSymbolRepository(db),
+    customers: new SqliteCustomerRepository(db),
   };
 }
