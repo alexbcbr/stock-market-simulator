@@ -1,6 +1,8 @@
 # Contributing
 
-This is a personal learning project, so I may be slow to respond. Please **open an issue before a large pull
+This is a gamification for a workshop for Gartner customers to materialize agents concepts. 
+
+Please **open an issue before a large pull
 request**, so we agree on the change first. Small fixes are welcome directly.
 
 By taking part you agree to the [Code of Conduct](CODE_OF_CONDUCT.md). For security problems, see
