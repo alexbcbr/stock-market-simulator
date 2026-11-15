@@ -15,6 +15,7 @@ High-level implementation order. Statuses: `implemented` (baseline, documented f
 | 8 | [F-010 customer registry](features/F-010-customer-registry/) | implemented (code and automation done; not yet deployed) |
 | 9 | [F-011 trade analytics](features/F-011-trade-analytics/) | implemented (local pipeline tested; Databricks upload dry-run only) |
 | 10 | [F-012 customer research agent](features/F-012-customer-research-agent/) | implemented (CrewAI; no unit tests yet) |
+| 11 | [F-013 Slack assistant bot](features/F-013-slack-assistant-bot/) | implemented (runs locally with `slack run`; no unit tests yet) |
 
 ## Phase 1: Close the baseline gaps (planned)
 Small items found while writing the specs; each is a task group in its feature's `plan.md`.

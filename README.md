@@ -13,9 +13,30 @@ It is also a teaching tool for a bigger question: **how can AI agents safely run
 
 - **One set of rules, many platforms.** The trade engine is written once in TypeScript and runs on AWS, Azure, local and Kubernetes, behind a single OpenAPI contract.
 - **AI agents as first-class users.** A financial assistant places trades through a narrow tool interface (MCP). It is implemented three ways: LangChain/LangGraph, the Claude Agent SDK and the Microsoft Agent Framework.
+- **Answers in Slack.** A Slack bot ([`trade-ai-slack-bot/`](trade-ai-slack-bot/)) answers direct messages and mentions with a model on Azure OpenAI, through the OpenAI Agents SDK.
 - **Analytics-ready data.** A daily pipeline ([`trade-analytics/`](trade-analytics/)) copies the trades into bronze, silver and gold layers (Parquet, with Apache Iceberg for silver and gold) and syncs them to Databricks for analysis.
 - **Measured, not guessed.** Agent behavior is traced and scored with LLM-as-judge evals against golden datasets (Arize).
 - **Spec-driven.** Mission, tech stack, roadmap and per-feature requirements live in [`specs/`](specs/).
+
+## The application
+
+The web UI has three pages, picked from the sidebar: market prices for the trading day, trade submission, and the leaderboard.
+
+**Trading day.** The stocks of the day with their open, highest and lowest prices.
+
+![Trading day: market prices for each symbol](ui/trading-day.png)
+
+**Submit a buy order.** Pick a customer, a symbol and a trading strategy (manual with a bid price, market, or one of the three AI agent profiles). The table lists every player's trades with profit and source.
+
+![Trade management: submit a buy order and list all trades](ui/submit-order.png)
+
+**Leaderboard.** Volume and price over time, and the most profitable trades ranked by player.
+
+![Trade leaderboard: chart and ranking by profit](ui/trade-leaderboard.png)
+
+**Slack bot.** Mention **AI Finance Helper** in a channel, or send it a direct message, and it answers in a thread.
+
+![Slack bot answering a question about investing in a thread](ui/slack.png)
 
 ## Architecture
 
@@ -36,6 +57,8 @@ flowchart LR
     PY["trade-backend-python<br/>FastAPI, SQLite"]
     AG -.traces and evals.-> ARIZE["Arize"]
 
+    SL["Slack"] --> SB["Slack bot<br/>Bolt, OpenAI Agents SDK"] --> AOAI["Azure OpenAI"]
+
     AN["Analytical layer (trade-analytics)<br/>Bronze, Silver, Gold<br/>Parquet + Apache Iceberg"]
     T3 -.reads SQLite.-> AN
     PY -.reads SQLite.-> AN
@@ -54,6 +77,7 @@ The Python backend is a separate implementation of the same domain, used by the 
 | [`trade-console/`](trade-console/) | Terminal client for the FastAPI backend |
 | [`trade-ai/`](trade-ai/) | Financial assistant (LangChain/LangGraph) and the MCP stocks server |
 | [`trade-ai-claude-agent-sdk/`](trade-ai-claude-agent-sdk/), [`trade-ai-microsoft-agent-framework/`](trade-ai-microsoft-agent-framework/) | The same assistant on other agent frameworks |
+| [`trade-ai-slack-bot/`](trade-ai-slack-bot/) | Slack bot (Bolt for Python) that answers direct messages and mentions with a model on Azure OpenAI |
 | [`trade-ai-crewai/`](trade-ai-crewai/) | CrewAI crew (researcher, writer, reviewer) that writes a brief with talking points per customer |
 | [`trade-analytics/`](trade-analytics/) | Analytics pipeline: bronze, silver and gold layers (Parquet and Apache Iceberg), synced to Databricks |
 | [`evals/`](evals/) | Datasets and the LLM-as-judge pipeline |
@@ -95,6 +119,7 @@ Other targets:
 | Azure | Terraform, see [`deploy/azure-terraform`](trade-backend/deploy/azure-terraform/) |
 | FastAPI backend | `make run-local` in `trade-backend-python/` (port 8000) |
 | Analytics | `uv run bronze_pipeline.py`, `silver_pipeline.py`, `gold_pipeline.py` in `trade-analytics/` (needs `FILE_PATH` in `.env`), then `upload_to_databricks.py` to sync. See [`trade-analytics/README.md`](trade-analytics/README.md) |
+| Slack bot | In `trade-ai-slack-bot/`: `uv sync`, fill `.env` (Azure OpenAI keys), `source .venv/bin/activate`, then `slack run`. Needs the [Slack CLI](https://docs.slack.dev/tools/slack-cli/) logged in to the workspace. See [F-013](specs/features/F-013-slack-assistant-bot/) |
 | AI assistant | Start the FastAPI backend, then `uv run stock_mcp_server.py` and an agent in `trade-ai/`. Needs AWS Bedrock credentials and, for tracing, Arize keys in a `.env` file |
 
 ## Analytics
@@ -160,4 +185,4 @@ Work happens on `dev` and reaches `main` through a pull request that passes CI. 
 
 ## License
 
-[MIT](LICENSE) © 2026 Alex BC
+[MIT](LICENSE) © 2026 Alex Coqueiro

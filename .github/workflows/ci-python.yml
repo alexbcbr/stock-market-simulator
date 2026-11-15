@@ -53,6 +53,8 @@ jobs:
           - project: trade-ai
           - project: trade-ai-microsoft-agent-framework
           - project: trade-ai-crewai
+          - project: trade-ai-openai
+          - project: trade-ai-slack-bot
     defaults:
       run:
         working-directory: ${{ matrix.project }}

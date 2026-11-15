@@ -27,6 +27,7 @@ Python terminal client for the FastAPI backend.
 - MCP stocks server (`trade-ai/stock_mcp_server.py`, :8001) wrapping the FastAPI backend (:8000).
 - Agents: LangChain / LangGraph (`trade-ai`), Claude Agent SDK, Microsoft Agent Framework (has a Dockerfile). Models via AWS Bedrock.
 - `trade-ai-crewai`: CrewAI crew (researcher, writer, reviewer) that writes customer briefs; Claude Haiku on Bedrock, DuckDuckGo search, tracing off (F-012).
+- `trade-ai-slack-bot`: Slack app (Bolt for Python, Socket Mode, async) that answers direct messages and mentions with an OpenAI Agents SDK agent on Azure OpenAI; tracing off (F-013).
 - Python via `uv`.
 
 ## Evals and observability: `evals/`
