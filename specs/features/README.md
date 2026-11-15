@@ -14,3 +14,4 @@ Convention: `F-NNN-kebab-case-title`, one folder per feature. IDs are permanent:
 | F-010 | [Customer registry](F-010-customer-registry/) | implemented |
 | F-011 | [Trade analytics (medallion pipeline)](F-011-trade-analytics/) | implemented |
 | F-012 | [Customer research agent (CrewAI)](F-012-customer-research-agent/) | implemented |
+| F-013 | [Slack assistant bot](F-013-slack-assistant-bot/) | implemented |
